@@ -10,6 +10,7 @@ export default defineConfig({
       pages: "/src/pages/index.ts",
       store: "/src/store",
       components: "/src/components",
+      icons: "/src/assets/icons",
     },
   },
 });

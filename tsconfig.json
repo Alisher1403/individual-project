@@ -24,7 +24,8 @@
       "store": ["./src/store"],
       "store/*": ["./src/store/*"],
       "backend": ["./backend"],
-      "components": ["./src/components"]
+      "components": ["./src/components"],
+      "icons": ["./src/assets/icons"]
     }
   },
   "include": ["src"],
