@@ -6,7 +6,7 @@ import { backend } from "store";
 
 const Home: FC = () => {
   const vacancies = useSelector((state: RootState) => state.vacancies.list);
-  backend.vacancyList(0, 10);
+  backend.vacancyList();
 
   return (
     <>

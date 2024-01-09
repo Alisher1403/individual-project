@@ -5,6 +5,8 @@ const vacancies = createSlice({
   name: "vacancies",
   initialState: {
     list: null as any[] | null,
+    error: false as boolean,
+    loading: false,
   },
   reducers: {
     getVacancyList(state, action: PayloadAction<any[]>) {
@@ -14,8 +16,15 @@ const vacancies = createSlice({
         state.list = [...action.payload];
       }
     },
+    vacancyListError(state, action: PayloadAction<boolean>) {
+      state.error = action.payload;
+    },
+    vacancyListLoading(state, action: PayloadAction<boolean>) {
+      state.error = action.payload;
+    },
   },
 });
 
-export const { getVacancyList } = vacancies.actions;
+export const { getVacancyList, vacancyListError, vacancyListLoading } =
+  vacancies.actions;
 export default vacancies.reducer;
