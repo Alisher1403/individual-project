@@ -1,22 +1,21 @@
-import MainLayout from "./layouts/MainLayout";
-import { Routes, Route } from "react-router-dom";
-import { Vacancy } from "pages";
-import { Navigation } from "components";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { VacancyList, Vacancy } from "pages";
+import { Navigation } from "layouts";
 import { GlobalStyle, Theme } from "./style";
 import { ThemeProvider } from "styled-components";
 
 function App() {
   return (
-    <>
+    <BrowserRouter>
       <ThemeProvider theme={Theme}>
         <Navigation />
         <GlobalStyle />
         <Routes>
-          <Route path="/" element={<MainLayout />}></Route>
+          <Route path="/vacancy-list" element={<VacancyList />}></Route>
           <Route path="/vacancy/:id" element={<Vacancy />}></Route>
         </Routes>
       </ThemeProvider>
-    </>
+    </BrowserRouter>
   );
 }
 

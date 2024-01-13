@@ -1,4 +1,4 @@
-import Home from "./Home";
+import VacancyList from "./VacancyList";
 import Vacancy from "./Vacancy";
 
-export { Home, Vacancy };
+export { VacancyList, Vacancy };

@@ -11,6 +11,7 @@ export default defineConfig({
       store: "/src/store",
       components: "/src/components",
       icons: "/src/assets/icons",
+      layouts: "/src/layouts",
     },
   },
 });

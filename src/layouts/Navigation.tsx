@@ -10,7 +10,7 @@ const Navigation: FC = () => {
           <NavLink to={"/"}>Home</NavLink>
         </li>
         <li>
-          <NavLink to={"/"}>Vacancy</NavLink>
+          <NavLink to={{ pathname: "/vacancy-list", search: "?page=1" }}>Vacancy</NavLink>
         </li>
       </ul>
     </Container>

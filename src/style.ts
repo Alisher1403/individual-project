@@ -51,6 +51,10 @@ export const GlobalStyle = createGlobalStyle`
 
         // icon
         --icon-bg: #717a7a;
+        --icon-hover-bg: white;
+
+        // button
+        --button-hover-bg: #717a7a;
 
         // border
         --border-style: 1px solid #717a7a;
