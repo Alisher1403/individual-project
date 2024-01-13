@@ -23,10 +23,10 @@ const Vacancy: FC = () => {
         const { data, error } = await supabase.from("vacancies").select("*").eq("id", id);
         if (error) {
           throw error;
+        } else {
+          dispatch(vacancyData({ key: id, data: data[0] }));
+          dispatch(vacancyLoading(false));
         }
-
-        dispatch(vacancyData({ key: id, data: data }));
-        dispatch(vacancyLoading(false));
       } catch (error) {
         dispatch(vacancyError(true));
       }
@@ -39,7 +39,7 @@ const Vacancy: FC = () => {
 
   /*******************************/
 
-  if (!element && error) return;
+  if (!element || error) return;
 
   /*******************************/
 
@@ -47,6 +47,15 @@ const Vacancy: FC = () => {
     <Container className="container">
       <h1>{loading && "Loading The Vacancy"}</h1>
       <div className="">{JSON.stringify(element)}</div>
+      <div className="container">
+        {/*  */}
+        <s1.Content>
+          <s1.Title>{element.title}</s1.Title>
+          <s1.Company>{element.company}</s1.Company>
+          <s1.Location>{element.location}</s1.Location>
+        </s1.Content>
+        {/*  */}
+      </div>
     </Container>
   );
 };
@@ -54,3 +63,10 @@ const Vacancy: FC = () => {
 export default Vacancy;
 
 const Container = styled.div``;
+
+const s1 = {
+  Content: styled.div``,
+  Title: styled.h1``,
+  Company: styled.p``,
+  Location: styled.p``,
+};

@@ -26,7 +26,9 @@
       "backend": ["./backend"],
       "layouts": ["./src/layouts"],
       "components": ["./src/components"],
-      "icons": ["./src/assets/icons"]
+      "icons": ["./src/assets/icons"],
+      "common": ["./src/common"],
+      "types": ["./src/types"]
     }
   },
   "include": ["src"],
