@@ -10,6 +10,7 @@ const vacancy = createSlice({
       range: 5,
       pageData: {} as any,
       count: 0 as number,
+      searchResults: {} as any,
     },
     element: {
       data: {} as any,
@@ -24,11 +25,17 @@ const vacancy = createSlice({
     vacancyListLoading(state, action: PayloadAction<boolean>) {
       state.list.loading = action.payload;
     },
-    setVacancyCount(state, action: PayloadAction<number>) {
-      state.list.count = action.payload;
+    setVacancyCount(state, action: PayloadAction<{ key: string; data: number }>) {
+      state.list.pageData[action.payload.key].count = action.payload.data;
     },
-    setVacancyPageData(state, action: PayloadAction<{ page: number; data: any[] }>) {
-      state.list.pageData[action.payload.page] = action.payload.data;
+    setVacancyPageData(state, action: PayloadAction<{ search: string; data: object }>) {
+      const pageData = state.list.pageData;
+      const data = action.payload.data;
+      const search = action.payload.search;
+      pageData[search] = { ...pageData[search], ...data };
+    },
+    setSearchResults(state, action: PayloadAction<{ key: string; data: any }>) {
+      state.list.searchResults[action.payload.key] = action.payload.data;
     },
     vacancyData(state, action: PayloadAction<{ key: string; data: object }>) {
       state.element.data[action.payload.key] = action.payload.data;
@@ -50,5 +57,6 @@ export const {
   vacancyLoading,
   setVacancyCount,
   setVacancyPageData,
+  setSearchResults,
 } = vacancy.actions;
 export default vacancy.reducer;

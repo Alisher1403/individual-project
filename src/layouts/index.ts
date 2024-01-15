@@ -1,3 +1,4 @@
 import Navigation from "./Navigation";
+import Searchbar from "./Searchbar";
 
-export { Navigation };
+export { Navigation, Searchbar };

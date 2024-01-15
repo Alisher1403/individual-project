@@ -24,6 +24,16 @@ export const GlobalStyle = createGlobalStyle`
         align-items: center;
     }
 
+    .prevent-btn{
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .mt{
+        margin-top: 70px;
+    }
+
     :root{
         // fonts
         --font-light: 'Nunito-Light';
@@ -39,6 +49,7 @@ export const GlobalStyle = createGlobalStyle`
 
         // link
         --link-color: red;
+        --link-hover-color: #d91e44;
 
         // text
         --text-size: 16px;
@@ -50,10 +61,11 @@ export const GlobalStyle = createGlobalStyle`
         --span-font: 'Nunito-Light';
 
         // icon
-        --icon-bg: #717a7a;
+        --icon-bg: #4f5959;
         --icon-hover-bg: white;
 
         // button
+        --button-bg: #87a3a3;
         --button-hover-bg: #717a7a;
 
         // border

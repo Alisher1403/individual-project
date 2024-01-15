@@ -1,109 +1,82 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { VacancyCard } from "components";
 import supabase from "backend";
-import { vacancyListLoading, vacancyListError, setVacancyCount, setVacancyPageData } from "store/reducers/vacancy";
+import { vacancyListLoading, vacancyListError, setVacancyPageData } from "store/reducers/vacancy";
 import styled from "styled-components";
 import { RootState } from "store";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import parse from "html-react-parser";
 import { icons } from "icons";
 
-const Home: FC = () => {
+const VacancyList: FC = () => {
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
-  const page = searchParams.get("page");
+  const page = searchParams.get("page") || "1";
+  const searchText = searchParams.get("text") || "";
 
-  const mainContent = useRef<HTMLDivElement>(null);
-
-  /********************************/
-
-  const { loading, error, range, count, pageData } = useSelector((state: RootState) => state.vacancy.list);
-
-  /********************************/
+  const { loading, error, range, pageData } = useSelector((state: RootState) => state.vacancy.list);
+  const mainData = pageData[searchText]?.[page];
+  const mainDataCount = pageData[searchText]?.count;
 
   const [pagesList, setPagesList] = useState<number[]>([]);
-
-  /********************************/
-
-  if (!page) return;
 
   useEffect(() => {
     if (!page) {
       setSearchParams({ page: "1" });
     }
 
-    const pagesCount = [];
-
-    for (let i = 0; i < count; i += range) {
-      pagesCount.push(i);
-    }
-
+    const pagesCount = Array.from({ length: Math.ceil(mainDataCount / range) }, (_, i) => i * range);
     setPagesList(pagesCount);
-  }, [count]);
+  }, [mainDataCount]);
 
-  /********************************/
-
-  useEffect(() => {
+  const fetchData = async () => {
     const fromIndex = (+page - 1) * range;
     const toIndex = fromIndex + range - 1;
 
-    const fetchData = async () => {
-      dispatch(vacancyListLoading(true));
+    window.scrollTo({ top: 0 });
 
-      try {
-        const { data, error, count } = await supabase
-          .from("vacancies")
-          .select(
-            `id, title, logo, company, location, subtitle, fromSalary, toSalary, currency, fromExperience, toExperience`,
-            { count: "exact" }
-          )
-          .range(fromIndex, toIndex);
-        if (error) {
-          throw error;
-        } else {
-          //-----------//
-          dispatch(vacancyListLoading(false));
-          dispatch(setVacancyPageData({ page: +page, data: data }));
+    dispatch(vacancyListLoading(true));
 
-          if (count) {
-            dispatch(setVacancyCount(count));
-          }
-        }
-        //-----------//
-      } catch (error) {
-        dispatch(vacancyListError(true));
+    try {
+      let query = supabase
+        .from("vacancies")
+        .select(
+          `id, created_at, userId, title, logo, company, location, subtitle, fromSalary, toSalary, currency, fromExperience, toExperience, remote`,
+          { count: "exact" }
+        );
+
+      if (searchText) {
+        query = query.or(`title.ilike.%${searchText}%,description.ilike.%${searchText}%`);
       }
-    };
 
-    if (!pageData[page]) {
-      fetchData();
+      const { data, error, count } = await query.range(fromIndex, toIndex).order("id", { ascending: false });
+
+      if (error) {
+        throw error;
+      } else {
+        dispatch(vacancyListLoading(false));
+        dispatch(setVacancyPageData({ search: searchText, data: { [page]: data, count } }));
+      }
+    } catch (error) {
+      dispatch(vacancyListError(true));
     }
-  }, [location.search]);
-
-  /********************************/
+  };
 
   useEffect(() => {
-    if (mainContent.current) {
-      mainContent.current.scroll(0, 0);
+    if (!mainData || !pageData[searchText]) {
+      fetchData();
     }
-  }, [page]);
-
-  /********************************/
+  }, [searchText, page]);
 
   return (
-    <Container ref={mainContent}>
-      <div className="container">
-        <div>This is Home Page</div>
-        <p>{count} items found</p>
-      </div>
+    <Container>
+      <div className="container">{mainDataCount} items found</div>
 
       <div className="container">
-        {/* ------------ LIST OF ITEMS ------------ */}
         <Data.List>
-          {pageData[page] &&
-            pageData[page].map((el: any, idx: any) => (
+          {mainData &&
+            mainData.map((el: any, idx: any) => (
               <li key={idx}>
                 <Data.ListItem>
                   <VacancyCard key={idx} element={el} index={idx} />
@@ -115,44 +88,35 @@ const Home: FC = () => {
         {loading && <div>Loading Vacancies...</div>}
         {error && <div>Error</div>}
 
-        {/* ------------ BUTTONS ------------ */}
         <div className="inline">
-          {/*  */}
-
           <Pagination.List className="inline">
-            {/*  */}
-            {+page > 1 && pageData[+page] && (
+            {+page > 1 && mainData && (
               <li>
-                <Pagination.Button $primary onClick={() => setSearchParams({ page: `${+page - 1}` })}>
+                <Pagination.Button $primary onClick={() => setSearchParams({ text: searchText, page: `${+page - 1}` })}>
                   {parse(icons["arrowLeft"])}
                 </Pagination.Button>
               </li>
             )}
-            {/*  */}
 
             {pagesList &&
-              pagesList.map((_, index) => {
-                return (
-                  <li key={index}>
-                    <Pagination.Button
-                      $currentPage={index + 1 == +page}
-                      onClick={() => setSearchParams({ page: `${index + 1}` })}
-                    >
-                      {index + 1}
-                    </Pagination.Button>
-                  </li>
-                );
-              })}
+              pagesList.map((index) => (
+                <li key={index}>
+                  <Pagination.Button
+                    $currentPage={index / range + 1 === +page}
+                    onClick={() => setSearchParams({ text: searchText, page: `${index / range + 1}` })}
+                  >
+                    {index / range + 1}
+                  </Pagination.Button>
+                </li>
+              ))}
 
-            {/*  */}
             {pagesList.length - 1 >= +page && (
               <li>
-                <Pagination.Button $primary onClick={() => setSearchParams({ page: `${+page + 1}` })}>
+                <Pagination.Button $primary onClick={() => setSearchParams({ text: searchText, page: `${+page + 1}` })}>
                   {parse(icons["arrowRight"])}
                 </Pagination.Button>
               </li>
             )}
-            {/*  */}
           </Pagination.List>
         </div>
       </div>
@@ -160,7 +124,7 @@ const Home: FC = () => {
   );
 };
 
-export default Home;
+export default VacancyList;
 
 const Container = styled.div``;
 
