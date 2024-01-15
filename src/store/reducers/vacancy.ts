@@ -1,23 +1,35 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Draft } from "immer";
+
+interface VacancyState {
+  list: {
+    loading: boolean;
+    error: boolean;
+    range: number;
+    pageData: Record<string, Draft<{ count: number; [page: string]: any }>>;
+  };
+  element: {
+    data: Record<string, any>;
+    loading: boolean;
+    error: boolean;
+  };
+}
 
 const vacancy = createSlice({
   name: "vacancy",
   initialState: {
     list: {
-      loading: false as boolean,
-      error: false as boolean,
+      loading: false,
+      error: false,
       range: 5,
-      pageData: {} as any,
-      count: 0 as number,
-      searchResults: {} as any,
+      pageData: {},
     },
     element: {
-      data: {} as any,
-      loading: false as boolean,
-      error: false as boolean,
+      data: {},
+      loading: false,
+      error: false,
     },
-  },
+  } as VacancyState,
   reducers: {
     vacancyListError(state, action: PayloadAction<boolean>) {
       state.list.error = action.payload;
@@ -29,16 +41,13 @@ const vacancy = createSlice({
       state.list.pageData[action.payload.key].count = action.payload.data;
     },
     setVacancyPageData(state, action: PayloadAction<{ search: string; data: object }>) {
-      const pageData = state.list.pageData;
-      const data = action.payload.data;
-      const search = action.payload.search;
+      const { pageData } = state.list;
+      const { data, search } = action.payload;
       pageData[search] = { ...pageData[search], ...data };
     },
-    setSearchResults(state, action: PayloadAction<{ key: string; data: any }>) {
-      state.list.searchResults[action.payload.key] = action.payload.data;
-    },
     vacancyData(state, action: PayloadAction<{ key: string; data: object }>) {
-      state.element.data[action.payload.key] = action.payload.data;
+      const { key, data } = action.payload;
+      state.element.data[key] = data;
     },
     vacancyError(state, action: PayloadAction<boolean>) {
       state.element.error = action.payload;
@@ -57,6 +66,5 @@ export const {
   vacancyLoading,
   setVacancyCount,
   setVacancyPageData,
-  setSearchResults,
 } = vacancy.actions;
 export default vacancy.reducer;
