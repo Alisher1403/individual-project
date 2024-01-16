@@ -21,7 +21,7 @@ const vacancy = createSlice({
     list: {
       loading: false,
       error: false,
-      range: 5,
+      range: 8,
       pageData: {},
     },
     element: {

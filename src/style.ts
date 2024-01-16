@@ -13,7 +13,7 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     .container{
-        max-width: 1040px;
+        max-width: 1340px;
         width: 100%;
         margin: 0 auto;
         padding: 0 15px;
@@ -73,6 +73,7 @@ export const GlobalStyle = createGlobalStyle`
         --border-color: #717a7a;
         --border-width: 1px;
         --border-radius: 0px;
+        --border-focus-bg: #87a3a3;
 
         // background
         --card-hover-bg: #c5c5c545;

@@ -67,7 +67,7 @@ const InputWrapper = styled.div`
   margin: 0 auto;
 
   &.focused {
-    border-color: var(--button-bg);
+    border-color: var(--border-focus-bg);
   }
 `;
 

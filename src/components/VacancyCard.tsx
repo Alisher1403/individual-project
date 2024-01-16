@@ -5,36 +5,35 @@ import { currencySymbol } from "../constants";
 import { icons } from "icons";
 import parse from "html-react-parser";
 
-interface MyComponentProps {
+interface ComponentProps {
   element: any;
   index: number;
 }
 
-const VacancyCard: FC<MyComponentProps> = ({ element, index }) => {
+const VacancyCard: FC<ComponentProps> = ({ element, index }) => {
   const navigate = useNavigate();
 
-  /********************/
+  const handleSaveButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
+
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate(`/profile/${element.userId}`);
+  };
 
   return (
     <Link to={{ pathname: `/vacancy/${element.id}` }}>
       <Card key={element.id} data-id={index}>
         <Top>
           <Title>{element.title}</Title>
-          <SaveButton onClick={(e) => e.preventDefault()} title="Save">
+          <SaveButton onClick={handleSaveButtonClick} title="Save">
             {parse(icons["bookmark"])}
           </SaveButton>
         </Top>
 
-        {/* ------------------------- */}
-
         <div className="inline">
-          <Center
-            className="inline prevent-btn"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate(`/profile/${element.userId}`);
-            }}
-          >
+          <Center className="inline prevent-btn" onClick={handleProfileClick}>
             {element.logo && <Logo src={element.logo} />}
             <div>
               <Company>{element.company}</Company>
@@ -42,31 +41,14 @@ const VacancyCard: FC<MyComponentProps> = ({ element, index }) => {
               <Location>{element.location}</Location>
             </div>
           </Center>
-          {element.remote ? (
-            <>
-              &nbsp;&nbsp;
-              <Remote>remote</Remote>
-            </>
-          ) : null}
+          &nbsp;&nbsp;
+          {element.remote && <Remote>remote</Remote>}
         </div>
 
-        {/* ------------------------- */}
-
         {Experience(element)}
-
-        {/* ------------------------- */}
-
         {element.subtitle && <Subtitle>{element.subtitle}</Subtitle>}
-
-        {/* ------------------------- */}
-
         {Salary(element)}
-
-        {/* ------------------------- */}
-
         <CreatedAt>{getTimeStamp(element.created_at)}</CreatedAt>
-
-        {/* ------------------------- */}
       </Card>
     </Link>
   );
@@ -83,28 +65,29 @@ function Experience(element: any) {
   const to = element.toExperience;
 
   function defineExperience() {
-    if (from == "0" && to == "0") {
+    if (from === "0" && to === "0") {
       return "Without experience";
     }
-    if (from == to) {
+
+    if (from === to) {
       return (
         <FromExperience>
-          {from}&nbsp;year{from != "1" && "s"} of experience
+          {from}&nbsp;year{from !== "1" && "s"} of experience
         </FromExperience>
       );
     } else {
       return (
         <>
-          {to == "0" ? "More than" : "From"}
+          {to === "0" ? "More than" : "From"}
           <FromExperience>&nbsp;{from}</FromExperience>
-          {to && to != "0" ? <ToExperience>&nbsp;to {to}</ToExperience> : null}
+          {to && to !== "0" ? <ToExperience>&nbsp;to {to}</ToExperience> : null}
           &nbsp;years
         </>
       );
     }
   }
 
-  if (from == "-1") return;
+  if (from === "-1") return null;
 
   return (
     <ExperienceContent className="inline">
@@ -124,44 +107,45 @@ function Salary(element: any) {
   const currency = element.currency;
 
   function defineSalary() {
-    if (from == "0" && to == "0") {
+    if (from === "0" && to === "0") {
       return <span>Free</span>;
     }
-    if (from == "0" && +to > 0) {
+
+    if (from === "0" && +to > 0) {
       return (
         <>
           <FromSalary>Up to</FromSalary> &nbsp;
-          <ToSalary>{to + currencySymbol[currency]}</ToSalary>
+          <ToSalary>{`${to} ${currencySymbol[currency]}`}</ToSalary>
         </>
       );
     }
-    if (+from > 0 && to == "0" && to != "-1") {
+
+    if (+from > 0 && to === "0" && to !== "-1") {
       return (
         <>
           <FromSalary>From</FromSalary> &nbsp;
-          <ToSalary>{from + currencySymbol[currency]}</ToSalary>
+          <ToSalary>{`${from} ${currencySymbol[currency]}`}</ToSalary>
         </>
       );
     }
-    if (from != "0" && to != "0" && from != to) {
+
+    if (from !== "0" && to !== "0" && from !== to) {
       return (
         <>
-          <FromSalary>{from + currencySymbol[currency]}</FromSalary>
+          <FromSalary>{`${from} ${currencySymbol[currency]}`}</FromSalary>
           &nbsp;&nbsp;─&nbsp;&nbsp;
-          <ToSalary>{to + currencySymbol[currency]}</ToSalary>
+          <ToSalary>{`${to} ${currencySymbol[currency]}`}</ToSalary>
         </>
       );
     }
-    if (from == to) {
-      return (
-        <>
-          <ToSalary>{to + currencySymbol[currency]}</ToSalary>
-        </>
-      );
+
+    if (from === to) {
+      return <ToSalary>{`${to} ${currencySymbol[currency]}`}</ToSalary>;
     }
   }
 
-  if (from == "-1") return;
+  if (from === "-1") return null;
+
   return (
     <SalaryContent className="inline">
       <div className="vc-icon">{parse(icons["coin"])}</div>&nbsp;
