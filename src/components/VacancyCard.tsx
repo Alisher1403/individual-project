@@ -267,7 +267,6 @@ const ExperienceContent = styled.div`
 `;
 
 const Experience = styled.span``;
-const ToExperience = styled.span``;
 
 const Subtitle = styled.span``;
 

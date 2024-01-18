@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Draft } from "immer";
 
 interface VacancyState {
   list: {
