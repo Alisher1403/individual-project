@@ -38,6 +38,7 @@ const Searchbar: FC = () => {
               onFocus={() => setFocus(true)}
               onBlur={() => setFocus(false)}
               onChange={(e) => setValue(e.target.value)}
+              placeholder="Search for items..."
             />
             <SearchBtn type="submit">Search</SearchBtn>
           </InputWrapper>
@@ -65,9 +66,11 @@ const InputWrapper = styled.div`
   padding: 2px;
   max-width: 600px;
   margin: 0 auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.055), 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.024);
 
   &.focused {
     border-color: var(--border-focus-bg);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.055), 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.024);
   }
 `;
 
@@ -80,6 +83,7 @@ const Input = styled.input`
   border: none;
   outline: none;
   width: 100%;
+  background: transparent;
 `;
 
 const SearchBtn = styled.button`

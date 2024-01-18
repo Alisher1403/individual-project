@@ -2,27 +2,26 @@ import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { VacancyCard } from "components";
 import supabase from "backend";
-import { vacancyListLoading, vacancyListError, setVacancyPageData } from "store/reducers/vacancy";
+import { vacancyListLoading, vacancyListError, setVacancyPageData, setVacancyCount } from "store/reducers/vacancy";
 import styled from "styled-components";
 import { RootState } from "store";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import parse from "html-react-parser";
 import { icons } from "icons";
-import { Input } from "common";
+import { Filter } from "layouts";
 
 const VacancyList: FC = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const dataKey = location.pathname + location.search;
   const [searchParams, setSearchParams] = useSearchParams();
   const page = searchParams.get("page") || "1";
   const searchText = searchParams.get("text") || "";
 
-  const { loading, error, range, pageData } = useSelector((state: RootState) => state.vacancy.list);
-  const mainData = pageData[searchText]?.[page];
-  const mainDataCount = pageData[searchText]?.count;
+  const { loading, error, range, pageData, count } = useSelector((state: RootState) => state.vacancy.list);
 
-  const [filter, setFilter] = useState({
-    location: "",
-  });
+  const mainData = pageData?.[dataKey];
+  const mainDataCount = count?.[dataKey];
 
   const [pagesList, setPagesList] = useState<number[]>([]);
 
@@ -45,12 +44,12 @@ const VacancyList: FC = () => {
       let query = supabase
         .from("vacancies")
         .select(
-          `id, created_at, userId, title, logo, company, location, subtitle, fromSalary, toSalary, currency, fromExperience, toExperience, remote`,
+          `id, created_at, userId, title, logo, company, location, subtitle, fromSalary, toSalary, currency, experience, remote`,
           { count: "exact" }
         );
 
       if (searchText) {
-        query = query.or(`title.ilike.%${searchText}%,description.ilike.%${searchText}%`);
+        query = query.or(`title.ilike.%${searchText}%,description.ilike.%${searchText}%,company.ilike.%${searchText}%`);
       }
 
       const { data, error, count } = await query.range(fromIndex, toIndex).order("id", { ascending: false });
@@ -59,7 +58,11 @@ const VacancyList: FC = () => {
         throw error;
       } else {
         dispatch(vacancyListLoading(false));
-        dispatch(setVacancyPageData({ search: searchText, data: { [page]: data, count } }));
+        dispatch(setVacancyPageData({ key: dataKey, data }));
+
+        if (count) {
+          dispatch(setVacancyCount({ key: dataKey, value: count }));
+        }
       }
     } catch (error) {
       dispatch(vacancyListError(true));
@@ -67,19 +70,17 @@ const VacancyList: FC = () => {
   };
 
   useEffect(() => {
-    if (!mainData || !pageData[searchText]) {
+    if (!mainData) {
       fetchData();
     }
-    window.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [searchText, page]);
 
   return (
     <Container className="container">
       <div>{mainDataCount} items found</div>
       <Content className="content">
-        <Filter>
-          <Input value={filter.location} onChange={(e) => setFilter({ location: e })} title="hello"/>
-        </Filter>
+        <Filter />
 
         <SearchContent>
           <div>
@@ -103,7 +104,7 @@ const VacancyList: FC = () => {
                   <li>
                     <Pagination.Button
                       $primary
-                      onClick={() => setSearchParams({ text: searchText, page: `${+page - 1}` })}
+                      onClick={() => setSearchParams((prevParams) => ({ ...prevParams, page: `${+page - 1}` }))}
                     >
                       {parse(icons["arrowLeft"])}
                     </Pagination.Button>
@@ -115,7 +116,9 @@ const VacancyList: FC = () => {
                     <li key={index}>
                       <Pagination.Button
                         $currentPage={index / range + 1 === +page}
-                        onClick={() => setSearchParams({ text: searchText, page: `${index / range + 1}` })}
+                        onClick={() =>
+                          setSearchParams((prevParams) => ({ ...prevParams, page: `${index / range + 1}` }))
+                        }
                       >
                         {index / range + 1}
                       </Pagination.Button>
@@ -126,7 +129,7 @@ const VacancyList: FC = () => {
                   <li>
                     <Pagination.Button
                       $primary
-                      onClick={() => setSearchParams({ text: searchText, page: `${+page + 1}` })}
+                      onClick={() => setSearchParams((prevParams) => ({ ...prevParams, page: `${+page + 1}` }))}
                     >
                       {parse(icons["arrowRight"])}
                     </Pagination.Button>
@@ -154,8 +157,11 @@ const Content = styled.div`
 
 const Data = {
   List: styled.ul`
-    border-top: var(--border-style);
     margin-bottom: 50px;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
   `,
   ListItem: styled.div`
     opacity: 0;
@@ -171,19 +177,6 @@ const Data = {
   `,
 };
 
-const Filter = styled.div`
-  width: 350px;
-  height: 100vh;
-  border-right: var(--border-style);
-  border-top: var(--border-style);
-  position: sticky;
-  overflow-y: scroll;
-  top: 0;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
 const SearchContent = styled.div`
   width: 100%;
   height: 100%;

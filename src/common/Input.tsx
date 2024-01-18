@@ -3,20 +3,30 @@ import styled from "styled-components";
 
 interface InputType {
   value?: string | number;
-  type?: "text" | "password";
+  type?: "text" | "password" | "number";
   placeholder?: string;
   title?: string;
   onChange?: (param: string) => void;
+  onBlur?: () => void;
 }
 
-const Input: FC<InputType> = ({ value, type, placeholder, title, onChange }) => {
-  const defineType = !type ? "text" : type;
+const Input: FC<InputType> = ({ value, type, placeholder, title, onChange, onBlur }) => {
+  const defineType = !type || type === "number" ? "text" : type;
 
   const [focus, setFocus] = useState("");
 
   function handleOnChange(event: any) {
+    const val = event.target.value;
+
     if (onChange) {
-      onChange(event.target.value);
+      if (type === "number") {
+        if (Number(val) || val.length <= 0) {
+          const defineNumbers = val.replace(/[^0-9]/g, "");
+          onChange(defineNumbers);
+        }
+      } else {
+        onChange(val);
+      }
     }
   }
 
@@ -30,7 +40,10 @@ const Input: FC<InputType> = ({ value, type, placeholder, title, onChange }) => 
           value={value}
           onChange={handleOnChange}
           onFocus={() => setFocus("focused")}
-          onBlur={() => setFocus("")}
+          onBlur={() => {
+            setFocus("");
+            if (onBlur) onBlur();
+          }}
         />
       </Wrapper>
     </Container>
@@ -43,7 +56,7 @@ const Container = styled.div`
   padding: 5px 0;
 
   span {
-    font-size: 12px;
+    font-size: 13px;
     font-family: var(--font-semiBold);
     display: block;
     margin-bottom: 2px;
@@ -54,9 +67,11 @@ const Wrapper = styled.div`
   border: var(--border-style);
   border-radius: 7px;
   overflow: hidden;
+  transition: 0.2s;
 
   &.focused {
     border-color: var(--border-focus-bg);
+    box-shadow: 0 0 5px var(--border-focus-bg);
   }
 
   input {
@@ -67,5 +82,11 @@ const Wrapper = styled.div`
     font-family: var(--text-font);
     border: none;
     background: none;
+    color: var(--text-font);
+
+    &::placeholder {
+      color: var(--text-color);
+      opacity: 0.6;
+    }
   }
 `;

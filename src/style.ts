@@ -19,6 +19,29 @@ export const GlobalStyle = createGlobalStyle`
         padding: 0 15px;
     }
 
+    body {
+        background: linear-gradient(to bottom, #f8f8f8, #e0e0e0);
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #6b8e23 transparent;
+        font-family: var(--font-regular);
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #5e6e6b;
+        border-radius: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
     .inline{
         display: flex;
         align-items: center;
@@ -30,10 +53,6 @@ export const GlobalStyle = createGlobalStyle`
         cursor: pointer;
     }
 
-    .mt{
-        margin-top: 70px;
-    }
-
     :root{
         // fonts
         --font-light: 'Nunito-Light';
@@ -43,7 +62,7 @@ export const GlobalStyle = createGlobalStyle`
         
         // title
         --h3-size: 23px;
-        --title-color: #2e2e2e;
+        --title-color: #333333;
         --title-color-dark: #262626;
         --title-font: 'Nunito-Medium';
 
@@ -53,8 +72,8 @@ export const GlobalStyle = createGlobalStyle`
 
         // text
         --text-size: 16px;
-        --text-color: #43464b;
-        --text-color-light: #4c5762;
+        --text-color: #333333;
+        --text-color-light: #87a3a3;
         --text-font: 'Nunito-Regular';
 
         // span

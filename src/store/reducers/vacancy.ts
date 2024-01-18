@@ -6,7 +6,9 @@ interface VacancyState {
     loading: boolean;
     error: boolean;
     range: number;
-    pageData: Record<string, Draft<{ count: number; [page: string]: any }>>;
+    pageData: { [key: string]: any[] };
+    count: { [key: string]: number };
+    filter: { [key: string]: number };
   };
   element: {
     data: Record<string, any>;
@@ -23,6 +25,8 @@ const vacancy = createSlice({
       error: false,
       range: 8,
       pageData: {},
+      count: {},
+      filter: {},
     },
     element: {
       data: {},
@@ -37,13 +41,13 @@ const vacancy = createSlice({
     vacancyListLoading(state, action: PayloadAction<boolean>) {
       state.list.loading = action.payload;
     },
-    setVacancyCount(state, action: PayloadAction<{ key: string; data: number }>) {
-      state.list.pageData[action.payload.key].count = action.payload.data;
-    },
-    setVacancyPageData(state, action: PayloadAction<{ search: string; data: object }>) {
+    setVacancyPageData(state, action: PayloadAction<{ key: string; data: any[] }>) {
       const { pageData } = state.list;
-      const { data, search } = action.payload;
-      pageData[search] = { ...pageData[search], ...data };
+      const { key, data } = action.payload;
+      pageData[key] = data;
+    },
+    setVacancyCount(state, action: PayloadAction<{ key: string; value: number }>) {
+      state.list.count[action.payload.key] = action.payload.value;
     },
     vacancyData(state, action: PayloadAction<{ key: string; data: object }>) {
       const { key, data } = action.payload;

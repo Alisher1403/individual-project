@@ -45,7 +45,7 @@ const VacancyCard: FC<ComponentProps> = ({ element, index }) => {
           {element.remote && <Remote>remote</Remote>}
         </div>
 
-        {Experience(element)}
+        {getExperience(element)}
         {element.subtitle && <Subtitle>{element.subtitle}</Subtitle>}
         {Salary(element)}
         <CreatedAt>{getTimeStamp(element.created_at)}</CreatedAt>
@@ -60,35 +60,24 @@ export default VacancyCard;
 
 //* =================================================================== EXPERIENCE =================================================================== *//
 
-function Experience(element: any) {
-  const from = element.fromExperience;
-  const to = element.toExperience;
+function getExperience(element: any) {
+  const experience = element.experience;
 
   function defineExperience() {
-    if (from === "0" && to === "0") {
-      return "Without experience";
-    }
-
-    if (from === to) {
-      return (
-        <FromExperience>
-          {from}&nbsp;year{from !== "1" && "s"} of experience
-        </FromExperience>
-      );
-    } else {
-      return (
-        <>
-          {to === "0" ? "More than" : "From"}
-          <FromExperience>&nbsp;{from}</FromExperience>
-          {to && to !== "0" ? <ToExperience>&nbsp;to {to}</ToExperience> : null}
-          &nbsp;years
-        </>
-      );
+    switch (experience) {
+      case "0":
+        return "Without experience";
+      case "1-3":
+        return <Experience>From 1 to 3 years</Experience>;
+      case "3-6":
+        return <Experience>From 3 to 6 years</Experience>;
+      case "6":
+        return <Experience>More than 6 years</Experience>;
+      default:
+        return "";
     }
   }
-
-  if (from === "-1") return null;
-
+  if (!experience || experience === "") return;
   return (
     <ExperienceContent className="inline">
       <div className="vc-icon">{parse(icons["briefcase"])}</div> &nbsp;
@@ -107,11 +96,11 @@ function Salary(element: any) {
   const currency = element.currency;
 
   function defineSalary() {
-    if (from === "0" && to === "0") {
+    if (from === 0 && to === 0) {
       return <span>Free</span>;
     }
 
-    if (from === "0" && +to > 0) {
+    if (from === 0 && +to > 0) {
       return (
         <>
           <FromSalary>Up to</FromSalary> &nbsp;
@@ -120,7 +109,7 @@ function Salary(element: any) {
       );
     }
 
-    if (+from > 0 && to === "0" && to !== "-1") {
+    if (+from > 0 && to === 0 && to !== -1) {
       return (
         <>
           <FromSalary>From</FromSalary> &nbsp;
@@ -129,7 +118,7 @@ function Salary(element: any) {
       );
     }
 
-    if (from !== "0" && to !== "0" && from !== to) {
+    if (from !== 0 && to !== 0 && from !== to) {
       return (
         <>
           <FromSalary>{`${from} ${currencySymbol[currency]}`}</FromSalary>
@@ -144,7 +133,7 @@ function Salary(element: any) {
     }
   }
 
-  if (from === "-1") return null;
+  if (from === -1) return null;
 
   return (
     <SalaryContent className="inline">
@@ -179,14 +168,14 @@ function getTimeStamp(time: string): string {
 //! =================================================================== STYLE =================================================================== !//
 
 const Card = styled.div`
-  padding: 20px 10px;
-  border-bottom: var(--border-style);
-  border-radius: var(--border-radius);
+  padding: 20px;
+  border: var(--border-style);
   font-family: var(--text-font);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   row-gap: 10px;
+  border-radius: 15px;
 
   &:hover {
     background: var(--card-hover-bg);
@@ -277,7 +266,7 @@ const ExperienceContent = styled.div`
   font-size: var(--text-size);
 `;
 
-const FromExperience = styled.span``;
+const Experience = styled.span``;
 const ToExperience = styled.span``;
 
 const Subtitle = styled.span``;
