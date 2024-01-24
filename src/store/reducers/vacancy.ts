@@ -8,6 +8,7 @@ interface VacancyState {
     pageData: { [key: string]: any[] };
     count: { [key: string]: number };
     filter: { [key: string]: number };
+    searchParams: any;
   };
   element: {
     data: Record<string, any>;

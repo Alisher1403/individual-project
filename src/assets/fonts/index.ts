@@ -7,21 +7,25 @@ const fonts = `
   @font-face {
     font-family: 'Nunito-Light';
     src: url(${NunitoLight});
+    font-display: swap;
   }
 
   @font-face {
     font-family: 'Nunito-Regular';
     src: url(${NunitoRegular});
+    font-display: swap;
   }
 
   @font-face {
     font-family: 'Nunito-Medium';
     src: url(${NunitoMedium});
+    font-display: swap;
   }
   
   @font-face {
     font-family: 'Nunito-SemiBold';
     src: url(${NunitoSemiBold});
+    font-display: swap;
   }
 `;
 

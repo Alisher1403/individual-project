@@ -1,10 +1,11 @@
 import { FC, FormEvent, useEffect, useRef, useState } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
+import { useSearchParams } from "hooks";
 
 const Searchbar: FC = () => {
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const text = searchParams.get("text");
   const [value, setValue] = useState<string>(text ? text : "");
   const [focus, setFocus] = useState(false);
@@ -12,7 +13,7 @@ const Searchbar: FC = () => {
 
   function search(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSearchParams({ text: value, page: "1" });
+    searchParams.set({ text: value, page: "1" });
   }
 
   useEffect(() => {
@@ -67,10 +68,11 @@ const InputWrapper = styled.div`
   max-width: 600px;
   margin: 0 auto;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.055), 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.024);
+  transition: 0.3s;
 
   &.focused {
     border-color: var(--border-focus-bg);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.055), 0 8px 16px rgba(0, 0, 0, 0.1), 0 16px 32px rgba(0, 0, 0, 0.024);
+    box-shadow: 0 2px 20px var(--border-focus-bg);
   }
 `;
 

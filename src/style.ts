@@ -20,7 +20,7 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     body {
-        background: linear-gradient(to bottom, #f8f8f8, #e0e0e0);
+        background: #f8f8f8;
     }
 
     * {
@@ -91,11 +91,18 @@ export const GlobalStyle = createGlobalStyle`
         --border-style: 1px solid #717a7a;
         --border-color: #717a7a;
         --border-width: 1px;
-        --border-radius: 0px;
         --border-focus-bg: #87a3a3;
 
         // background
         --card-hover-bg: #c5c5c545;
+
+        // input
+        --input-border-radius: 10px;
+        --input-radio-corner: 5px;
+        --input-font-size: 15px;
+        --input-bg: #87a3a3;
+        --input-bg-active: #87a3a3;
+        --input-color: #333333;
     }
 `;
 

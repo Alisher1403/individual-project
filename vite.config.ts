@@ -14,6 +14,8 @@ export default defineConfig({
       layouts: "/src/layouts",
       common: "/src/common",
       types: "/src/types",
+      constant: "/src/constant",
+      hooks: "/src/hooks",
     },
   },
 });

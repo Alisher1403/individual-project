@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { currencySymbol } from "../constants";
+import { currencySymbol } from "../constant";
 import { icons } from "icons";
 import parse from "html-react-parser";
 
