@@ -1,66 +1,80 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import styled from "styled-components";
-import { CheckSelect, RadioSelect } from "common";
+import { CheckSelect, RadioSelect, InputStateful, Select, Grid } from "ui";
 import { formData } from "constant";
 import { useSearchParams } from "hooks";
 
-const Filter: FC = () => {
+interface FilterProps {}
+
+const Filter: FC<FilterProps> = () => {
   const searchParams = useSearchParams();
-  const { experience, emp_type, education } = searchParams.getAll();
+  const { experience, emp_type, education, salary, currency } = searchParams.getAll();
   const lang = "eng";
 
-  const [filter, setFilter] = useState({
-    experience,
-    emp_type,
-    education,
-  });
-
-  useEffect(() => {
-    searchParams.set(filter);
-  }, [filter]);
-
-  function getOptions(
-    obj: Map<string, { eng: string; rus: string; fr: string; es: string }>
-  ): { value: string; label: string }[] {
+  const getMapOptions = (
+    obj: Map<string | undefined, { eng: string; rus: string; fr: string; es: string }>
+  ): { value: string | undefined; label: string }[] => {
     const keys = Array.from(obj.keys());
     const values = Array.from(obj.values());
 
-    const returnValue = [];
+    return keys.map((key, i) => ({ value: key, label: values[i]?.[lang] }));
+  };
 
-    for (let i = 0; i < keys.length; i++) {
-      returnValue.push({ value: keys[i], label: values[i]?.[lang] });
-    }
-
-    return returnValue;
-  }
+  const getObjectOptions = (obj: { [key: string]: string }): { value: string; label: string }[] => {
+    return Object.keys(obj).map((e) => {
+      return {
+        value: e as keyof typeof formData.currency,
+        label: formData.currency[e as keyof typeof formData.currency],
+      };
+    });
+  };
 
   return (
     <Container>
       <form>
-        <div className="section">
-          <p className="section-title">{formData.experience.title[lang]}</p>
-          <RadioSelect
-            value={filter.experience}
-            options={getOptions(formData.experience.data)}
-            onChange={(e) => setFilter({ ...filter, experience: e })}
-          />
-        </div>
-        <div className="section">
-          <p className="section-title">{formData.emp_type.title[lang]}</p>
-          <CheckSelect
-            value={filter.emp_type}
-            options={getOptions(formData.emp_type.data)}
-            onChange={(e) => setFilter({ ...filter, emp_type: e })}
-          />
-        </div>
-        <div className="section">
-          <p className="section-title">{formData.education.title[lang]}</p>
-          <CheckSelect
-            value={filter.education}
-            options={getOptions(formData.education.data)}
-            onChange={(e) => setFilter({ ...filter, education: e })}
-          />
-        </div>
+        <Content>
+          <Section>
+            <p className="section-title">{formData.experience.title[lang]}</p>
+            <RadioSelect
+              value={experience}
+              options={getMapOptions(formData.experience.data)}
+              onChange={(value) => searchParams.set({ experience: value })}
+            />
+          </Section>
+          <Section>
+            <p className="section-title">{formData.emp_type.title[lang]}</p>
+            <CheckSelect
+              value={emp_type}
+              options={getMapOptions(formData.emp_type.data)}
+              onChange={(value) => searchParams.set({ emp_type: value })}
+            />
+          </Section>
+          <Section>
+            <p className="section-title">{formData.education.title[lang]}</p>
+            <CheckSelect
+              value={education}
+              options={getMapOptions(formData.education.data)}
+              onChange={(value) => searchParams.set({ education: value })}
+            />
+          </Section>
+          <Section>
+            <p className="section-title">{formData.salary.title[lang]}</p>
+
+            <Grid gap="20px">
+              <InputStateful
+                type="number"
+                value={salary}
+                onPressEnter={(value) => searchParams.set({ salary: value })}
+                onBlur={(value) => searchParams.set({ salary: value })}
+              />
+              <Select
+                value={currency}
+                options={getObjectOptions(formData.currency)}
+                onChange={(value) => searchParams.set({ currency: value })}
+              />
+            </Grid>
+          </Section>
+        </Content>
       </form>
     </Container>
   );
@@ -93,14 +107,16 @@ const Container = styled.div`
     background: var(--border-color);
     margin: 5px 0;
   }
+`;
 
-  .section {
-    padding: 10px 0;
+const Content = styled.div``;
 
-    .section-title {
-      font-family: var(--font-semiBold);
-      font-size: 15px;
-      margin-bottom: 10px;
-    }
+const Section = styled.div`
+  padding: 10px 0;
+
+  .section-title {
+    font-family: var(--font-semiBold);
+    font-size: 15px;
+    margin-bottom: 10px;
   }
 `;

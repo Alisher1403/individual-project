@@ -100,6 +100,8 @@ const vacancies = () => {
 
   useEffect(() => {
     if (!mainData) {
+      let timeout;
+      clearTimeout(timeout);
       fetchData();
     }
     window.scrollTo({ top: 0, behavior: "smooth" });

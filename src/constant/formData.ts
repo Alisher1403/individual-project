@@ -46,8 +46,32 @@ const education = {
   ]),
 };
 
+const salary = {
+  title: {
+    eng: "Salary",
+    rus: "Заработная плата",
+    fr: "Salaire",
+    es: "Salario",
+  },
+  data: new Map([
+    ["entryLevel", { eng: "Entry-level", rus: "Начальный уровень", fr: "Débutant", es: "Nivel de entrada" }],
+    ["midLevel", { eng: "Mid-level", rus: "Средний уровень", fr: "Intermédiaire", es: "Nivel intermedio" }],
+    ["seniorLevel", { eng: "Senior level", rus: "Старший уровень", fr: "Sénior", es: "Nivel senior" }],
+  ]),
+};
+
+const currency = {
+  dollar: "$",
+  soum: "сум",
+  euro: "€",
+  rouble: "₽",
+  pound: "£",
+};
+
 export const formData = {
   experience,
   emp_type,
   education,
-} as any;
+  salary,
+  currency,
+};

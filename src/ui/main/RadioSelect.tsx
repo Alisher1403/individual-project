@@ -1,14 +1,14 @@
 import { FC } from "react";
 import styled from "styled-components";
 
-interface RadioSelectType {
+interface Props {
   value: string;
-  options: { value: string; label: string }[];
-  onChange: (value: string) => void;
+  options: { value: string | undefined; label: string }[];
+  onChange: (value: string | undefined) => void;
 }
 
-const RadioSelect: FC<RadioSelectType> = ({ value, options, onChange }) => {
-  function handleClick(newValue: string) {
+const RadioSelect: FC<Props> = ({ value, options, onChange }) => {
+  function handleClick(newValue: string | undefined) {
     onChange(newValue);
   }
   return (
@@ -16,18 +16,19 @@ const RadioSelect: FC<RadioSelectType> = ({ value, options, onChange }) => {
       <List>
         {options.map((elem, idx) => {
           return (
-            <Element
-              key={idx}
-              onClick={(e) => {
-                e.preventDefault();
-                handleClick(elem.value);
-              }}
-            >
-              <div>
-                <RadioBtn $selected={elem.value === value}></RadioBtn>
-                <Label>{elem.label}</Label>
-              </div>
-            </Element>
+            <li key={idx}>
+              <Element
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleClick(elem.value);
+                }}
+              >
+                <div>
+                  <RadioBtn $selected={elem.value === value}></RadioBtn>
+                  <Label>{elem.label}</Label>
+                </div>
+              </Element>
+            </li>
           );
         })}
       </List>
@@ -44,8 +45,12 @@ const List = styled.ul`
   flex-direction: column;
   row-gap: 8px;
 `;
-const Element = styled.li`
+const Element = styled.button`
   cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  color: var(--input-color);
 
   div {
     display: flex;
@@ -59,7 +64,7 @@ const RadioBtn = styled.div<{ $selected: boolean }>`
   border: var(--border-style);
   border-radius: 50%;
   overflow: hidden;
-  background: ${(props) => (props.$selected ? "var(--input-bg)" : "none")};
+  background: ${(props) => (props.$selected ? "var(--input-indicator-color)" : "none")};
   transition: 0.2s;
 
   div {

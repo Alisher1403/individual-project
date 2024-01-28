@@ -3,20 +3,23 @@ import { VacancyList, Vacancy, Profile, Home } from "pages";
 import { Navigation, Searchbar } from "layouts";
 import { GlobalStyle, Theme } from "./style";
 import { ThemeProvider } from "styled-components";
+import { UIProvider } from "ui";
 
 function App() {
   return (
     <BrowserRouter>
       <ThemeProvider theme={Theme}>
-        <GlobalStyle />
-        <Navigation />
-        <Searchbar />
-        <Routes>
-          <Route path="/" element={<Home />}></Route>
-          <Route path="/search/vacancy" element={<VacancyList />}></Route>
-          <Route path="/vacancy/:id" element={<Vacancy />}></Route>
-          <Route path="/profile/:id" element={<Profile />}></Route>
-        </Routes>
+        <UIProvider>
+          <GlobalStyle />
+          <Navigation />
+          <Searchbar />
+          <Routes>
+            <Route path="/" element={<Home />}></Route>
+            <Route path="/search/vacancy" element={<VacancyList />}></Route>
+            <Route path="/vacancy/:id" element={<Vacancy />}></Route>
+            <Route path="/profile/:id" element={<Profile />}></Route>
+          </Routes>
+        </UIProvider>
       </ThemeProvider>
     </BrowserRouter>
   );

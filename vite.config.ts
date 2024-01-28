@@ -12,7 +12,7 @@ export default defineConfig({
       components: "/src/components",
       icons: "/src/assets/icons",
       layouts: "/src/layouts",
-      common: "/src/common",
+      ui: "/src/ui",
       types: "/src/types",
       constant: "/src/constant",
       hooks: "/src/hooks",

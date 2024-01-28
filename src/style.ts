@@ -20,7 +20,7 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     body {
-        background: #f8f8f8;
+        background: var(--main-bg);
     }
 
     * {
@@ -54,6 +54,9 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     :root{
+        // Main
+        --main-bg: #f8f8f8;
+
         // fonts
         --font-light: 'Nunito-Light';
         --font-regular: 'Nunito-Regular';
@@ -96,13 +99,25 @@ export const GlobalStyle = createGlobalStyle`
         // background
         --card-hover-bg: #c5c5c545;
 
-        // input
+        // UI Lib
+        --ui-grid-gap: 5px;
         --input-border-radius: 10px;
+        --input-border: 1px solid #717a7a;
+        --input-margin: 5px 0;
+        --input-padding: 7px 10px;
+        --input-icon-color: var(--icon-bg);
         --input-radio-corner: 5px;
         --input-font-size: 15px;
-        --input-bg: #87a3a3;
+        --input-bg: var(--main-bg);
+        --input-indicator-color: #87a3a3;
         --input-bg-active: #87a3a3;
         --input-color: #333333;
+        --input-icon-size: 20px;
+        --input-transition: 0.2s;
+        --option-wrapper-padding: 2px;
+        --option-border-radius: calc(var(--input-border-radius) - 2px);
+        --option-padding: 7px 10px;
+        --option-selected-bg: #b8d9d3;
     }
 `;
 

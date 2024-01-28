@@ -27,7 +27,7 @@
       "layouts": ["./src/layouts"],
       "components": ["./src/components"],
       "icons": ["./src/assets/icons"],
-      "common": ["./src/common"],
+      "ui": ["./src/ui"],
       "constant": ["./src/constant"],
       "types": ["./src/types"],
       "hooks": ["./src/hooks"]

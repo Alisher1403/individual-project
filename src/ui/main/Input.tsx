@@ -1,21 +1,22 @@
 import { FC, useState } from "react";
 import styled from "styled-components";
 
-interface InputType {
+interface Props {
   value?: string | number;
   type?: "text" | "password" | "number";
   placeholder?: string;
   title?: string;
-  onChange?: (param: string) => void;
-  onBlur?: () => void;
+  onChange?: (value: string) => void;
 }
 
-const Input: FC<InputType> = ({ value, type, placeholder, title, onChange, onBlur }) => {
+const Input: FC<Props> = ({ value, type, placeholder, title, onChange }) => {
   const defineType = !type || type === "number" ? "text" : type;
+  if (!value) value = "";
 
   const [focus, setFocus] = useState("");
 
   function handleOnChange(event: any) {
+    event.preventDefault();
     const val = event.target.value;
 
     if (onChange) {
@@ -42,7 +43,6 @@ const Input: FC<InputType> = ({ value, type, placeholder, title, onChange, onBlu
           onFocus={() => setFocus("focused")}
           onBlur={() => {
             setFocus("");
-            if (onBlur) onBlur();
           }}
         />
       </Wrapper>
@@ -53,7 +53,7 @@ const Input: FC<InputType> = ({ value, type, placeholder, title, onChange, onBlu
 export default Input;
 
 const Container = styled.div`
-  padding: 5px 0;
+  margin: var(--input-margin);
 
   span {
     font-size: 13px;
