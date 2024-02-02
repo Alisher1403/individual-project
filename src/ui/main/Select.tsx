@@ -16,6 +16,7 @@ const Select: FC<Props> = ({ value, options, onChange, width = "auto", style }) 
   const { id, setId } = useContext(UIContext);
   const [uid] = useState(Math.random() * 1000000 + Math.random() * 50000);
   const open = uid === id;
+  const [label, setLabel] = useState(getSelected());
 
   function componentClick(e: React.MouseEvent) {
     e.preventDefault();
@@ -23,15 +24,21 @@ const Select: FC<Props> = ({ value, options, onChange, width = "auto", style }) 
     setId(uid);
   }
 
-  function handleClick(newValue: string | undefined) {
-    onChange(newValue);
+  function handleClick(params: { value: string | undefined; label: string }) {
+    onChange(params.value);
+    setLabel(params.label);
+  }
+
+  function getSelected() {
+    const returnValue = options.find((e) => e.value === value)?.label;
+    return returnValue;
   }
 
   return (
     <Container style={style}>
       <Content $width={width}>
         <Selected onClick={componentClick} className={open ? "opened" : ""}>
-          <p>{value}</p>
+          <p>{label}</p>
           <Icon className={open ? "opened" : ""}>{parse(icons["arrowBottom"])}</Icon>
         </Selected>
         <OptionsWrapper className={open ? "opened" : ""}>
@@ -42,7 +49,7 @@ const Select: FC<Props> = ({ value, options, onChange, width = "auto", style }) 
                   <Option
                     onClick={(e) => {
                       e.preventDefault();
-                      handleClick(elem.value);
+                      handleClick(elem);
                     }}
                     className={elem.value === value ? "selected" : ""}
                   >
@@ -87,6 +94,7 @@ const Selected = styled.button`
   width: 100%;
   border-radius: var(--input-border-radius);
   padding: var(--input-padding);
+  height: var(--input-height);
   background: var(--input-bg);
   transition: var(--input-transition);
   color: var(--input-color);

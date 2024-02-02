@@ -68,6 +68,8 @@ const Wrapper = styled.div`
   border-radius: 7px;
   overflow: hidden;
   transition: 0.2s;
+  padding: var(--input-padding);
+  height: var(--input-height);
 
   &.focused {
     border-color: var(--border-focus-bg);

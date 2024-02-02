@@ -1,0 +1,23 @@
+@font-face {
+  font-family: "Nunito-Light";
+  src: url(./Nunito-Light.ttf);
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito-Regular";
+  src: url(./Nunito-Regular.ttf);
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito-Medium";
+  src: url(./Nunito-Medium.ttf);
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Nunito-SemiBold";
+  src: url(./Nunito-SemiBold.ttf);
+  font-display: swap;
+}

@@ -5,6 +5,7 @@ const profile = createSlice({
   name: "user",
   initialState: {
     data: {} as any,
+    id: "56d26b6c-085c-4003-8381-6109937a7d18",
   },
   reducers: {
     setUser(state, action: PayloadAction<{ key: string; data: object }>) {

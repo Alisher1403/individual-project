@@ -4,6 +4,7 @@ import { Navigation, Searchbar } from "layouts";
 import { GlobalStyle, Theme } from "./style";
 import { ThemeProvider } from "styled-components";
 import { UIProvider } from "ui";
+import "./index.css";
 
 function App() {
   return (

@@ -9,4 +9,13 @@ export const icons = {
     light: `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><defs><style>.cls-1{stroke-linecap:round;stroke-linejoin:round;stroke-width:2px;}</style></defs><title/><g id="checkmark"><line class="cls-1" x1="3" x2="12" y1="16" y2="25"/><line class="cls-1" x1="12" x2="29" y1="25" y2="7"/></g></svg>`,
     bold: `<svg style="enable-background:new 0 0 36 36;" version="1.1" viewBox="0 0 36 36" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><style type="text/css">.st0{fill:#222A30;}.st1{fill:none;stroke:#222A30;stroke-width:2.0101;stroke-linejoin:round;stroke-miterlimit:10;}.st2{fill:#171715;}.st3{fill-rule:evenodd;clip-rule:evenodd;fill:#222A30;}</style><g id="Layer_1"/><g id="icons"><path class="st0" d="M12.8,28.7l-9.5-9.5c-0.4-0.4-0.4-1.1,0-1.6l1.5-1.5c0.4-0.4,1.1-0.4,1.6,0l7.2,7.2 l16-16c0.4-0.4,1.1-0.4,1.6,0l1.5,1.5c0.4,0.4,0.4,1.1,0,1.6L14.4,28.7C13.9,29.1,13.2,29.1,12.8,28.7z" id="check_x5F_mark_1_"/></g></svg>`,
   },
+  cross: {
+    light: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 6L18 18" stroke="#000000" stroke-linecap="round"></path> <path d="M18 6L6.00001 18" stroke="#000000" stroke-linecap="round"></path> </g></svg>`,
+  },
+  history: {
+    light: `<svg viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg" aria-labelledby="historyIconTitle" stroke="#000000" stroke-width="1" stroke-linecap="square" stroke-linejoin="miter" fill="none" color="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title id="historyIconTitle">History</title> <polyline points="1 12 3 14 5 12"></polyline> <polyline points="12 7 12 12 15 15"></polyline> <path d="M12,21 C16.9705627,21 21,16.9705627 21,12 C21,7.02943725 16.9705627,3 12,3 C7.02943725,3 3,7.02943725 3,12 C3,11.975305 3,12.3086383 3,13"></path> </g></svg>`,
+  },
+  search: {
+    light: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 20L15.8033 15.8033M18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18C14.6421 18 18 14.6421 18 10.5Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`,
+  },
 };

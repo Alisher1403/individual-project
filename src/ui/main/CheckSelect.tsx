@@ -14,20 +14,28 @@ const CheckSelect: FC<Props> = ({ value, options, onChange }) => {
     if (newValue === undefined) {
       return;
     }
-
     if (!value) {
       onChange([newValue]);
-    } else if (typeof value === "string") {
+      return;
+    }
+    if (typeof value === "string") {
       onChange([value, newValue]);
-    } else if (Array.isArray(value)) {
+    }
+    if (value === newValue) {
+      onChange(undefined);
+      return;
+    }
+    if (Array.isArray(value)) {
       const valueExists = value.includes(newValue);
 
       if (valueExists) {
         const returnValue: string[] = value.filter((e) => e !== newValue);
         onChange(returnValue);
+        return;
       } else {
         const returnValue: string[] = [...value, newValue];
         onChange(returnValue);
+        return;
       }
     }
   }

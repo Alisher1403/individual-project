@@ -11,24 +11,6 @@ const Filter: FC<FilterProps> = () => {
   const { experience, emp_type, education, salary, currency } = searchParams.getAll();
   const lang = "eng";
 
-  const getMapOptions = (
-    obj: Map<string | undefined, { eng: string; rus: string; fr: string; es: string }>
-  ): { value: string | undefined; label: string }[] => {
-    const keys = Array.from(obj.keys());
-    const values = Array.from(obj.values());
-
-    return keys.map((key, i) => ({ value: key, label: values[i]?.[lang] }));
-  };
-
-  const getObjectOptions = (obj: { [key: string]: string }): { value: string; label: string }[] => {
-    return Object.keys(obj).map((e) => {
-      return {
-        value: e as keyof typeof formData.currency,
-        label: formData.currency[e as keyof typeof formData.currency],
-      };
-    });
-  };
-
   return (
     <Container>
       <form>
@@ -37,7 +19,7 @@ const Filter: FC<FilterProps> = () => {
             <p className="section-title">{formData.experience.title[lang]}</p>
             <RadioSelect
               value={experience}
-              options={getMapOptions(formData.experience.data)}
+              options={formData.experience.data(lang)}
               onChange={(value) => searchParams.set({ experience: value })}
             />
           </Section>
@@ -45,7 +27,7 @@ const Filter: FC<FilterProps> = () => {
             <p className="section-title">{formData.emp_type.title[lang]}</p>
             <CheckSelect
               value={emp_type}
-              options={getMapOptions(formData.emp_type.data)}
+              options={formData.emp_type.data(lang)}
               onChange={(value) => searchParams.set({ emp_type: value })}
             />
           </Section>
@@ -53,7 +35,7 @@ const Filter: FC<FilterProps> = () => {
             <p className="section-title">{formData.education.title[lang]}</p>
             <CheckSelect
               value={education}
-              options={getMapOptions(formData.education.data)}
+              options={formData.education.data(lang)}
               onChange={(value) => searchParams.set({ education: value })}
             />
           </Section>
@@ -69,7 +51,7 @@ const Filter: FC<FilterProps> = () => {
               />
               <Select
                 value={currency}
-                options={getObjectOptions(formData.currency)}
+                options={formData.currency.data}
                 onChange={(value) => searchParams.set({ currency: value })}
               />
             </Grid>
@@ -83,7 +65,7 @@ const Filter: FC<FilterProps> = () => {
 export default Filter;
 
 const Container = styled.div`
-  width: 350px;
+  min-width: 250px;
   height: 100vh;
   border-right: var(--border-style);
   /* border-top: var(--border-style); */

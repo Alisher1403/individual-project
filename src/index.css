@@ -1,68 +1,70 @@
+@import url(./assets/fonts/fonts.css);
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Main */
+  --main-bg: #f8f8f8;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* fonts */
+  --font-light: "Nunito-Light";
+  --font-regular: "Nunito-Regular";
+  --font-medium: "Nunito-Medium";
+  --font-semiBold: "Nunito-SemiBold";
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  /* title */
+  --h3-size: 23px;
+  --title-color: #333333;
+  --title-color-dark: #262626;
+  --title-font: "Nunito-Medium";
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+  /* link */
+  --link-color: red;
+  --link-hover-color: #d91e44;
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+  /* text */
+  --text-size: 16px;
+  --text-color: #333333;
+  --text-color-light: #87a3a3;
+  --text-font: "Nunito-Regular";
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+  /* span */
+  --span-font: "Nunito-Light";
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+  /* icon */
+  --icon-bg: #4f5959;
+  --icon-hover-bg: white;
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+  /* button */
+  --button-bg: #87a3a3;
+  --button-hover-bg: #717a7a;
+
+  /* border */
+  --border-style: 1px solid #717a7a;
+  --border-color: #717a7a;
+  --border-color-light: #c2c4c3;
+  --border-width: 1px;
+  --border-focus-bg: #87a3a3;
+
+  /* background */
+  --card-hover-bg: #c5c5c545;
+
+  /* UI Lib */
+  --ui-grid-gap: 5px;
+  --input-border-radius: 10px;
+  --input-border: 1px solid #717a7a;
+  --input-margin: 5px 0;
+  --input-padding: 7px 10px;
+  --input-height: 35px;
+  --input-icon-color: var(--icon-bg);
+  --input-radio-corner: 5px;
+  --input-font-size: 15px;
+  --input-bg: var(--main-bg);
+  --input-indicator-color: #87a3a3;
+  --input-bg-active: #87a3a3;
+  --input-color: #333333;
+  --input-icon-size: 16px;
+  --input-transition: 0.2s;
+  --option-wrapper-padding: 2px;
+  --option-border-radius: calc(var(--input-border-radius) - 2px);
+  --option-padding: 7px 10px;
+  --option-selected-bg: #b8d9d3;
 }

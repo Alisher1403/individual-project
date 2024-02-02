@@ -76,7 +76,6 @@ const Container = styled.div``;
 const Content = styled.div`
   display: flex;
   justify-content: center;
-  align-items: flex-start;
   position: relative;
 `;
 
