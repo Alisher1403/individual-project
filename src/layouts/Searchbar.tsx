@@ -23,6 +23,7 @@ const Searchbar: FC = () => {
                   value={value}
                   ref={inputRef}
                   onFocus={() => setFocus(true)}
+                  onBlur={() => setFocus(true)}
                   onChange={(e) => setValue(e.target.value)}
                   placeholder="Search for items..."
                 />
@@ -101,8 +102,8 @@ const FocusBg = styled.div`
   transition: 0.2s;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  height: 100lvh;
+  width: 100lvw;
   visibility: collapse;
   opacity: 0;
 
