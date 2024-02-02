@@ -102,8 +102,8 @@ const FocusBg = styled.div`
   transition: 0.2s;
   top: 0;
   left: 0;
-  height: 100lvh;
-  width: 100lvw;
+  height: 100%;
+  width: 100%;
   visibility: collapse;
   opacity: 0;
 
