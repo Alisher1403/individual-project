@@ -23,7 +23,7 @@ const Searchbar: FC = () => {
                   value={value}
                   ref={inputRef}
                   onFocus={() => setFocus(true)}
-                  onBlur={() => setFocus(true)}
+                  onBlur={() => setFocus(false)}
                   onChange={(e) => setValue(e.target.value)}
                   placeholder="Search for items..."
                 />
