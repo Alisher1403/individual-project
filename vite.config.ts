@@ -16,6 +16,7 @@ export default defineConfig({
       types: "/src/types",
       constant: "/src/constant",
       hooks: "/src/hooks",
+      utils: "/src/utils",
     },
   },
 });

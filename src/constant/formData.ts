@@ -31,6 +31,11 @@ const experience = {
       },
     ];
   },
+  get(data: { experience: string }, lang: LangKeys) {
+    const value = data.experience;
+    const item = this.data(lang).find((e) => e.value === value);
+    return item?.label;
+  },
 };
 
 const emp_type = {
@@ -67,6 +72,11 @@ const emp_type = {
         label: { eng: "Internship", rus: "Стажировка", fr: "Stage", es: "Prácticas" }[lang],
       },
     ];
+  },
+  get(data: { emp_type: string }, lang: LangKeys) {
+    const value = data.emp_type;
+    const item = this.data(lang).find((e) => e.value === value);
+    return item?.label;
   },
 };
 
@@ -108,22 +118,138 @@ const salary = {
     fr: "Salaire",
     es: "Salario",
   },
-  data(lang: LangKeys) {
-    return [
-      {
-        value: "entryLevel",
-        label: { eng: "Entry-level", rus: "Начальный уровень", fr: "Débutant", es: "Nivel de entrada" }[lang],
-      },
-      {
-        value: "midLevel",
-        label: { eng: "Mid-level", rus: "Средний уровень", fr: "Intermédiaire", es: "Nivel intermedio" }[lang],
-      },
-      {
-        value: "seniorLevel",
-        label: { eng: "Senior level", rus: "Старший уровень", fr: "Sénior", es: "Nivel senior" }[lang],
-      },
-    ];
+  get(data: { fromSalary: number; toSalary: number; currency: string }, lang: LangKeys) {
+    const { fromSalary: from, toSalary: to, currency: curr } = data;
+
+    if (from === 0 && to === 0) {
+      return {
+        eng: "Free",
+        rus: "Бесплатно",
+        fr: "Gratuit",
+        es: "Gratis",
+      }[lang];
+    }
+
+    if (from === 0 && to > 0) {
+      return (
+        {
+          eng: "Up to",
+          rus: "До",
+          fr: "Jusqu'à",
+          es: "Hasta",
+        }[lang] + ` ${to}${currency.get(curr)}`
+      );
+    }
+
+    if (from > 0 && to === 0) {
+      return (
+        {
+          eng: "From",
+          rus: "От",
+          fr: "De",
+          es: "Desde",
+        }[lang] + ` ${from}${currency.get(curr)}`
+      );
+    }
+
+    if (from !== 0 && to !== 0 && from !== to) {
+      return (
+        {
+          eng: `From ${from} to ${to}`,
+          rus: `От ${from} до ${to}`,
+          fr: `De ${from} à ${to}`,
+          es: `De ${from} a ${to}`,
+        }[lang] + currency.get(curr)
+      );
+    }
+
+    if (from === to) {
+      return `${to}${currency.get(curr)}`;
+    }
+
+    if (from === -1) return null;
   },
+};
+
+const created_at = {
+  get(data: { created_at: string }, lang: LangKeys) {
+    const value = data.created_at;
+    const date = new Date(value);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+
+    function addZero(num: number): string | number {
+      if (num < 10) return "0" + num;
+      return num;
+    }
+
+    const timeString = `${addZero(day)} ${months[lang][month - 1]} ${year} - ${addZero(hour)}:${addZero(minute)}`;
+
+    const keys = { eng: "Posted at", rus: "Опубликовано", fr: "Publié à", es: "Publicado en" }[lang];
+    return `${keys} ${timeString}`;
+  },
+};
+
+const months = {
+  eng: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
+  rus: [
+    "Январь",
+    "Февраль",
+    "Март",
+    "Апрель",
+    "Май",
+    "Июнь",
+    "Июль",
+    "Август",
+    "Сентябрь",
+    "Октябрь",
+    "Ноябрь",
+    "Декабрь",
+  ],
+  fr: [
+    "Janvier",
+    "Février",
+    "Mars",
+    "Avril",
+    "Mai",
+    "Juin",
+    "Juillet",
+    "Août",
+    "Septembre",
+    "Octobre",
+    "Novembre",
+    "Décembre",
+  ],
+  es: [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ],
 };
 
 const currency = {
@@ -134,6 +260,11 @@ const currency = {
     { value: "rouble", label: "₽" },
     { value: "pound", label: "£" },
   ],
+  get(value: string) {
+    const item = this.data.find((e) => e.value === value);
+    if (value === "dollar") return "$";
+    return item?.label;
+  },
 };
 
 export const formData = {
@@ -142,4 +273,6 @@ export const formData = {
   education,
   salary,
   currency,
+  created_at,
+  months,
 };

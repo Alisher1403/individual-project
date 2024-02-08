@@ -5,10 +5,24 @@ import parse from "html-react-parser";
 import { icons } from "icons";
 
 const Searchbar: FC = () => {
-  const { value, setValue, focus, setFocus, search, inputRef, searched, searchedRef, searchHistory, searchListHeight } =
-    backend.searchbar();
+  const {
+    value,
+    setValue,
+    focus,
+    setFocus,
+    search,
+    searchList,
+    inputRef,
+    searchedItems,
+    listRef,
+    searchHistory,
+    searchListHeight,
+    clearInput,
+  } = backend.searchbar();
 
   if (!location.pathname.includes("search")) return;
+
+  const listLength = 10;
 
   return (
     <Container className="container">
@@ -18,40 +32,67 @@ const Searchbar: FC = () => {
           <Top>
             <form onSubmit={(e) => search(value, e)}>
               <InputWrapper>
-                <Input
-                  type="text"
-                  value={value}
-                  ref={inputRef}
-                  onFocus={() => setFocus(true)}
-                  onBlur={() => setFocus(false)}
-                  onChange={(e) => setValue(e.target.value)}
-                  placeholder="Search for items..."
-                />
-                <SearchBtn type="submit">Search</SearchBtn>
+                <div className="left">
+                  <Input
+                    name="text"
+                    type="text"
+                    value={value}
+                    ref={inputRef}
+                    onFocus={() => setFocus(true)}
+                    onChange={(e) => setValue(e.target.value)}
+                    placeholder="Search for items..."
+                  />
+                </div>
+                <div className="right">
+                  <button className="icon" data-visible={value.length !== 0} onClick={() => clearInput()}>
+                    {parse(icons.cross.light)}
+                  </button>
+                  <SearchBtn type="submit">Search</SearchBtn>
+                </div>
               </InputWrapper>
             </form>
-            <Line data-focus={searched && Array.isArray(searched) && focus} />
-            {searched && Array.isArray(searched) ? (
+            <Line data-focus={searchedItems && Array.isArray(searchedItems) && focus} />
+            {searchedItems && Array.isArray(searchedItems) ? (
               <SearchList data-focus={focus} $height={searchListHeight}>
-                <ul ref={searchedRef}>
-                  {searched?.slice(0, 10)?.map((elem, idx) => {
+                <ul ref={listRef}>
+                  {searchedItems.slice(0, listLength)?.map((elem, idx) => {
                     return (
                       <li key={idx}>
-                        <SearchItems onClick={() => search(elem.value)}>
+                        <SearchItems onClick={() => search(elem)}>
                           <div className="content">
                             <div className="left">
-                              <div className="icon">
-                                {elem.searched ? parse(icons.history.light) : parse(icons.search.light)}
-                              </div>
-                              <p>{elem.value}</p>
+                              <div className="icon">{parse(icons.history.light)}</div>
+                              <p>
+                                <b>{elem.slice(0, value.length)}</b>
+                                {elem.slice(value.length)}
+                              </p>
                             </div>
-                            <div className="right" onClick={(e) => searchHistory.delete(elem.value, e)}>
-                              {elem.searched ? <div className="icon">{parse(icons.cross.light)}</div> : null}
+                            <div className="right" onClick={(e) => searchHistory.delete(elem, e)}>
+                              {elem ? <div className="icon">{parse(icons.cross.light)}</div> : null}
                             </div>
                           </div>
                         </SearchItems>
                       </li>
                     );
+                  })}
+                  {searchList?.slice(0, listLength - searchedItems.length)?.map((elem, idx) => {
+                    if (!searchedItems.includes(elem)) {
+                      return (
+                        <li key={idx}>
+                          <SearchItems onClick={() => search(elem)}>
+                            <div className="content">
+                              <div className="left">
+                                <div className="icon">{parse(icons.search.light)}</div>
+                                <p>
+                                  <b>{elem.slice(0, value.length)}</b>
+                                  {elem.slice(value.length)}
+                                </p>
+                              </div>
+                            </div>
+                          </SearchItems>
+                        </li>
+                      );
+                    }
                   })}
                 </ul>
               </SearchList>
@@ -119,12 +160,34 @@ const InputWrapper = styled.div`
   border-color: auto;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   transition: 0.1s;
   overflow: hidden;
   height: 45px;
   margin: 0 auto;
   transition: 0.3s;
-  width: 100%;
+
+  .left {
+    width: 100%;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+
+    .icon {
+      height: 20px;
+      width: 20px;
+      background: none;
+      border: none;
+      display: none;
+      cursor: pointer;
+
+      &[data-visible="true"] {
+        display: block;
+      }
+    }
+  }
 `;
 
 const Input = styled.input`

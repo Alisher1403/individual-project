@@ -128,7 +128,7 @@ const vacancies = () => {
   const pagination = {
     list: mainPagesList,
     current: +page,
-    last: mainPagesList.length > 0 && mainPagesList[mainPagesList.length - 1] >= +page,
+    last: mainPagesList.length > 0 && mainPagesList[mainPagesList.length - 1] > +page,
     first: +page > 1 && mainData,
     page: (index: number) => searchParams.set({ page: `${index}` }),
     prev: () => searchParams.set({ page: `${+page - 1}` }),
@@ -153,7 +153,7 @@ const vacancy = () => {
       const { data } = await supabase.from("vacancies").select("*").eq("id", id);
 
       if (data && id) {
-        dispatch(vacancyData({ key: id, data: data }));
+        dispatch(vacancyData({ key: id, data: data[0] }));
         dispatch(vacancyLoading(false));
       }
     } catch (e) {
@@ -176,22 +176,21 @@ const searchbar = () => {
   // React Hooks and Refs
   const searchParams = useSearchParams();
   const text = searchParams.get("text");
+
   const [value, setValue] = useState<string>(text || "");
   const [focus, setFocus] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const searchedRef = useRef<HTMLUListElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const [searchListHeight, setSearchListHeight] = useState<number>();
 
   // Redux Selector
   const userData = useSelector((state: RootState) => state.profile);
 
-  // Type definition for search list
-  type SearchListType = { value: string; searched: boolean }[];
-
-  // State for searched items
-  const [searchedItems, setSearchedItems] = useState<SearchListType>();
-
   // State for fetched search items from the database
   const [searched, setSearched] = useState<string[]>([]);
+
+  const [searchedItems, setSearchedItems] = useState<string[]>();
+  const [searchList, setSearchList] = useState<string[]>([]);
 
   // Search history utility object
   const searchHistory = {
@@ -220,15 +219,52 @@ const searchbar = () => {
   };
 
   // Function to handle search
-  function search(value: string, e?: FormEvent<HTMLFormElement>) {
-    if (e) {
-      e.preventDefault();
+  function search(value: string, event?: FormEvent<HTMLFormElement>) {
+    if (event) {
+      event.preventDefault();
     }
 
     searchParams.set({ text: value, page: "1" });
     setFocus(false);
     inputRef.current?.blur();
     searchHistory.update(value);
+
+    upsert(value);
+  }
+
+  // Function to refetch search list
+  async function refetch(data: string[]) {
+    try {
+      await supabase.from("users").update({ searched: data }).eq("user_id", userData.id).select("*");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Upserting new searched values
+  async function upsert(name: string) {
+    if (name.trim().length >= 4) {
+      await supabase
+        .from("search")
+        .select("count")
+        .eq("name", name)
+        .then(async (record) => {
+          const currentTimestamp = new Date().toISOString();
+          if (record && record.data && record.data[0]) {
+            const count = record.data[0].count;
+            await supabase
+              .from("search")
+              .upsert([{ created_at: currentTimestamp, name, count: count + 1 }], { onConflict: "name" });
+          } else {
+            await supabase.from("search").upsert([{ created_at: currentTimestamp, name, count: 1 }]);
+          }
+        });
+    }
+  }
+
+  function clearInput() {
+    setValue("");
+    inputRef.current?.focus();
   }
 
   // Effect to fetch data from the database based on user search history
@@ -249,29 +285,6 @@ const searchbar = () => {
     fetchData();
   }, []);
 
-  // Function to set the searched list
-  function setSearchedList(list: string[], searched: boolean) {
-    const searchedObj: SearchListType = list.map((e: string) => ({
-      value: e,
-      searched,
-    }));
-    setSearchedItems(searchedObj);
-  }
-
-  // Effect to set the searched list
-  useEffect(() => {
-    setSearchedList(searched, true);
-  }, [searched]);
-
-  // Function to refetch search list
-  async function refetch(data: string[]) {
-    try {
-      await supabase.from("users").update({ searched: data }).eq("user_id", userData.id).select("*");
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   // Effect to update the input value when the text prop changes
   useEffect(() => {
     if (text) {
@@ -284,37 +297,75 @@ const searchbar = () => {
 
   // Effect Timout to decrease number of requests
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    // Initialize a timer variable
+    let searchTimer: NodeJS.Timeout;
 
-    timer = setTimeout(() => {
-      console.log(value);
-    }, 1000);
+    // Set up a timer to delay the search by 1000 milliseconds (1 second)
+    if (value.trim().length > 2) {
+      searchTimer = setTimeout(async () => {
+        // Check if the search input has a non-empty trimmed value
+        async function fetchSearches() {
+          try {
+            const regexValue = value.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
+            const { data, error } = await supabase
+              .from("search")
+              .select("name")
+              .ilike("name", `${regexValue}%`)
+              .gte("count", "20");
 
+            // Map the retrieved data to a list format with specific properties
+            const searchResults = data?.map((result) => result.name);
+
+            // Set retrieved value
+            if (searchResults) {
+              setSearchList(searchResults);
+            }
+            if (error) throw error;
+          } catch (error) {
+            console.error(error);
+          }
+        }
+        fetchSearches();
+      }, 300);
+    }
+
+    // Cleanup function: Clear the timer when the component unmounts or when the 'value' dependency changes
     return () => {
-      clearTimeout(timer);
+      clearTimeout(searchTimer);
     };
   }, [value]);
 
-  // State for search list height
-  const [searchListHeight, setSearchListHeight] = useState(searchedRef.current?.getBoundingClientRect().height);
+  // Define searchedItemsList
+  useEffect(() => {
+    if (searched && Array.isArray(searched)) {
+      const arr = searched.filter((elem) => {
+        if (elem.startsWith(value)) {
+          return elem;
+        }
+      });
+      setSearchedItems(arr);
+    }
+  }, [value, searched]);
 
   // Effect to update search list height when 'searchedItems' state changes
   useEffect(() => {
-    const height = searchedRef.current?.getBoundingClientRect().height;
+    const height = listRef.current?.getBoundingClientRect().height;
     setSearchListHeight(height);
-  }, [searchedItems]);
+  });
 
   return {
     value,
     setValue,
-    searchedRef,
+    listRef,
     focus,
     setFocus,
     search,
+    searchList,
     inputRef,
-    searched: searchedItems,
     searchHistory,
     searchListHeight,
+    clearInput,
+    searchedItems,
   };
 };
 
