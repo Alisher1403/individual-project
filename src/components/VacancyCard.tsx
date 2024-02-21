@@ -1,8 +1,5 @@
 import { FC } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { icons } from "icons";
-import parse from "html-react-parser";
 import { formData } from "../constant/formData";
 import { useSearchParams } from "hooks";
 
@@ -12,17 +9,7 @@ interface ComponentProps {
 }
 
 const VacancyCard: FC<ComponentProps> = ({ element, index }) => {
-  const navigate = useNavigate();
   const searchParams = useSearchParams();
-
-  const handleSaveButtonClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-  };
-
-  const handleProfileClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    navigate(`/profile/${element.userId}`);
-  };
 
   return (
     <Card
