@@ -9,38 +9,37 @@ interface FilterProps {}
 const Filter: FC<FilterProps> = () => {
   const searchParams = useSearchParams();
   const { experience, emp_type, education, salary, currency } = searchParams.getAll();
-  const lang = "eng";
 
   return (
     <Container>
       <form>
         <Content>
           <Section>
-            <p className="section-title">{formData.experience.title[lang]}</p>
+            <p className="section-title">{formData.experience.title}</p>
             <RadioSelect
               value={experience}
-              options={formData.experience.data(lang)}
+              options={formData.experience.data}
               onChange={(value) => searchParams.set({ experience: value })}
             />
           </Section>
           <Section>
-            <p className="section-title">{formData.emp_type.title[lang]}</p>
+            <p className="section-title">{formData.emp_type.title}</p>
             <CheckSelect
               value={emp_type}
-              options={formData.emp_type.data(lang)}
+              options={formData.emp_type.data}
               onChange={(value) => searchParams.set({ emp_type: value })}
             />
           </Section>
           <Section>
-            <p className="section-title">{formData.education.title[lang]}</p>
+            <p className="section-title">{formData.education.title}</p>
             <CheckSelect
               value={education}
-              options={formData.education.data(lang)}
+              options={formData.education.data}
               onChange={(value) => searchParams.set({ education: value })}
             />
           </Section>
           <Section>
-            <p className="section-title">{formData.salary.title[lang]}</p>
+            <p className="section-title">{formData.salary.title}</p>
 
             <Grid gap="20px">
               <InputStateful
@@ -66,21 +65,13 @@ export default Filter;
 
 const Container = styled.div`
   min-width: 250px;
-  height: 100vh;
-  border-right: var(--border-style);
-  /* border-top: var(--border-style); */
   position: sticky;
   overflow-y: scroll;
+  height: 100%;
   top: 0;
-  padding: 10px;
 
   &::-webkit-scrollbar {
     display: none;
-  }
-
-  * {
-    font-family: var(--text-font);
-    font-size: var(--text-size);
   }
 
   .break {

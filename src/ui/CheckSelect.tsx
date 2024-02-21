@@ -1,7 +1,5 @@
 import { FC } from "react";
 import styled from "styled-components";
-import parse from "html-react-parser";
-import { icons } from "icons";
 
 interface Props {
   value: string[] | string | undefined;
@@ -62,9 +60,11 @@ const CheckSelect: FC<Props> = ({ value, options, onChange }) => {
               }}
             >
               <div>
-                <RadioBtn $selected={activeElements(elem.value)}>
-                  <div className={activeElements(elem.value) ? "selected" : ""}>{parse(icons.checkmark.bold)}</div>
-                </RadioBtn>
+                <Button data-selected={activeElements(elem.value)}>
+                  <span className="material-symbols-rounded filled icon">
+                    {activeElements(elem.value) ? "check_box" : "check_box_outline_blank"}
+                  </span>
+                </Button>
                 <Label>{elem.label}</Label>
               </div>
             </Element>
@@ -94,31 +94,26 @@ const Element = styled.button`
   div {
     display: flex;
     align-items: center;
-    column-gap: 10px;
+    column-gap: 7px;
   }
 `;
-const RadioBtn = styled.div<{ $selected: boolean }>`
-  height: 20px;
+const Button = styled.div`
+  height: 18px;
   aspect-ratio: 1/1;
-  border: var(--border-style);
-  border-radius: var(--input-radio-corner);
-  overflow: hidden;
-  background: ${(props) => (props.$selected ? "var(--input-indicator-color)" : "none")};
   transition: 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  div {
-    padding: 2px;
-    height: 100%;
-    width: 100%;
-    visibility: hidden;
-
-    &.selected {
-      visibility: visible;
+  &[data-selected="true"] {
+    .icon {
+      color: var(--element-color);
     }
+  }
 
-    * {
-      fill: white;
-    }
+  .icon {
+    color: #ababac;
+    font-size: 28px;
   }
 `;
 const Label = styled.p`

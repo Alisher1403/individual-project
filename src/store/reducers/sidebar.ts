@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const searchbar = createSlice({
-  name: "searchbar",
+const sidebar = createSlice({
+  name: "sidebar",
   initialState: {
     data: [],
   },
   reducers: {},
 });
 
-export default searchbar.reducer;
+export default sidebar.reducer;

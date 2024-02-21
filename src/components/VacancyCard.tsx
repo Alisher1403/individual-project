@@ -1,9 +1,10 @@
 import { FC } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { icons } from "icons";
 import parse from "html-react-parser";
-import { getExperience, getSalary, getTimeStamp } from "utils";
+import { formData } from "../constant/formData";
+import { useSearchParams } from "hooks";
 
 interface ComponentProps {
   element: any;
@@ -12,6 +13,7 @@ interface ComponentProps {
 
 const VacancyCard: FC<ComponentProps> = ({ element, index }) => {
   const navigate = useNavigate();
+  const searchParams = useSearchParams();
 
   const handleSaveButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -23,37 +25,32 @@ const VacancyCard: FC<ComponentProps> = ({ element, index }) => {
   };
 
   return (
-    <Link to={{ pathname: `/vacancy/${element.id}` }}>
-      <Card key={element.id} data-id={index}>
-        <Top>
-          <Title>{element.title}</Title>
-          <SaveButton onClick={handleSaveButtonClick} title="Save">
-            {parse(icons["bookmark"])}
-          </SaveButton>
-        </Top>
-
-        <div className="inline">
-          <Center className="inline prevent-btn" onClick={handleProfileClick}>
-            {element.logo && <Logo src={element.logo} />}
-            <div>
-              <Company>{element.company}</Company>
-              &nbsp;&nbsp;<span>─</span>&nbsp;&nbsp;
-              <Location>{element.location}</Location>
-            </div>
-          </Center>
-          &nbsp;&nbsp;
-          {element.remote && <Remote>remote</Remote>}
+    <Card
+      key={element.id}
+      data-id={index}
+      onClick={() => searchParams.set({ post: element.id })}
+      tabIndex={1}
+      data-disabled={+searchParams.get("post") === element.id}
+    >
+      <div className="top">
+        <div className="logo">
+          <img src={element.logo} alt="" />
         </div>
-
-        <Experience className="inline">
-          <div className="vc-icon">{parse(icons["briefcase"])}</div> &nbsp;
-          {getExperience(element.experience)}
-        </Experience>
-        {element.subtitle && <Subtitle>{element.subtitle}</Subtitle>}
-        <Salary>{getSalary(element)}</Salary>
-        <CreatedAt>{getTimeStamp(element.created_at)}</CreatedAt>
-      </Card>
-    </Link>
+        <div className="main">
+          <h3>{element.title}</h3>
+          <p>{element.company}</p>
+          <p>{element.location}</p>
+        </div>
+        <div className="options">
+          <button>
+            <span className="material-symbols-rounded icon">bookmark</span>
+          </button>
+        </div>
+      </div>
+      <div className="bottom">
+        <div>{formData.timeAgo(element.created_at)}</div>
+      </div>
+    </Card>
   );
 };
 
@@ -63,120 +60,54 @@ export default VacancyCard;
 
 const Card = styled.div`
   padding: 20px;
-  border: var(--border-style);
-  font-family: var(--text-font);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  row-gap: 10px;
-  border-radius: 15px;
+  background: white;
+  border: 1px solid var(--border-color);
+  margin: 10px 0;
 
-  &:hover {
-    background: var(--card-hover-bg);
-  }
+  .top {
+    display: grid;
+    grid-template-columns: 80px auto 40px;
+    border-bottom: 1px solid var(--border-color-dark);
+    padding-bottom: 15px;
+    column-gap: 20px;
 
-  * {
-    color: var(--text-color);
-    font-size: var(--text-size);
-  }
+    .logo {
+      aspect-ratio: 1/1;
+      background: var(--element-color);
+      border-radius: 7px;
+    }
 
-  .vc-icon {
-    height: 25px;
-    aspect-ratio: 1/1;
-    fill: var(--icon-bg);
-  }
-`;
+    .main {
+      width: 100%;
 
-const Top = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
+      h3 {
+        font-family: var(--font-bold);
+        color: var(--title-color-dark);
+        font-size: 20px;
+        margin-bottom: 4px;
+      }
 
-const SaveButton = styled.button`
-  height: 28px;
-  background: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: none;
-  cursor: pointer;
+      p {
+        color: var(--text-color);
+      }
+    }
 
-  &:hover {
-    * {
-      fill: var(--icon-bg);
+    .options {
+      button {
+        height: 40px;
+        aspect-ratio: 1/1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--content-background);
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+
+        .icon {
+          font-size: 32px;
+        }
+      }
     }
   }
-
-  * {
-    height: 100%;
-    width: 100%;
-    fill: none;
-    stroke: var(--icon-bg);
-    stroke-width: 2.5px;
-  }
-`;
-
-const Title = styled.h3`
-  font-size: var(--h3-size);
-  color: var(--title-color);
-  font-family: var(--title-font);
-`;
-
-const Center = styled.button`
-  display: inline-flex;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-const Logo = styled.img`
-  height: 25px;
-  aspect-ratio: 1/1;
-  object-fit: cover;
-  margin-right: 7px;
-`;
-const Company = styled.span`
-  color: var(--text-color);
-  font-family: var(--title-font);
-`;
-const Location = styled.span`
-  color: var(--text-color);
-  font-family: var(--title-font);
-`;
-
-const Remote = styled.div`
-  background: var(--icon-bg);
-  border-radius: 30px;
-  font-size: 12px;
-  color: white;
-  font-family: var(--span-font);
-  padding: 0 5px;
-`;
-
-const Experience = styled.div`
-  font-family: var(--text-font);
-  font-size: var(--text-size);
-`;
-
-const Subtitle = styled.span``;
-
-const Salary = styled.div`
-  font-family: var(--font-semiBold);
-  color: var(--text-color-light);
-  display: flex;
-  align-items: center;
-
-  * {
-    font-size: 20px;
-    color: var(--text-color-light);
-  }
-`;
-
-const CreatedAt = styled.p`
-  font-family: var(--text-font);
-  font-size: 14px;
-  margin-top: 10px;
-  color: #969696cc;
 `;

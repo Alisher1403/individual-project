@@ -1,9 +1,9 @@
-import * as router_dom from "react-router-dom";
+import { useSearchParams as useRouterSearchParams } from "react-router-dom";
 
-const useSearchParams = (): any => {
-  const [searchParams, setSearchParams] = router_dom.useSearchParams();
+const useSearchParams = () => {
+  const [searchParams, setSearchParams] = useRouterSearchParams();
 
-  const params: searchParamsMethods = {
+  const params = {
     getAll,
     set,
     get,
@@ -11,58 +11,38 @@ const useSearchParams = (): any => {
 
   function get(param: string) {
     const getParam = searchParams.get(param);
-    const isArray = getParam?.includes(",");
-    if (isArray) {
-      return getParam?.split(",");
-    } else {
-      return getParam;
+    if (getParam) {
+      return isArrayParam(getParam) ? getParam.split(",") : (getParam as any);
     }
   }
 
   function getAll() {
-    const allParams = {} as any;
+    const allParams: any = {};
     for (const [key, value] of searchParams.entries()) {
       if (value !== "undefined") {
-        const isArray = value?.includes(",");
-        if (isArray) {
-          allParams[key] = value?.split(",");
-        } else {
-          allParams[key] = value;
-        }
+        allParams[key] = isArrayParam(value) ? value.split(",") : value;
       }
     }
     return allParams;
   }
 
-  function set(params: any) {
-    const newParams = {} as any;
+  function set(newParams: object) {
+    const updatedParams = { ...Object.fromEntries(searchParams.entries()), ...newParams };
 
-    for (const [key, value] of searchParams.entries()) {
-      newParams[key] = value;
+    for (const key in updatedParams) {
+      if (!updatedParams[key]) {
+        delete updatedParams[key];
+      }
     }
 
-    Object.keys(params).map((e: string): void => {
-      if (Array.isArray(params[e])) {
-        newParams[e] = params[e].join(",");
-      } else {
-        newParams[e] = params[e];
-      }
-    });
+    setSearchParams(updatedParams);
+  }
 
-    Object.keys(newParams).map((e) => {
-      if (!newParams[e]) delete newParams[e];
-    });
-
-    setSearchParams(newParams);
+  function isArrayParam(value: string) {
+    return value && value.includes(",");
   }
 
   return params;
 };
 
 export default useSearchParams;
-
-interface searchParamsMethods {
-  getAll: () => {};
-  set: (params: { [key: string]: string }) => void;
-  get: (param: string) => void;
-}

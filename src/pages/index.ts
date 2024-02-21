@@ -1,6 +1,6 @@
-import VacancyList from "./VacancyList";
+import VacanciesPage from "./VacanciesPage";
 import Vacancy from "./Vacancy";
 import Profile from "./Profile";
 import Home from "./Home";
 
-export { VacancyList, Vacancy, Profile, Home };
+export { VacanciesPage, Vacancy, Profile, Home };

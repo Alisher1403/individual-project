@@ -1,11 +1,11 @@
 import { FC, createContext, useEffect, useState } from "react";
 
-import Input from "./main/Input";
-import RadioSelect from "./main/RadioSelect";
-import CheckSelect from "./main/CheckSelect";
-import Select from "./main/Select";
-import InputStateful from "./main/InputStateful";
-import Grid from "./main/Grid";
+import Input from "./Input";
+import RadioSelect from "./RadioSelect";
+import CheckSelect from "./CheckSelect";
+import Select from "./Select";
+import InputStateful from "./InputStateful";
+import Grid from "./Grid";
 
 export { Input, RadioSelect, CheckSelect, Select, InputStateful, Grid };
 

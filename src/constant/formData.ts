@@ -1,4 +1,6 @@
-type LangKeys = "eng" | "rus" | "fr" | "es";
+import type { LangKeys } from "constant";
+
+const lang: LangKeys = "eng";
 
 const experience = {
   title: {
@@ -6,34 +8,33 @@ const experience = {
     rus: "Опыт работы",
     fr: "Expérience",
     es: "Experiencia",
-  },
-  data(lang: LangKeys) {
-    return [
-      {
-        value: undefined,
-        label: { eng: "All", rus: "Не имеет значения", fr: "Tous", es: "Todos" }[lang],
-      },
-      {
-        value: "0",
-        label: { eng: "Without Experience", rus: "Без опыта", fr: "Sans expérience", es: "Sin experiencia" }[lang],
-      },
-      {
-        value: "1-3",
-        label: { eng: "From 1 to 3 years", rus: "От 1 до 3 лет", fr: "De 1 à 3 ans", es: "De 1 a 3 años" }[lang],
-      },
-      {
-        value: "3-6",
-        label: { eng: "From 3 to 6 years", rus: "От 3 до 6 лет", fr: "De 3 à 6 ans", es: "De 3 a 6 años" }[lang],
-      },
-      {
-        value: "6",
-        label: { eng: "More than 6 years", rus: "Более 6 лет", fr: "Plus de 6 ans", es: "Más de 6 años" }[lang],
-      },
-    ];
-  },
-  get(data: { experience: string }, lang: LangKeys) {
+  }[lang],
+  data: [
+    {
+      value: undefined,
+      label: { eng: "All", rus: "Не имеет значения", fr: "Tous", es: "Todos" }[lang],
+    },
+    {
+      value: "0",
+      label: { eng: "Without Experience", rus: "Без опыта", fr: "Sans expérience", es: "Sin experiencia" }[lang],
+    },
+    {
+      value: "1-3",
+      label: { eng: "From 1 to 3 years", rus: "От 1 до 3 лет", fr: "De 1 à 3 ans", es: "De 1 a 3 años" }[lang],
+    },
+    {
+      value: "3-6",
+      label: { eng: "From 3 to 6 years", rus: "От 3 до 6 лет", fr: "De 3 à 6 ans", es: "De 3 a 6 años" }[lang],
+    },
+    {
+      value: "6",
+      label: { eng: "More than 6 years", rus: "Более 6 лет", fr: "Plus de 6 ans", es: "Más de 6 años" }[lang],
+    },
+  ],
+
+  get(data: { experience: string }) {
     const value = data.experience;
-    const item = this.data(lang).find((e) => e.value === value);
+    const item = this.data.find((e) => e.value === value);
     return item?.label;
   },
 };
@@ -44,38 +45,36 @@ const emp_type = {
     rus: "Вид занятости",
     fr: "Type d'emploi",
     es: "Tipo de empleo",
-  },
-  data(lang: LangKeys) {
-    return [
-      {
-        value: "full-time",
-        label: { eng: "Full-time", rus: "Полная занятость", fr: "Temps plein", es: "Tiempo completo" }[lang],
-      },
-      {
-        value: "part-time",
-        label: { eng: "Part-time", rus: "Частичная занятость", fr: "Temps partiel", es: "Tiempo parcial" }[lang],
-      },
-      {
-        value: "remote",
-        label: { eng: "Remote", rus: "Удаленная работа", fr: "À distance", es: "Trabajo remoto" }[lang],
-      },
-      {
-        value: "contract",
-        label: { eng: "Contract", rus: "Контракт", fr: "Contrat", es: "Contrato" }[lang],
-      },
-      {
-        value: "freelance",
-        label: { eng: "Freelance", rus: "Фриланс", fr: "Freelance", es: "Freelance" }[lang],
-      },
-      {
-        value: "internship",
-        label: { eng: "Internship", rus: "Стажировка", fr: "Stage", es: "Prácticas" }[lang],
-      },
-    ];
-  },
-  get(data: { emp_type: string }, lang: LangKeys) {
+  }[lang],
+  data: [
+    {
+      value: "full-time",
+      label: { eng: "Full-time", rus: "Полная занятость", fr: "Temps plein", es: "Tiempo completo" }[lang],
+    },
+    {
+      value: "part-time",
+      label: { eng: "Part-time", rus: "Частичная занятость", fr: "Temps partiel", es: "Tiempo parcial" }[lang],
+    },
+    {
+      value: "remote",
+      label: { eng: "Remote", rus: "Удаленная работа", fr: "À distance", es: "Trabajo remoto" }[lang],
+    },
+    {
+      value: "contract",
+      label: { eng: "Contract", rus: "Контракт", fr: "Contrat", es: "Contrato" }[lang],
+    },
+    {
+      value: "freelance",
+      label: { eng: "Freelance", rus: "Фриланс", fr: "Freelance", es: "Freelance" }[lang],
+    },
+    {
+      value: "internship",
+      label: { eng: "Internship", rus: "Стажировка", fr: "Stage", es: "Prácticas" }[lang],
+    },
+  ],
+  get(data: { emp_type: string }) {
     const value = data.emp_type;
-    const item = this.data(lang).find((e) => e.value === value);
+    const item = this.data.find((e) => e.value === value);
     return item?.label;
   },
 };
@@ -86,29 +85,25 @@ const education = {
     rus: "Образование",
     fr: "Éducation",
     es: "Educación",
-  },
-  data(lang: LangKeys) {
-    return [
-      {
-        value: "secondary",
-        label: { eng: "Secondary school", rus: "Среднее школа", fr: "École secondaire", es: "Escuela secundaria" }[
-          lang
-        ],
-      },
-      {
-        value: "bachelor",
-        label: { eng: "Bachelor's degree", rus: "Бакалавр", fr: "Licence", es: "Licenciatura" }[lang],
-      },
-      {
-        value: "master",
-        label: { eng: "Master's degree", rus: "Магистр", fr: "Master", es: "Maestría" }[lang],
-      },
-      {
-        value: "doctor",
-        label: { eng: "Doctor's degree", rus: "Доктор", fr: "Doctorat", es: "Doctorado" }[lang],
-      },
-    ];
-  },
+  }[lang],
+  data: [
+    {
+      value: "secondary",
+      label: { eng: "Secondary school", rus: "Среднее школа", fr: "École secondaire", es: "Escuela secundaria" }[lang],
+    },
+    {
+      value: "bachelor",
+      label: { eng: "Bachelor's degree", rus: "Бакалавр", fr: "Licence", es: "Licenciatura" }[lang],
+    },
+    {
+      value: "master",
+      label: { eng: "Master's degree", rus: "Магистр", fr: "Master", es: "Maestría" }[lang],
+    },
+    {
+      value: "doctor",
+      label: { eng: "Doctor's degree", rus: "Доктор", fr: "Doctorat", es: "Doctorado" }[lang],
+    },
+  ],
 };
 
 const salary = {
@@ -117,8 +112,8 @@ const salary = {
     rus: "Заработная плата",
     fr: "Salaire",
     es: "Salario",
-  },
-  get(data: { fromSalary: number; toSalary: number; currency: string }, lang: LangKeys) {
+  }[lang],
+  get(data: { fromSalary: number; toSalary: number; currency: string }) {
     const { fromSalary: from, toSalary: to, currency: curr } = data;
 
     if (from === 0 && to === 0) {
@@ -171,8 +166,17 @@ const salary = {
   },
 };
 
+const skills = {
+  title: {
+    eng: "Skills",
+    rus: "Навыки",
+    fr: "Compétences",
+    es: "Habilidades",
+  }[lang],
+};
+
 const created_at = {
-  get(data: { created_at: string }, lang: LangKeys) {
+  get(data: { created_at: string }) {
     const value = data.created_at;
     const date = new Date(value);
     const day = date.getDate();
@@ -192,6 +196,94 @@ const created_at = {
     return `${keys} ${timeString}`;
   },
 };
+
+function timeAgo(ts: string): string {
+  const postedDate: Date = new Date(ts);
+  const currentDate: Date = new Date();
+
+  const timeDifference: number = (currentDate.getTime() - postedDate.getTime()) / 1000;
+
+  const minute: number = 60;
+  const hour: number = 60 * minute;
+  const day: number = 24 * hour;
+  const week: number = 7 * day;
+  const month: number = 30.44 * day;
+
+  const returnString = {
+    seconds() {
+      return {
+        eng: `${timeDifference} seconds ago`,
+        rus: `${timeDifference} секунд назад`,
+        es: `${timeDifference} segundos atrás`,
+        fr: `${timeDifference} secondes auparavant`,
+      }[lang];
+    },
+    minutes() {
+      const minutes: number = Math.floor(timeDifference / minute);
+      const isOne = minutes === 1;
+      return {
+        eng: `${minutes} ${isOne ? "minute" : "minutes"} ago`,
+        rus: `${minutes} ${isOne ? "минута" : "минут"} назад`,
+        es: `${minutes} ${isOne ? "minuto" : "minutos"} atrás`,
+        fr: `${minutes} ${isOne ? "minute" : "minutes"} auparavant`,
+      }[lang];
+    },
+    hours() {
+      const hours: number = Math.floor(timeDifference / hour);
+      const isOne = hours === 1;
+      return {
+        eng: `${hours} ${isOne ? "hour" : "hours"} ago`,
+        rus: `${hours} ${isOne ? "час" : "часов"} назад`,
+        es: `${hours} ${isOne ? "hora" : "horas"} atrás`,
+        fr: `${hours} ${isOne ? "heure" : "heures"} auparavant`,
+      }[lang];
+    },
+    days() {
+      const days: number = Math.floor(timeDifference / day);
+      const isOne = days === 1;
+      return {
+        eng: `${days} ${isOne} ? "day" : "days"} ago`,
+        rus: `${days} ${isOne} ? "день" : "дней"} назад`,
+        es: `${days} ${isOne} ? "día" : "días"} atrás`,
+        fr: `${days} ${isOne} ? "jour" : "jours"} auparavant`,
+      }[lang];
+    },
+    weeks() {
+      const weeks: number = Math.floor(timeDifference / week);
+      const isOne = weeks === 1;
+      return {
+        eng: `${weeks} ${isOne ? "week" : "weeks"} ago`,
+        rus: `${weeks} ${isOne ? "неделя" : "недель"} назад`,
+        es: `${weeks} ${isOne ? "semana" : "semanas"} atrás`,
+        fr: `${weeks} ${isOne ? "semaine" : "semaines"} auparavant`,
+      }[lang];
+    },
+    months() {
+      const months: number = Math.floor(timeDifference / month);
+      const isOne = months === 1;
+      return {
+        eng: `${months} ${isOne ? "month" : "months"} ago`,
+        rus: `${months} ${isOne ? "месяц" : "месяцев"} назад`,
+        es: `${months} ${isOne ? "mes" : "meses"} atrás`,
+        fr: `${months} ${isOne ? "mois" : "mois"} auparavant`,
+      }[lang];
+    },
+  };
+
+  if (timeDifference < minute) {
+    return returnString.seconds();
+  } else if (timeDifference < hour) {
+    return returnString.minutes();
+  } else if (timeDifference < day) {
+    return returnString.hours();
+  } else if (timeDifference < week) {
+    return returnString.days();
+  } else if (timeDifference < month) {
+    return returnString.weeks();
+  } else {
+    return returnString.months();
+  }
+}
 
 const months = {
   eng: [
@@ -275,4 +367,6 @@ export const formData = {
   currency,
   created_at,
   months,
+  skills,
+  timeAgo,
 };

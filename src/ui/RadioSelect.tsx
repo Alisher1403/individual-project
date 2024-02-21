@@ -24,7 +24,11 @@ const RadioSelect: FC<Props> = ({ value, options, onChange }) => {
                 }}
               >
                 <div>
-                  <RadioBtn $selected={elem.value === value}></RadioBtn>
+                  <RadioBtn data-selected={elem.value === value}>
+                    <span className="material-symbols-rounded icon">
+                      {elem.value === value ? "radio_button_checked" : "radio_button_unchecked"}
+                    </span>
+                  </RadioBtn>
                   <Label>{elem.label}</Label>
                 </div>
               </Element>
@@ -55,31 +59,26 @@ const Element = styled.button`
   div {
     display: flex;
     align-items: center;
-    column-gap: 10px;
+    column-gap: 8px;
   }
 `;
-const RadioBtn = styled.div<{ $selected: boolean }>`
+const RadioBtn = styled.div`
   height: 18px;
   aspect-ratio: 1/1;
-  border: var(--border-style);
-  border-radius: 50%;
-  overflow: hidden;
-  background: ${(props) => (props.$selected ? "var(--input-indicator-color)" : "none")};
   transition: 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  div {
-    padding: 2px;
-    height: 100%;
-    width: 100%;
-    visibility: hidden;
-
-    &.selected {
-      visibility: visible;
+  &[data-selected="true"] {
+    .icon {
+      color: var(--element-color);
     }
+  }
 
-    * {
-      fill: white;
-    }
+  .icon {
+    color: #ababac;
+    font-size: 22px;
   }
 `;
 const Label = styled.p`

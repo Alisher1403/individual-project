@@ -2,7 +2,13 @@
 
 :root {
   /* Main */
-  --main-bg: #f8f8f8;
+  --main-bg: #ffffff;
+
+  /* common */
+  --element-color: #7487eb;
+  --element-background: white;
+  --element-background-hover: #f9f9fb;
+  --content-background: #f7f7f7;
 
   /* fonts */
   --font-light: "Nunito-Light";
@@ -22,16 +28,16 @@
 
   /* text */
   --text-size: 16px;
-  --text-color: #333333;
-  --text-color-light: #87a3a3;
+  --text-color: #87868e;
+  --text-color-light: #a8aabc;
+  --text-color-dark: #5b5b5e;
   --text-font: "Nunito-Regular";
 
   /* span */
   --span-font: "Nunito-Light";
 
   /* icon */
-  --icon-bg: #4f5959;
-  --icon-color: #4f5959;
+  --icon-color: #87878a;
   --icon-hover-bg: white;
 
   /* button */
@@ -39,33 +45,12 @@
   --button-hover-bg: #717a7a;
 
   /* border */
-  --border-style: 1px solid #717a7a;
-  --border-color: #717a7a;
+  --border-style: 2px solid #eeeded;
+  --border-color: #eeeded;
   --border-color-light: #c2c4c3;
-  --border-width: 1px;
-  --border-focus-bg: #87a3a3;
+  --border-color-dark: #cacaca;
+  --border-width: 2px;
 
   /* background */
   --card-hover-bg: #c5c5c545;
-
-  /* UI Lib */
-  --ui-grid-gap: 5px;
-  --input-border-radius: 10px;
-  --input-border: 1px solid #717a7a;
-  --input-margin: 5px 0;
-  --input-padding: 7px 10px;
-  --input-height: 35px;
-  --input-icon-color: var(--icon-bg);
-  --input-radio-corner: 5px;
-  --input-font-size: 15px;
-  --input-bg: var(--main-bg);
-  --input-indicator-color: #87a3a3;
-  --input-bg-active: #87a3a3;
-  --input-color: #333333;
-  --input-icon-size: 16px;
-  --input-transition: 0.2s;
-  --option-wrapper-padding: 2px;
-  --option-border-radius: calc(var(--input-border-radius) - 2px);
-  --option-padding: 7px 10px;
-  --option-selected-bg: #b8d9d3;
 }

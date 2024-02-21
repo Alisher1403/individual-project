@@ -106,7 +106,7 @@ const Selected = styled.button`
 `;
 
 const Icon = styled.div`
-  height: var(--input-icon-size);
+  height: 20px;
   transition: var(--input-transition);
   transform: rotate(0);
 

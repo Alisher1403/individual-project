@@ -1,4 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { supabase } from "backend";
 
 interface VacancyState {
   list: {
@@ -11,7 +13,7 @@ interface VacancyState {
     searchParams: any;
   };
   element: {
-    data: Record<string, any>;
+    data: { [key: string]: any };
     loading: boolean;
     error: boolean;
   };
@@ -56,19 +58,40 @@ const vacancy = createSlice({
     vacancyError(state, action: PayloadAction<boolean>) {
       state.element.error = action.payload;
     },
-    vacancyLoading(state, action: PayloadAction<boolean>) {
-      state.element.loading = action.payload;
-    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(vacancyApi.element.fulfilled, (state, action) => {
+      const { key, data, error } = action.payload;
+
+      try {
+        if (!state.element.data[key] && data) {
+          state.element.data[key] = data[0];
+        }
+        if (error) throw error;
+      } catch (error) {
+        console.log("Failed to fetch data:", error);
+      }
+    });
   },
 });
 
-export const {
-  vacancyListError,
-  vacancyListLoading,
-  vacancyData,
-  vacancyError,
-  vacancyLoading,
-  setVacancyCount,
-  setVacancyPageData,
-} = vacancy.actions;
+export const { vacancyListError, vacancyListLoading, vacancyData, vacancyError, setVacancyCount, setVacancyPageData } =
+  vacancy.actions;
+
 export default vacancy.reducer;
+
+/********************************************************************************************************************/
+const element = createAsyncThunk("vacancy", async (id: string) => {
+  const { data, error } = await supabase
+    .from("vacancies")
+    .select(
+      `id, created_at, user_id, title, logo, company, location, subtitle, fromSalary, toSalary, currency, experience, remote`
+    )
+    .eq("id", id);
+
+  return { key: id, data, error };
+});
+
+export const vacancyApi = {
+  element,
+};

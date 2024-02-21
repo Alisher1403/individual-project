@@ -1,31 +1,31 @@
 import { useDispatch } from "react-redux";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useSearchParams } from "hooks";
-import {
-  setVacancyCount,
-  setVacancyPageData,
-  vacancyData,
-  vacancyError,
-  vacancyListError,
-  vacancyListLoading,
-  vacancyLoading,
-} from "store/reducers/vacancy";
+import { setVacancyCount, setVacancyPageData, vacancyListError, vacancyListLoading } from "store/reducers/vacancy";
 import { useSelector } from "react-redux";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "backend";
-import { RootState } from "store";
+import { AppDispatch, RootState } from "store";
+import { api } from "store/reducers";
 
 /******************************** VACANCIES API *************************************/
 
 const vacancies = () => {
   // Redux
   const dispatch = useDispatch();
-  const { loading, error, range, pageData, count } = useSelector((state: RootState) => state.vacancy.list);
+  const vacancyState = useSelector((state: RootState) => state.vacancy.list);
+
+  // Memoize the result of the useSelector
+  const memoizedState = useMemo(() => vacancyState, [vacancyState]);
+
+  const { loading, error, range, pageData, count } = memoizedState;
 
   // Location and search parameters
-  const location = useLocation();
-  const dataKey = location.pathname + location.search;
   const searchParams = useSearchParams();
+  const allSearchParams = searchParams.getAll();
+  delete allSearchParams.post;
+
+  const dataKey = JSON.stringify(allSearchParams);
   const page = searchParams.get("page") || "1";
   const searchText = searchParams.get("text") || "";
 
@@ -48,7 +48,7 @@ const vacancies = () => {
   }, [mainDataCount]);
 
   // Fetch data from the API
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const fromIndex = (+page - 1) * range;
     const toIndex = fromIndex + range - 1;
 
@@ -58,7 +58,7 @@ const vacancies = () => {
       let query = supabase
         .from("vacancies")
         .select(
-          `id, created_at, userId, title, logo, company, location, subtitle, fromSalary, toSalary, currency, experience, remote`,
+          `id, created_at, user_id, title, logo, company, location, subtitle, fromSalary, toSalary, currency, experience, remote`,
           { count: "exact" }
         );
 
@@ -91,10 +91,9 @@ const vacancies = () => {
       };
 
       // Apply additional filters from search parameters
-      const filters = searchParams.getAll();
-      useFilter.like({ value: filters.experience, column: "experience" });
-      useFilter.or({ value: filters.emp_type, column: "emp_type" });
-      useFilter.or({ value: filters.education, column: "education" });
+      useFilter.like({ value: allSearchParams.experience, column: "experience" });
+      useFilter.or({ value: allSearchParams.emp_type, column: "emp_type" });
+      useFilter.or({ value: allSearchParams.education, column: "education" });
 
       // Fetch data from the API
       const { data, error, count } = await query.range(fromIndex, toIndex).order("id", { ascending: false });
@@ -112,16 +111,13 @@ const vacancies = () => {
     } catch (error) {
       dispatch(vacancyListError(true));
     }
-  };
+  }, [dispatch, allSearchParams, page, range, searchParams]);
 
   useEffect(() => {
     // Fetch data on component mount if data for the current page is not available
     if (!mainData) {
       fetchData();
     }
-
-    // Scroll to the top of the page
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [dataKey]);
 
   // Pagination object
@@ -141,33 +137,21 @@ const vacancies = () => {
 
 const vacancy = () => {
   const params = useParams();
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const id = params.id;
 
   const element = useSelector((state: RootState) => state.vacancy.element.data[id!]);
-  const { loading, error } = useSelector((state: RootState) => state.vacancy.element);
+  const data = useMemo(() => element, [element]);
+  const { error } = useSelector((state: RootState) => state.vacancy.element);
 
-  async function fetchData() {
-    try {
-      dispatch(vacancyLoading(true));
-      const { data } = await supabase.from("vacancies").select("*").eq("id", id);
-
-      if (data && id) {
-        dispatch(vacancyData({ key: id, data: data[0] }));
-        dispatch(vacancyLoading(false));
-      }
-    } catch (e) {
-      dispatch(vacancyError(true));
-    }
-  }
-
+  /** ====================== **/
   useEffect(() => {
-    if (!element) {
-      fetchData();
+    if (id && !data) {
+      dispatch(api.vacancy.element(id));
     }
-  }, []);
+  }, [id]);
 
-  return { data: element, loading, error };
+  return { data, error };
 };
 
 /******************************** SEARCHBAR API *************************************/
@@ -188,6 +172,7 @@ const searchbar = () => {
 
   // State for fetched search items from the database
   const [searched, setSearched] = useState<string[]>([]);
+  const [searchListData, setSearchListData] = useState<string[]>([]);
 
   const [searchedItems, setSearchedItems] = useState<string[]>();
   const [searchList, setSearchList] = useState<string[]>([]);
@@ -262,7 +247,8 @@ const searchbar = () => {
     }
   }
 
-  function clearInput() {
+  function clearInput(event: FormEvent<HTMLDivElement>) {
+    event.preventDefault();
     setValue("");
     inputRef.current?.focus();
   }
@@ -318,7 +304,7 @@ const searchbar = () => {
 
             // Set retrieved value
             if (searchResults) {
-              setSearchList(searchResults);
+              setSearchListData(searchResults);
             }
             if (error) throw error;
           } catch (error) {
@@ -346,6 +332,18 @@ const searchbar = () => {
       setSearchedItems(arr);
     }
   }, [value, searched]);
+
+  //
+  useEffect(() => {
+    if (searchListData && Array.isArray(searchListData)) {
+      const arr = searchListData.filter((elem) => {
+        if (elem.startsWith(value)) {
+          return elem;
+        }
+      });
+      setSearchList(arr);
+    }
+  }, [value, searchListData]);
 
   // Effect to update search list height when 'searchedItems' state changes
   useEffect(() => {

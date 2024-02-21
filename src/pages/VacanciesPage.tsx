@@ -4,17 +4,14 @@ import backend from "backend";
 import styled from "styled-components";
 import parse from "html-react-parser";
 import { icons } from "icons";
-import { Filter } from "layouts";
 
-const VacancyList: FC = () => {
+const VacanciesPage: FC = () => {
   const { data, count, loading, error, pagination } = backend.vacancies();
 
   return (
-    <Container className="container">
+    <Container>
       <div>{count} items found</div>
-      <Content className="content">
-        <Filter />
-
+      <Content>
         <SearchContent>
           <div>
             <Data.List>
@@ -69,23 +66,22 @@ const VacancyList: FC = () => {
   );
 };
 
-export default VacancyList;
+export default VacanciesPage;
 
-const Container = styled.div``;
+const Container = styled.div`
+  background-color: var(--content-background);
+  width: 100%;
+`;
 
 const Content = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   position: relative;
 `;
 
 const Data = {
   List: styled.ul`
     margin-bottom: 50px;
-    padding: 0 15px;
-    display: flex;
-    flex-direction: column;
-    row-gap: 15px;
   `,
   ListItem: styled.div`
     opacity: 0;
@@ -104,6 +100,9 @@ const Data = {
 const SearchContent = styled.div`
   width: 100%;
   height: 100%;
+  padding: 0 40px;
+  max-width: 1100px;
+  margin: 0 auto;
 `;
 
 const Pagination = {
