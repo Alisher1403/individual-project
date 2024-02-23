@@ -49,11 +49,11 @@ const emp_type = {
   data: [
     {
       value: "full-time",
-      label: { eng: "Full-time", rus: "Полная занятость", fr: "Temps plein", es: "Tiempo completo" }[lang],
+      label: { eng: "Full time", rus: "Полная занятость", fr: "Temps plein", es: "Tiempo completo" }[lang],
     },
     {
       value: "part-time",
-      label: { eng: "Part-time", rus: "Частичная занятость", fr: "Temps partiel", es: "Tiempo parcial" }[lang],
+      label: { eng: "Part time", rus: "Частичная занятость", fr: "Temps partiel", es: "Tiempo parcial" }[lang],
     },
     {
       value: "remote",
@@ -72,9 +72,8 @@ const emp_type = {
       label: { eng: "Internship", rus: "Стажировка", fr: "Stage", es: "Prácticas" }[lang],
     },
   ],
-  get(data: { emp_type: string }) {
-    const value = data.emp_type;
-    const item = this.data.find((e) => e.value === value);
+  get(data: string) {
+    const item = this.data.find((e) => e.value === data);
     return item?.label;
   },
 };
@@ -242,10 +241,10 @@ function timeAgo(ts: string): string {
       const days: number = Math.floor(timeDifference / day);
       const isOne = days === 1;
       return {
-        eng: `${days} ${isOne} ? "day" : "days"} ago`,
-        rus: `${days} ${isOne} ? "день" : "дней"} назад`,
-        es: `${days} ${isOne} ? "día" : "días"} atrás`,
-        fr: `${days} ${isOne} ? "jour" : "jours"} auparavant`,
+        eng: `${days} ${isOne ? "day" : "days"} ago`,
+        rus: `${days} ${isOne ? "день" : "дней"} назад`,
+        es: `${days} ${isOne ? "día" : "días"} atrás`,
+        fr: `${days} ${isOne ? "jour" : "jours"} auparavant`,
       }[lang];
     },
     weeks() {

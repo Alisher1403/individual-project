@@ -84,9 +84,7 @@ export default vacancy.reducer;
 const element = createAsyncThunk("vacancy", async (id: string) => {
   const { data, error } = await supabase
     .from("vacancies")
-    .select(
-      `id, created_at, user_id, title, logo, company, location, subtitle, fromSalary, toSalary, currency, experience, remote`
-    )
+    .select(`*, likes (count), dislikes (count), views (count)`)
     .eq("id", id);
 
   return { key: id, data, error };

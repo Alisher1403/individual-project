@@ -110,9 +110,9 @@ const Container = styled.div``;
 const SearchInputWrapper = styled.div`
   z-index: 100;
   max-width: 500px;
-  width: 100%;
   height: 40px;
   position: relative;
+  margin: 0 auto;
 `;
 
 const SearchInput = styled.div`

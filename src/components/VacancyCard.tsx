@@ -6,9 +6,10 @@ import { useSearchParams } from "hooks";
 interface ComponentProps {
   element: any;
   index: number;
+  expanded?: boolean;
 }
 
-const VacancyCard: FC<ComponentProps> = ({ element, index }) => {
+const VacancyCard: FC<ComponentProps> = ({ element, index, expanded = true }) => {
   const searchParams = useSearchParams();
 
   return (
@@ -19,7 +20,7 @@ const VacancyCard: FC<ComponentProps> = ({ element, index }) => {
       tabIndex={1}
       data-disabled={+searchParams.get("post") === element.id}
     >
-      <div className="top">
+      <div className="s1">
         <div className="logo">
           <img src={element.logo} alt="" />
         </div>
@@ -34,8 +35,16 @@ const VacancyCard: FC<ComponentProps> = ({ element, index }) => {
           </button>
         </div>
       </div>
-      <div className="bottom">
-        <div>{formData.timeAgo(element.created_at)}</div>
+      {expanded && element.subtitle && <div className="s2">{element.subtitle}</div>}
+      <div className="s3">
+        <div className="left">
+          <div>{formData.timeAgo(element.created_at)}</div>
+          <div>{formData.emp_type.get(element.emp_type)}</div>
+          <div>
+            <span className="material-symbols-rounded">visibility</span>
+            {element.views[0].count}
+          </div>
+        </div>
       </div>
     </Card>
   );
@@ -47,15 +56,18 @@ export default VacancyCard;
 
 const Card = styled.div`
   padding: 20px;
-  background: white;
+  background: var(--element-background);
   border: 1px solid var(--border-color);
   margin: 10px 0;
+  cursor: pointer;
 
-  .top {
+  &:hover {
+    background: var(--element-background-hover);
+  }
+
+  .s1 {
     display: grid;
     grid-template-columns: 80px auto 40px;
-    border-bottom: 1px solid var(--border-color-dark);
-    padding-bottom: 15px;
     column-gap: 20px;
 
     .logo {
@@ -93,6 +105,33 @@ const Card = styled.div`
 
         .icon {
           font-size: 32px;
+        }
+      }
+    }
+  }
+
+  .s2 {
+    padding-top: 15px;
+  }
+
+  .s3 {
+    border-top: 1px solid var(--border-color-dark);
+    padding-top: 10px;
+    margin-top: 20px;
+
+    .left {
+      display: flex;
+
+      div {
+        display: flex;
+        align-items: center;
+        text-transform: lowercase;
+        border-left: 1px solid var(--border-color);
+        padding: 0 15px;
+
+        &:first-child {
+          border: none;
+          padding-left: 0;
         }
       }
     }

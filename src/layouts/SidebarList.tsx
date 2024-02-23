@@ -18,7 +18,8 @@ const SidebarList: FC = () => {
             <li key={index} data-selected={+post === elem.id}>
               <button onClick={() => searchParams.set({ post: elem.id })}>
                 <div>
-                  <p>{elem.title}</p>
+                  <h3>{elem.title}</h3>
+                  <p>{elem.company}</p>
                   <p>{formData.salary.get(elem)}</p>
                 </div>
               </button>
@@ -80,6 +81,16 @@ const List = styled.ul`
           top: 0;
           bottom: 0;
           position: absolute;
+        }
+
+        h3 {
+          font-size: 15px;
+          color: var(--title-color);
+          line-height: 100%;
+        }
+
+        p {
+          color: var(--text-color);
         }
       }
     }

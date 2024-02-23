@@ -6,8 +6,9 @@
 
   /* common */
   --element-color: #7487eb;
+  --element-color-hover: #3a53cf;
   --element-background: white;
-  --element-background-hover: #f9f9fb;
+  --element-background-hover: #ededef;
   --content-background: #f7f7f7;
 
   /* fonts */
@@ -18,17 +19,17 @@
 
   /* title */
   --h3-size: 23px;
-  --title-color: #333333;
+  --title-color: #454545;
   --title-color-dark: #262626;
   --title-font: "Nunito-Medium";
 
   /* link */
-  --link-color: red;
-  --link-hover-color: #d91e44;
+  --link-color: var(--element-color);
+  --link-color-hover: var(--element-color-hover);
 
   /* text */
   --text-size: 16px;
-  --text-color: #87868e;
+  --text-color: rgb(79, 79, 79);
   --text-color-light: #a8aabc;
   --text-color-dark: #5b5b5e;
   --text-font: "Nunito-Regular";
@@ -45,8 +46,8 @@
   --button-hover-bg: #717a7a;
 
   /* border */
-  --border-style: 2px solid #eeeded;
-  --border-color: #eeeded;
+  --border-style: 1px solid var(--border-color);
+  --border-color: rgb(212, 212, 212);
   --border-color-light: #c2c4c3;
   --border-color-dark: #cacaca;
   --border-width: 2px;

@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Home, Profile, Vacancy, VacanciesPage } from "pages";
+import { Home, Profile, Vacancy } from "pages";
 import styled from "styled-components";
 import { Route, Routes } from "react-router-dom";
 import { Navigation } from "layouts";
@@ -16,8 +16,7 @@ const MainLayout: FC = () => {
           <Navigation />
           <Routes>
             <Route path="/" element={<Home />}></Route>
-            <Route path="/search/vacancy" element={<VacanciesPage />}></Route>
-            <Route path="/vacancy/:id" element={<Vacancy />}></Route>
+            <Route path="/search/vacancy" element={<Vacancy />}></Route>
             <Route path="/profile/:id" element={<Profile />}></Route>
           </Routes>
         </MainContent>
@@ -46,4 +45,9 @@ const Left = styled.div`
 const MainContent = styled.div`
   width: 100%;
   background-color: var(--content-background);
+
+  .main-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
 `;

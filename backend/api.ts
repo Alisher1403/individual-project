@@ -1,5 +1,4 @@
 import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
 import { useSearchParams } from "hooks";
 import { setVacancyCount, setVacancyPageData, vacancyListError, vacancyListLoading } from "store/reducers/vacancy";
 import { useSelector } from "react-redux";
@@ -24,6 +23,7 @@ const vacancies = () => {
   const searchParams = useSearchParams();
   const allSearchParams = searchParams.getAll();
   delete allSearchParams.post;
+  delete allSearchParams.extended;
 
   const dataKey = JSON.stringify(allSearchParams);
   const page = searchParams.get("page") || "1";
@@ -58,9 +58,10 @@ const vacancies = () => {
       let query = supabase
         .from("vacancies")
         .select(
-          `id, created_at, user_id, title, logo, company, location, subtitle, fromSalary, toSalary, currency, experience, remote`,
+          `id, created_at, user_id, title, logo, company, emp_type, location, subtitle, fromSalary, toSalary, currency, experience, views (count)`,
           { count: "exact" }
         );
+      // console.log((await query).data);
 
       // Apply search text filter
       if (searchText) {
@@ -136,9 +137,9 @@ const vacancies = () => {
 };
 
 const vacancy = () => {
-  const params = useParams();
+  const searchParams = useSearchParams();
   const dispatch: AppDispatch = useDispatch();
-  const id = params.id;
+  const id = searchParams.get("post");
 
   const element = useSelector((state: RootState) => state.vacancy.element.data[id!]);
   const data = useMemo(() => element, [element]);
@@ -297,14 +298,20 @@ const searchbar = () => {
               .from("search")
               .select("name")
               .ilike("name", `${regexValue}%`)
-              .gte("count", "20");
+              .gte("count", "10");
 
             // Map the retrieved data to a list format with specific properties
-            const searchResults = data?.map((result) => result.name);
+            const searchResults = data
+              ?.map((result) => {
+                if (!searchListData.includes(result.name)) {
+                  return result.name;
+                }
+              })
+              .filter(Boolean);
 
             // Set retrieved value
             if (searchResults) {
-              setSearchListData(searchResults);
+              setSearchListData([...searchListData, ...searchResults]);
             }
             if (error) throw error;
           } catch (error) {

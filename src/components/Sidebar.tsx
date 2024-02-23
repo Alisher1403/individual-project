@@ -1,22 +1,28 @@
 import { FC } from "react";
 import styled from "styled-components";
-import { SidebarList } from "layouts";
-import { NavLink, useLocation } from "react-router-dom";
+import { Filter, SidebarList } from "layouts";
+import { NavLink, useLocation, useSearchParams } from "react-router-dom";
 
 const Sidebar: FC = () => {
   const location = useLocation();
-  const currentPage =
-    {
-      "/search/vacancy": "vacancy",
-    }[location.pathname] || "";
+  const [searchParams] = useSearchParams();
+  const post = searchParams.get("post");
 
-  const pageTitle = {
-    search: "Filters",
-    vacancy: "Jobs",
-  }[currentPage];
+  const pageTitle = () => {
+    if (location.pathname === "/search/vacancy") {
+      if (post) {
+        return "Jobs";
+      } else {
+        return "Filters";
+      }
+    }
+  };
 
   function getContent() {
-    if (location.pathname === "/search/vacancy") {
+    if (!post && location.pathname.includes("search")) {
+      return <Filter />;
+    }
+    if (post) {
       return <SidebarList />;
     }
 
@@ -59,7 +65,7 @@ const Sidebar: FC = () => {
         </Left>
         <Right>
           <div className="header">
-            <h2 className="title">{pageTitle}</h2>
+            <h2 className="title">{pageTitle()}</h2>
           </div>
           <div className="content">
             {/* <Filter /> */}

@@ -27,15 +27,17 @@ const useSearchParams = () => {
   }
 
   function set(newParams: object) {
-    const updatedParams = { ...Object.fromEntries(searchParams.entries()), ...newParams };
+    const existingParams = Object.fromEntries(searchParams.entries());
+    const updatedParams = { ...existingParams, ...newParams };
 
     for (const key in updatedParams) {
-      if (!updatedParams[key]) {
+      if (updatedParams[key] === undefined || updatedParams[key] === null) {
         delete updatedParams[key];
       }
     }
 
     setSearchParams(updatedParams);
+    console.log(2);
   }
 
   function isArrayParam(value: string) {
