@@ -73,27 +73,28 @@ const Searchbar: FC = () => {
                     </li>
                   );
                 })}
-                {searchList?.slice(0, listLength - searchedItems.length)?.map((elem, idx) => {
-                  if (!searchedItems.includes(elem)) {
-                    return (
-                      <li key={idx}>
-                        <SearchItems onClick={() => search(elem)}>
-                          <div className="content">
-                            <div className="left">
-                              <div className="icon">
-                                <span className="material-symbols-rounded">search</span>
+                {value.length > 0 &&
+                  searchList?.slice(0, listLength - searchedItems.length)?.map((elem, idx) => {
+                    if (!searchedItems.includes(elem)) {
+                      return (
+                        <li key={idx}>
+                          <SearchItems onClick={() => search(elem)}>
+                            <div className="content">
+                              <div className="left">
+                                <div className="icon">
+                                  <span className="material-symbols-rounded">search</span>
+                                </div>
+                                <p>
+                                  <b>{elem.slice(0, value.length)}</b>
+                                  {elem.slice(value.length)}
+                                </p>
                               </div>
-                              <p>
-                                <b>{elem.slice(0, value.length)}</b>
-                                {elem.slice(value.length)}
-                              </p>
                             </div>
-                          </div>
-                        </SearchItems>
-                      </li>
-                    );
-                  }
-                })}
+                          </SearchItems>
+                        </li>
+                      );
+                    }
+                  })}
               </ul>
             </SearchList>
           ) : null}
@@ -109,14 +110,14 @@ const Container = styled.div``;
 
 const SearchInputWrapper = styled.div`
   z-index: 100;
-  max-width: 500px;
+  max-width: 600px;
   height: 40px;
   position: relative;
   margin: 0 auto;
 `;
 
 const SearchInput = styled.div`
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
   background: var(--content-background);
   border: var(--border-style);

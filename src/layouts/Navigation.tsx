@@ -20,5 +20,5 @@ const Container = styled.nav`
   border-bottom: var(--border-style);
   background: var(--element-background);
   z-index: 100;
-  padding: 30px 0;
+  padding: 20px 0;
 `;

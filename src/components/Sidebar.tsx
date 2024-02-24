@@ -33,35 +33,44 @@ const Sidebar: FC = () => {
     <Container>
       <Content>
         <Left>
-          <button className="btn">
-            <span className="material-symbols-rounded icon">menu</span>
-          </button>
-          <ul>
-            <li>
-              <NavLink to={{ pathname: "/search/vacancy", search: "?page=1" }} className={"btn"}>
-                <span className="material-symbols-rounded icon">trip</span>
-                <p className="btn-label">Vacancies</p>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to={"/"} className="btn">
-                <span className="material-symbols-rounded icon">data_loss_prevention</span>
-                <p className="btn-label">CV's</p>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to={"/"} className="btn">
-                <span className="material-symbols-rounded icon">group</span>
-                <p className="btn-label">People</p>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to={"/"} className="btn">
-                <span className="material-symbols-rounded icon">trip</span>
-                <p className="btn-label">Jobs</p>
-              </NavLink>
-            </li>
-          </ul>
+          <div className="p-1">
+            <button className="btn">
+              <span className="material-symbols-rounded icon">menu</span>
+            </button>
+            <ul>
+              <li>
+                <NavLink to={{ pathname: "/search/vacancy", search: "?page=1" }} className={"btn"}>
+                  <span className="material-symbols-rounded icon">trip</span>
+                  <p className="btn-label">Vacancies</p>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to={"/"} className="btn">
+                  <span className="material-symbols-rounded icon">data_loss_prevention</span>
+                  <p className="btn-label">CV's</p>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to={"/"} className="btn">
+                  <span className="material-symbols-rounded icon">group</span>
+                  <p className="btn-label">People</p>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to={"/"} className="btn">
+                  <span className="material-symbols-rounded icon">trip</span>
+                  <p className="btn-label">Jobs</p>
+                </NavLink>
+              </li>
+            </ul>
+          </div>
+          <div className="p-2">
+            <button className="btn">
+              <div className="account">
+                <img src="" alt="" />
+              </div>
+            </button>
+          </div>
         </Left>
         <Right>
           <div className="header">
@@ -88,13 +97,14 @@ const Container = styled.div`
 const Content = styled.div`
   display: flex;
   width: 100%;
+  height: 100%;
 `;
 
 const Left = styled.div`
   min-width: 80px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
   border-right: var(--border-style);
 
   ul {
@@ -111,7 +121,6 @@ const Left = styled.div`
     border: none;
     background: transparent;
     transition: 0.1s;
-    display: flex;
     flex-direction: column;
     color: var(--icon-color);
 
@@ -130,6 +139,20 @@ const Left = styled.div`
     .icon {
       font-size: 28px;
       color: var(--icon-color);
+    }
+
+    .account {
+      height: 60%;
+      aspect-ratio: 1/1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--element-color);
+
+      img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+      }
     }
   }
 `;

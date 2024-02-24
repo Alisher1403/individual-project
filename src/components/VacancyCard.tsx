@@ -1,7 +1,7 @@
 import { FC } from "react";
 import styled from "styled-components";
 import { formData } from "../constant/formData";
-import { useSearchParams } from "hooks";
+import { Link } from "react-router-dom";
 
 interface ComponentProps {
   element: any;
@@ -9,44 +9,40 @@ interface ComponentProps {
   expanded?: boolean;
 }
 
-const VacancyCard: FC<ComponentProps> = ({ element, index, expanded = true }) => {
-  const searchParams = useSearchParams();
-
+const VacancyCard: FC<ComponentProps> = ({ element, expanded = true }) => {
   return (
-    <Card
-      key={element.id}
-      data-id={index}
-      onClick={() => searchParams.set({ post: element.id })}
-      tabIndex={1}
-      data-disabled={+searchParams.get("post") === element.id}
-    >
-      <div className="s1">
-        <div className="logo">
-          <img src={element.logo} alt="" />
-        </div>
-        <div className="main">
-          <h3>{element.title}</h3>
-          <p>{element.company}</p>
-          <p>{element.location}</p>
-        </div>
-        <div className="options">
-          <button>
-            <span className="material-symbols-rounded icon">bookmark</span>
-          </button>
-        </div>
-      </div>
-      {expanded && element.subtitle && <div className="s2">{element.subtitle}</div>}
-      <div className="s3">
-        <div className="left">
-          <div>{formData.timeAgo(element.created_at)}</div>
-          <div>{formData.emp_type.get(element.emp_type)}</div>
-          <div>
-            <span className="material-symbols-rounded">visibility</span>
-            {element.views[0].count}
+    <Container key={element.id}>
+      <Link to={{ search: `${window.location.search}&post=${element.id}` }}>
+        <Content>
+          <div className="s1">
+            <div className="logo">
+              <img src={element.logo} alt="" />
+            </div>
+            <div className="main">
+              <h3>{element.title}</h3>
+              <p>{element.company}</p>
+              <p>{element.location}</p>
+            </div>
+            <div className="options">
+              <button>
+                <span className="material-symbols-rounded icon">bookmark</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
-    </Card>
+          {expanded && element.subtitle && <div className="s2">{element.subtitle}</div>}
+          <div className="s3">
+            <div className="left">
+              <div>{formData.timeAgo(element.created_at)}</div>
+              <div>{formData.emp_type.get(element.emp_type)}</div>
+              <div>
+                <span className="material-symbols-rounded">visibility</span>
+                {element.views[0].count}
+              </div>
+            </div>
+          </div>
+        </Content>
+      </Link>
+    </Container>
   );
 };
 
@@ -54,7 +50,13 @@ export default VacancyCard;
 
 //! =================================================================== STYLE =================================================================== !//
 
-const Card = styled.div`
+const Container = styled.div`
+  a {
+    color: var(--text-color);
+  }
+`;
+
+const Content = styled.div`
   padding: 20px;
   background: var(--element-background);
   border: 1px solid var(--border-color);

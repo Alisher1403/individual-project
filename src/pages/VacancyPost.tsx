@@ -47,16 +47,16 @@ const VacancyPost: FC = () => {
           </Section_1>
           {/*  */}
           <Section_2>
-            <img src={data.logo} />
-            <h3>{data.company}</h3>
-          </Section_2>
-          {/*  */}
-          <s3.Content>
-            {data.description && <s3.Description>{parse(data.description)}</s3.Description>}
+            {data.description && (
+              <div className="p-1">
+                <h3>{appData.titles.description}</h3>
+                <p>{data.description}</p>
+              </div>
+            )}
             {data.skills ? (
-              <s3.Div>
-                <s3.Heading>{appData.titles.skillsRequired}</s3.Heading>
-                <s3.List>
+              <div className="p-1">
+                <h3>{appData.titles.skillsRequired}</h3>
+                <ul>
                   {data.skills.map((item: keyof typeof skillsIcon, index: string) => {
                     return (
                       <li key={index} data-list="skills">
@@ -73,12 +73,12 @@ const VacancyPost: FC = () => {
                       </li>
                     );
                   })}
-                </s3.List>
-              </s3.Div>
+                </ul>
+              </div>
             ) : null}
-            <s3.Date>{formData.created_at.get(data)}</s3.Date>
-          </s3.Content>
+          </Section_2>
           {/*  */}
+          <div>{formData.created_at.get(data)}</div>
         </Content>
       </div>
     </Container>
@@ -104,11 +104,6 @@ const Section_1 = styled.div`
   background: var(--element-background);
   border: 1px solid var(--border-color);
   margin: 10px 0;
-  cursor: pointer;
-
-  &:hover {
-    background: var(--element-background-hover);
-  }
 
   .p-1 {
     display: grid;
@@ -192,80 +187,54 @@ const Section_1 = styled.div`
 `;
 
 const Section_2 = styled.div`
-  padding: 15px;
-  display: flex;
-  align-items: center;
-  background-color: var(--data-background);
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-
+  padding: 30px 0;
   h3 {
-    font-size: 23px;
-    font-family: var(--font-regular);
-    font-weight: normal;
-    text-align: center;
-  }
-
-  img {
-    width: 50px;
-    aspect-ratio: 1/1;
-    border: var(--border-style);
-    object-fit: cover;
-    border-radius: 50%;
-  }
-`;
-
-const s3 = {
-  Content: styled.div``,
-  Description: styled.div``,
-  Div: styled.div`
-    padding: 10px 0;
-  `,
-  Heading: styled.h3`
     text-transform: capitalize;
+    font-size: 15px;
     margin-bottom: 10px;
-  `,
-  List: styled.ul`
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--title-color-light);
+  }
 
-    li {
-      .content {
-        display: flex;
-        align-items: center;
-        background: white;
-        height: 40px;
-        padding: 7px;
-        border-radius: 8px;
-        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.055), 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.024);
+  .p-1 {
+    padding-bottom: 30px;
 
-        .icon {
-          height: 100%;
-          aspect-ratio: 1/1;
+    ul {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      li {
+        .content {
+          display: flex;
+          align-items: center;
+          height: 40px;
+          padding: 7px;
+          border: 1px solid var(--border-color);
+          background: var(--element-background);
           border-radius: 5px;
-          overflow: hidden;
+          cursor: pointer;
 
-          svg {
+          .icon {
             height: 100%;
-            width: 100%;
-          }
-        }
+            aspect-ratio: 1/1;
+            border-radius: 5px;
+            overflow: hidden;
 
-        .name {
-          padding: 0 5px;
-          font-size: 18px;
+            svg {
+              height: 100%;
+              width: 100%;
+            }
+          }
+
+          .name {
+            padding: 0 4px;
+            font-size: 16px;
+          }
         }
       }
     }
-  `,
-  Date: styled.div`
-    color: #a8a8a8;
-  `,
-  text: styled.div`
-    display: flex;
-    column-gap: 3px;
-    align-items: center;
-  `,
-};
+  }
+`;

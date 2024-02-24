@@ -25,11 +25,11 @@ const VacancyList: FC = () => {
         <div className="top-content">
           <div className="count">{count} items found</div>
           <div className="btn-group">
-            <button onClick={() => setExpanded(false)} data-active={!expanded}>
-              <span className="material-symbols-rounded">list</span>
-            </button>
             <button onClick={() => setExpanded(true)} data-active={expanded}>
               <span className="material-symbols-rounded">checklist</span>
+            </button>
+            <button onClick={() => setExpanded(false)} data-active={!expanded}>
+              <span className="material-symbols-rounded">list</span>
             </button>
           </div>
         </div>

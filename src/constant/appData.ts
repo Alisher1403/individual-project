@@ -15,6 +15,12 @@ const titles = {
     fr: "Offres similaires",
     es: "Ofertas similares",
   }[lang],
+  description: {
+    eng: "Description",
+    rus: "Описание",
+    fr: "Description",
+    es: "Descripción",
+  }[lang],
 };
 
 const buttons = {
