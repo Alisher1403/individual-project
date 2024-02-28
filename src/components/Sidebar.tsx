@@ -1,22 +1,12 @@
 import { FC } from "react";
 import styled from "styled-components";
 import { Filter, SidebarList } from "layouts";
-import { NavLink, useLocation, useSearchParams } from "react-router-dom";
+import { Link, NavLink, useLocation, useSearchParams } from "react-router-dom";
 
 const Sidebar: FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const post = searchParams.get("post");
-
-  const pageTitle = () => {
-    if (location.pathname === "/search/vacancy") {
-      if (post) {
-        return "Jobs";
-      } else {
-        return "Filters";
-      }
-    }
-  };
+  const post = searchParams.get("vacancy_post");
 
   function getContent() {
     if (!post && location.pathname.includes("search")) {
@@ -41,7 +31,7 @@ const Sidebar: FC = () => {
               <li>
                 <NavLink to={{ pathname: "/search/vacancy", search: "?page=1" }} className={"btn"}>
                   <span className="material-symbols-rounded icon">trip</span>
-                  <p className="btn-label">Vacancies</p>
+                  <p className="btn-label">Jobs</p>
                 </NavLink>
               </li>
               <li>
@@ -74,7 +64,7 @@ const Sidebar: FC = () => {
         </Left>
         <Right>
           <div className="header">
-            <h2 className="title">{pageTitle()}</h2>
+            <Logo to="/">Constant</Logo>
           </div>
           <div className="content">
             {/* <Filter /> */}
@@ -98,6 +88,13 @@ const Content = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
+`;
+
+const Logo = styled(Link)`
+  font-size: 25px;
+  font-family: var(--font-semiBold);
+  color: var(--element-color);
+  font-weight: 700;
 `;
 
 const Left = styled.div`
@@ -161,13 +158,12 @@ const Right = styled.div`
   width: 100%;
 
   .header {
-    padding: 22px 20px;
+    height: 70px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
     border-bottom: var(--border-style);
     width: 100%;
-
-    .title {
-      font-size: 20px;
-    }
   }
 
   .content {

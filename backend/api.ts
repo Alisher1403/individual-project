@@ -6,6 +6,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "re
 import { supabase } from "backend";
 import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
+import { useLocation, useNavigate } from "react-router-dom";
 
 /******************************** VACANCIES API *************************************/
 
@@ -22,7 +23,7 @@ const vacancies = () => {
   // Location and search parameters
   const searchParams = useSearchParams();
   const allSearchParams = searchParams.getAll();
-  delete allSearchParams.post;
+  delete allSearchParams.vacancy_post;
   delete allSearchParams.extended;
 
   const dataKey = JSON.stringify(allSearchParams);
@@ -139,7 +140,7 @@ const vacancies = () => {
 const vacancy = () => {
   const searchParams = useSearchParams();
   const dispatch: AppDispatch = useDispatch();
-  const id = searchParams.get("post");
+  const id = searchParams.get("vacancy_post");
 
   const element = useSelector((state: RootState) => state.vacancy.element.data[id!]);
   const data = useMemo(() => element, [element]);
@@ -161,6 +162,8 @@ const searchbar = () => {
   // React Hooks and Refs
   const searchParams = useSearchParams();
   const text = searchParams.get("text");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [value, setValue] = useState<string>(text || "");
   const [focus, setFocus] = useState(false);
@@ -210,7 +213,12 @@ const searchbar = () => {
       event.preventDefault();
     }
 
-    searchParams.set({ text: value, page: "1" });
+    if (location.pathname === "/") {
+      navigate({ pathname: "/search/vacancy", search: `text=${value}&page=1` });
+    } else {
+      searchParams.set({ text: value, page: "1" });
+    }
+
     setFocus(false);
     inputRef.current?.blur();
     searchHistory.update(value);
@@ -374,4 +382,15 @@ const searchbar = () => {
   };
 };
 
-export default { vacancies, vacancy, searchbar };
+const home = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const data = useSelector((state: RootState) => state.home);
+
+  useEffect(() => {
+    dispatch(api.home.categories());
+  }, []);
+
+  return { data };
+};
+
+export default { vacancies, vacancy, searchbar, home };

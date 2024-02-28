@@ -12,7 +12,7 @@ interface ComponentProps {
 const VacancyCard: FC<ComponentProps> = ({ element, expanded = true }) => {
   return (
     <Container key={element.id}>
-      <Link to={{ search: `${window.location.search}&post=${element.id}` }}>
+      <Link to={{ search: `${window.location.search}&vacancy_post=${element.id}` }}>
         <Content>
           <div className="s1">
             <div className="logo">

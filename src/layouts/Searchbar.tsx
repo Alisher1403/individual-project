@@ -18,14 +18,12 @@ const Searchbar: FC = () => {
     clearInput,
   } = backend.searchbar();
 
-  if (!location.pathname.includes("search")) return;
-
   const listLength = 10;
 
   return (
     <Container className="container">
       <SearchInputWrapper>
-        <SearchInput data-focused={focus}>
+        <SearchInput data-focused={focus} data-bg={location.pathname === "/"}>
           <FocusBg data-focus={focus} onClick={() => setFocus(false)} />
           <Top>
             <form onSubmit={(e) => search(value, e)}>
@@ -125,6 +123,10 @@ const SearchInput = styled.div`
   top: 0;
   left: 0;
   right: 0;
+
+  &[data-bg="true"] {
+    background: var(--element-background);
+  }
 
   &[data-focused="true"] {
     border-color: var(--border-color-dark);

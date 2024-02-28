@@ -3,8 +3,8 @@ import { FC } from "react";
 import styled from "styled-components";
 import { formData } from "../constant/formData";
 import parse from "html-react-parser";
-import { skillsIcon } from "icons";
-import { appData } from "../constant/appData";
+import { skills } from "icons";
+import { appData } from "constant";
 import { Link } from "react-router-dom";
 
 const VacancyPost: FC = () => {
@@ -49,27 +49,29 @@ const VacancyPost: FC = () => {
           <Section_2>
             {data.description && (
               <div className="p-1">
-                <h3>{appData.titles.description}</h3>
-                <p>{data.description}</p>
+                <div className="description">{parse(data.description)}</div>
               </div>
             )}
             {data.skills ? (
               <div className="p-1">
                 <h3>{appData.titles.skillsRequired}</h3>
-                <ul>
-                  {data.skills.map((item: keyof typeof skillsIcon, index: string) => {
+                <ul data-skills>
+                  {data.skills.map((item: keyof typeof skills, index: number) => {
+                    const { icon, name } = skills[item] || {};
+                    const hasIcon = icon && name;
+
                     return (
                       <li key={index} data-list="skills">
-                        {skillsIcon[item]?.icon ? (
-                          <div className="content">
-                            <div className="icon">{parse(skillsIcon[item]?.icon)}</div>
-                            <p className="name">{skillsIcon[item]?.name}</p>
-                          </div>
-                        ) : (
-                          <div className="content">
+                        <div className="content">
+                          {hasIcon ? (
+                            <>
+                              <div className="icon">{parse(icon)}</div>
+                              <p className="name">{name}</p>
+                            </>
+                          ) : (
                             <p className="name">{item}</p>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </li>
                     );
                   })}
@@ -187,14 +189,36 @@ const Section_1 = styled.div`
 `;
 
 const Section_2 = styled.div`
-  padding: 30px 0;
   h3 {
     text-transform: capitalize;
     font-size: 15px;
     margin-bottom: 10px;
-    padding-bottom: 2px;
-    border-bottom: 1px solid var(--border-color);
     color: var(--title-color-light);
+  }
+
+  .description {
+    font-family: var(--font-regular);
+    color: var(--text-color);
+
+    h2 {
+      font-size: 16px;
+      color: var(--title-color);
+      margin-top: 20px;
+      margin-bottom: 3px;
+    }
+
+    ul {
+      li {
+        position: relative;
+        padding-left: 25px;
+
+        &::before {
+          content: "―";
+          left: 0;
+          position: absolute;
+        }
+      }
+    }
   }
 
   .p-1 {
@@ -207,6 +231,8 @@ const Section_2 = styled.div`
       gap: 8px;
 
       li {
+        cursor: pointer;
+
         .content {
           display: flex;
           align-items: center;
@@ -215,12 +241,11 @@ const Section_2 = styled.div`
           border: 1px solid var(--border-color);
           background: var(--element-background);
           border-radius: 5px;
-          cursor: pointer;
+          pointer-events: none;
 
           .icon {
             height: 100%;
             aspect-ratio: 1/1;
-            border-radius: 5px;
             overflow: hidden;
 
             svg {

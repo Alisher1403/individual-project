@@ -1,13 +1,11 @@
 import { FC } from "react";
 import styled from "styled-components";
 import { Searchbar } from "layouts";
+import { useLocation } from "react-router-dom";
 
 const Navigation: FC = () => {
-  return (
-    <Container>
-      <Searchbar />
-    </Container>
-  );
+  const location = useLocation();
+  return <Container>{location.pathname !== "/" && <Searchbar />}</Container>;
 };
 
 export default Navigation;

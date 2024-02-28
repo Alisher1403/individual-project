@@ -358,6 +358,61 @@ const currency = {
   },
 };
 
+const specialization = {
+  data: [
+    { value: "it", label: { eng: "IT", rus: "IT", es: "IT", fr: "IT" }[lang] },
+    { value: "marketing", label: { eng: "Marketing", rus: "Маркетинг", es: "Marketing", fr: "Marketing" }[lang] },
+    { value: "finance", label: { eng: "Finance", rus: "Финансы", es: "Finanzas", fr: "Finance" }[lang] },
+    { value: "design", label: { eng: "Design", rus: "Дизайн", es: "Diseño", fr: "Design" }[lang] },
+    {
+      value: "healthcare",
+      label: { eng: "Healthcare", rus: "Здравоохранение", es: "Cuidado de la salud", fr: "Soin de santé" }[lang],
+    },
+    { value: "education", label: { eng: "Education", rus: "Образование", es: "Educación", fr: "Éducation" }[lang] },
+    { value: "sales", label: { eng: "Sales", rus: "Продажи", es: "Ventas", fr: "Ventes" }[lang] },
+    {
+      value: "hospitality",
+      label: { eng: "Hospitality", rus: "Гостеприимство", es: "Hospitalidad", fr: "Hospitalité" }[lang],
+    },
+    { value: "law", label: { eng: "Law", rus: "Право", es: "Derecho", fr: "Droit" }[lang] },
+    { value: "media", label: { eng: "Media", rus: "Медиа", es: "Medios de comunicación", fr: "Médias" }[lang] },
+    { value: "engineering", label: { eng: "Engineering", rus: "Инженерия", es: "Ingeniería", fr: "Ingénierie" }[lang] },
+    {
+      value: "manufacturing",
+      label: { eng: "Manufacturing", rus: "Производство", es: "Manufactura", fr: "Fabrication" }[lang],
+    },
+    { value: "consulting", label: { eng: "Consulting", rus: "Консалтинг", es: "Consultoría", fr: "Conseil" }[lang] },
+    { value: "research", label: { eng: "Research", rus: "Исследования", es: "Investigación", fr: "Recherche" }[lang] },
+    {
+      value: "pharmaceuticals",
+      label: { eng: "Pharmaceuticals", rus: "Фармацевтика", es: "Farmacéuticos", fr: "Pharmaceutiques" }[lang],
+    },
+    { value: "energy", label: { eng: "Energy", rus: "Энергетика", es: "Energía", fr: "Énergie" }[lang] },
+    {
+      value: "telecommunications",
+      label: { eng: "Telecommunications", rus: "Телекоммуникации", es: "Telecomunicaciones", fr: "Télécommunications" }[
+        lang
+      ],
+    },
+    { value: "logistics", label: { eng: "Logistics", rus: "Логистика", es: "Logística", fr: "Logistique" }[lang] },
+    { value: "aviation", label: { eng: "Aviation", rus: "Авиация", es: "Aviación", fr: "Aviation" }[lang] },
+    { value: "fashion", label: { eng: "Fashion", rus: "Мода", es: "Moda", fr: "Mode" }[lang] },
+    {
+      value: "real estate",
+      label: { eng: "Real Estate", rus: "Недвижимость", es: "Bienes raíces", fr: "Immobilier" }[lang],
+    },
+    {
+      value: "automotive",
+      label: { eng: "Automotive", rus: "Автомобильная промышленность", es: "Automotriz", fr: "Automobile" }[lang],
+    },
+    { value: "business", label: { eng: "Business", rus: "Бизнес", es: "Negocio", fr: "Entreprise" }[lang] },
+  ],
+  get(value: string) {
+    const item = this.data.find((e) => e.value === value);
+    return item?.label;
+  },
+};
+
 export const formData = {
   experience,
   emp_type,
@@ -368,4 +423,5 @@ export const formData = {
   months,
   skills,
   timeAgo,
+  specialization,
 };

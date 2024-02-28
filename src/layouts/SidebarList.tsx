@@ -7,7 +7,7 @@ import { formData } from "../constant/formData";
 const SidebarList: FC = () => {
   const { data } = backend.vacancies();
   const searchParams = useSearchParams();
-  const post = searchParams.get("post");
+  const post = searchParams.get("vacancy_post");
 
   if (!data) return;
   return (
@@ -16,7 +16,7 @@ const SidebarList: FC = () => {
         {data.map((elem, index) => {
           return (
             <li key={index} data-selected={+post === elem.id}>
-              <button onClick={() => searchParams.set({ post: elem.id })}>
+              <button onClick={() => searchParams.set({ vacancy_post: elem.id })}>
                 <div>
                   <h3>{elem.title}</h3>
                   <p>{elem.company}</p>
