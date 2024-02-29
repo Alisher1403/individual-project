@@ -143,6 +143,8 @@ const vacancy = () => {
   const id = searchParams.get("vacancy_post");
 
   const element = useSelector((state: RootState) => state.vacancy.element.data[id!]);
+  const commentsList = useSelector((state: RootState) => state.vacancy.element.comments[id!]);
+  const commentsCount = useSelector((state: RootState) => state.vacancy.element.commentsCount[id!]);
   const data = useMemo(() => element, [element]);
   const { error } = useSelector((state: RootState) => state.vacancy.element);
 
@@ -153,7 +155,15 @@ const vacancy = () => {
     }
   }, [id]);
 
-  return { data, error };
+  const comments = {
+    list: commentsList,
+    count: commentsCount,
+    load() {
+      dispatch(api.vacancy.loadMoreComments(id));
+    },
+  };
+
+  return { data, error, comments };
 };
 
 /******************************** SEARCHBAR API *************************************/

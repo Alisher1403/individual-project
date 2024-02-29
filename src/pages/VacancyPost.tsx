@@ -1,14 +1,25 @@
 import backend from "backend";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import styled from "styled-components";
 import { formData } from "../constant/formData";
 import parse from "html-react-parser";
 import { skills } from "icons";
 import { appData } from "constant";
 import { Link } from "react-router-dom";
+import { Comment } from "components";
+import { useInView } from "react-intersection-observer";
 
 const VacancyPost: FC = () => {
-  const { data, error } = backend.vacancy();
+  const { data, error, comments } = backend.vacancy();
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+  });
+
+  useEffect(() => {
+    if (inView) {
+      comments.load();
+    }
+  }, [inView]);
 
   if (!data || error) return;
 
@@ -81,6 +92,25 @@ const VacancyPost: FC = () => {
           </Section_2>
           {/*  */}
           <div>{formData.created_at.get(data)}</div>
+
+          <Section_3>
+            <h2>Comments {comments.count}</h2>
+            <ul>
+              {comments.list
+                ? comments.list?.map((item: any, index: number) => {
+                    return (
+                      <li key={index}>
+                        <Comment element={item} />
+                      </li>
+                    );
+                  })
+                : undefined}
+            </ul>
+            <div ref={ref} className="loading-animation">
+              <div className="loader"></div>
+              <p>Loading...</p>
+            </div>
+          </Section_3>
         </Content>
       </div>
     </Container>
@@ -231,8 +261,6 @@ const Section_2 = styled.div`
       gap: 8px;
 
       li {
-        cursor: pointer;
-
         .content {
           display: flex;
           align-items: center;
@@ -260,6 +288,32 @@ const Section_2 = styled.div`
           }
         }
       }
+    }
+  }
+`;
+
+const Section_3 = styled.div`
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed var(--border-color-black);
+
+  h2 {
+    color: var(--title-color);
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .loading-animation {
+    font-size: 15px;
+    font-family: var(--font-semiBold);
+    color: var(--title-color);
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
+    padding: 10px;
+
+    .loader {
+      width: 26px;
     }
   }
 `;

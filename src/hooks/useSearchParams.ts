@@ -37,7 +37,6 @@ const useSearchParams = () => {
     }
 
     setSearchParams(updatedParams);
-    console.log(2);
   }
 
   function isArrayParam(value: string) {

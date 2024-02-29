@@ -3,10 +3,11 @@ import { FC } from "react";
 import styled from "styled-components";
 import { Searchbar } from "layouts";
 import { formData } from "../constant/formData";
-import { appData } from "constant";
+import { home } from "constant";
 
 const Home: FC = () => {
   const { data } = backend.home();
+  const content = home();
 
   return (
     <Container>
@@ -21,7 +22,7 @@ const Home: FC = () => {
                     <li key={e.name}>
                       <div className="content">
                         <h3>{formData.specialization.get(e.name)}</h3>
-                        <div>{appData.home.specialization(e)}</div>
+                        <div>{content.specialization(e)}</div>
                       </div>
                     </li>
                   );
