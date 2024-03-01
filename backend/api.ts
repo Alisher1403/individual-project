@@ -7,6 +7,7 @@ import { supabase } from "backend";
 import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useInView } from "react-intersection-observer";
 
 /******************************** VACANCIES API *************************************/
 
@@ -142,9 +143,24 @@ const vacancy = () => {
   const dispatch: AppDispatch = useDispatch();
   const id = searchParams.get("vacancy_post");
 
+  const [newComment, setNewComment] = useState("");
+  const [newCommentFocus, setNewCommentFocus] = useState(false);
+
   const element = useSelector((state: RootState) => state.vacancy.element.data[id!]);
-  const commentsList = useSelector((state: RootState) => state.vacancy.element.comments[id!]);
-  const commentsCount = useSelector((state: RootState) => state.vacancy.element.commentsCount[id!]);
+  const commentsList = useSelector((state: RootState) => state.vacancy.comments.data[id!]);
+  const commentsCount = useSelector((state: RootState) => state.vacancy.comments.count[id!]);
+  const commentsLoading = useSelector((state: RootState) => state.vacancy.comments.loading);
+  const profile = useSelector((state: RootState) => state.profile);
+  const [commentsObserver, InCommentsObserver] = useInView({
+    triggerOnce: false,
+  });
+
+  useEffect(() => {
+    if (InCommentsObserver) {
+      comments.load();
+    }
+  }, [InCommentsObserver]);
+
   const data = useMemo(() => element, [element]);
   const { error } = useSelector((state: RootState) => state.vacancy.element);
 
@@ -158,12 +174,18 @@ const vacancy = () => {
   const comments = {
     list: commentsList,
     count: commentsCount,
+    loading: commentsLoading,
+    value: newComment,
+    setValue: setNewComment,
+    observer: commentsObserver,
+    focus: newCommentFocus,
+    setFocus: setNewCommentFocus,
     load() {
       dispatch(api.vacancy.loadMoreComments(id));
     },
   };
 
-  return { data, error, comments };
+  return { data, error, comments, profile };
 };
 
 /******************************** SEARCHBAR API *************************************/

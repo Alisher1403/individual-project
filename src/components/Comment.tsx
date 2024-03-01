@@ -11,7 +11,9 @@ const Comment: FC<iComment> = ({ element }) => {
   return (
     <Container>
       <Content>
-        <div className="logo"></div>
+        <div className="logo">
+          {element.user.img ? <img src={element.user.img} alt="" /> : element.user.name[0].toUpperCase()}
+        </div>
         <div className="main">
           <div className="header">
             <div className="name">{element.user.name}</div>
@@ -53,6 +55,13 @@ const Content = styled.div`
     background-color: var(--element-color);
     border-radius: 50%;
     overflow: hidden;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    user-select: none;
+    font-family: var(--font-semiBold);
   }
 
   .main {

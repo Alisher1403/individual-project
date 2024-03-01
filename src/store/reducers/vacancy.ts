@@ -17,8 +17,11 @@ interface VacancyState {
     data: { [key: string]: any };
     loading: boolean;
     error: boolean;
-    comments: { [key: string]: any };
-    commentsCount: { [key: string]: number };
+  };
+  comments: {
+    data: { [key: string]: any };
+    count: { [key: string]: number };
+    loading: boolean;
   };
 }
 
@@ -37,8 +40,11 @@ const vacancy = createSlice({
       data: {},
       loading: false,
       error: false,
-      comments: {},
-      commentsCount: {},
+    },
+    comments: {
+      data: {},
+      count: {},
+      loading: false,
     },
   } as VacancyState,
   reducers: {
@@ -63,6 +69,9 @@ const vacancy = createSlice({
     vacancyError(state, action: PayloadAction<boolean>) {
       state.element.error = action.payload;
     },
+    commentsLoading(state, action: PayloadAction<boolean>) {
+      state.comments.loading = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(element.fulfilled, (state, action) => {
@@ -80,11 +89,11 @@ const vacancy = createSlice({
     builder.addCase(comments.fulfilled, (state, action) => {
       const { key, data, count } = action.payload;
 
-      if (data && !state.element.comments[key]) {
-        state.element.comments[key] = data;
+      if (data && !state.comments.data[key]) {
+        state.comments.data[key] = data;
       }
       if (count) {
-        state.element.commentsCount[key] = count;
+        state.comments.count[key] = count;
       }
     });
     builder.addCase(loadMoreComments.fulfilled, (state, action) => {
@@ -92,7 +101,11 @@ const vacancy = createSlice({
         const { key, data } = action.payload;
 
         if (data) {
-          state.element.comments[key].push(...data);
+          const uniqueArray = Array.from(
+            new Set([...state.comments.data[key], ...data].map((item) => JSON.stringify(item)))
+          ).map((item) => JSON.parse(item));
+
+          state.comments.data[key] = uniqueArray;
         }
       }
     });
@@ -106,12 +119,12 @@ export default vacancy.reducer;
 
 /********************************************************************************************************************/
 const element = createAsyncThunk("vacancy", async (id: string, { dispatch }) => {
+  dispatch(comments(id));
+
   const { data, error } = await supabase
     .from("vacancies")
     .select(`*, likes (count), dislikes (count), views (count)`)
     .eq("id", id);
-
-  dispatch(comments(id));
 
   return { key: id, data, error };
 });
@@ -119,7 +132,8 @@ const element = createAsyncThunk("vacancy", async (id: string, { dispatch }) => 
 const comments = createAsyncThunk("comments", async (id: string) => {
   let query = supabase
     .from("comments")
-    .select("*, user: user_id (name: user_name)", { count: "exact" })
+    .select("*, user: user_id (name: user_name, img)", { count: "exact" })
+    .order("id", { ascending: true })
     .eq("vacancy_id", id);
 
   const { data, count } = await query.limit(5);
@@ -127,22 +141,28 @@ const comments = createAsyncThunk("comments", async (id: string) => {
   return { key: id, data, count };
 });
 
-const loadMoreComments = createAsyncThunk("loadMoreComments", async (id: string, { getState }) => {
+const loadMoreComments = createAsyncThunk("loadMoreComments", async (id: string, { getState, dispatch }) => {
   const state = getState() as RootState;
-  const mainState = state.vacancy.element.comments[id] || [];
-  const stateCount = state.vacancy.element.commentsCount[id] || 0;
-  if (stateCount !== mainState.length) {
-    let query = supabase.from("comments").select("*, user: user_id (name: user_name)").eq("vacancy_id", id);
+  const mainState = state.vacancy.comments.data[id] || [];
+  const stateCount = state.vacancy.comments.count[id] || false;
 
-    if (mainState.length > 0) {
-      const latestTimestamp = mainState[mainState.length - 1].id;
-      query = query.gt("id", latestTimestamp);
-    }
-
-    const { data } = await query.limit(5);
-
-    return { key: id, data };
+  if (!stateCount || stateCount <= mainState.length) {
+    return;
   }
+
+  dispatch(vacancy.actions.commentsLoading(true));
+  let query = supabase.from("comments").select("*, user: user_id (name: user_name)").eq("vacancy_id", id);
+
+  if (mainState.length > 0) {
+    const latestId = mainState[mainState.length - 1].id;
+    query = query.gt("id", latestId);
+  }
+
+  const { data } = await query.limit(5);
+
+  dispatch(vacancy.actions.commentsLoading(false));
+
+  return { key: id, data };
 });
 
 export const vacancyApi = {

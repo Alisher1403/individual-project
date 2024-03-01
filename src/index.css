@@ -55,4 +55,7 @@
 
   /* background */
   --card-hover-bg: #c5c5c545;
+
+  /* placeholder */
+  --placeholder-color: #a8aabc;
 }

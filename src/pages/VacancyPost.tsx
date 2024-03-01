@@ -1,5 +1,5 @@
 import backend from "backend";
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import styled from "styled-components";
 import { formData } from "../constant/formData";
 import parse from "html-react-parser";
@@ -7,19 +7,9 @@ import { skills } from "icons";
 import { appData } from "constant";
 import { Link } from "react-router-dom";
 import { Comment } from "components";
-import { useInView } from "react-intersection-observer";
 
 const VacancyPost: FC = () => {
-  const { data, error, comments } = backend.vacancy();
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-  });
-
-  useEffect(() => {
-    if (inView) {
-      comments.load();
-    }
-  }, [inView]);
+  const { data, error, comments, profile } = backend.vacancy();
 
   if (!data || error) return;
 
@@ -94,7 +84,41 @@ const VacancyPost: FC = () => {
           <div>{formData.created_at.get(data)}</div>
 
           <Section_3>
-            <h2>Comments {comments.count}</h2>
+            <div className="title">
+              <h2>Comments </h2>
+              <i>{comments.count}</i>
+            </div>
+            <div className="new-comment">
+              <div className="body">
+                <div className="img">
+                  {profile.img ? <img src={profile.img} alt="" /> : profile.name[0]?.toUpperCase()}
+                </div>
+                <div className="input-wrapper">
+                  <input
+                    type="text"
+                    value={comments.value}
+                    onChange={(e) => comments.setValue(e.target.value)}
+                    onFocus={() => comments.setFocus(true)}
+                    placeholder={"Enter Comment"}
+                  />
+                </div>
+              </div>
+              {comments.focus ? (
+                <div className="footer">
+                  <div className="buttons-wrapper">
+                    <button className="button" onClick={() => comments.setFocus(false)}>
+                      Cancel
+                    </button>
+                    <button className="button" data-primary onClick={() => comments.setFocus(false)}>
+                      Leave Comment
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="footer-margin"></div>
+              )}
+            </div>
+            {/*  */}
             <ul>
               {comments.list
                 ? comments.list?.map((item: any, index: number) => {
@@ -104,12 +128,16 @@ const VacancyPost: FC = () => {
                       </li>
                     );
                   })
-                : undefined}
+                : null}
             </ul>
-            <div ref={ref} className="loading-animation">
-              <div className="loader"></div>
-              <p>Loading...</p>
-            </div>
+            {/*  */}
+            {comments.loading ? (
+              <div className="loading-animation">
+                <div className="loader"></div>
+                <p>Loading...</p>
+              </div>
+            ) : null}
+            <div ref={comments.observer}></div>
           </Section_3>
         </Content>
       </div>
@@ -297,10 +325,96 @@ const Section_3 = styled.div`
   padding-top: 15px;
   border-top: 1px dashed var(--border-color-black);
 
-  h2 {
-    color: var(--title-color);
-    font-size: 20px;
-    margin-bottom: 10px;
+  .title {
+    display: flex;
+    column-gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+
+    h2 {
+      color: var(--title-color);
+      font-size: 20px;
+    }
+  }
+
+  .new-comment {
+    width: 100%;
+
+    .body {
+      display: flex;
+      align-items: center;
+      column-gap: 10px;
+      margin-bottom: 10px;
+
+      .img {
+        height: 35px;
+        aspect-ratio: 1/1;
+        background: var(--element-color);
+        color: white;
+        font-family: var(--font-semiBold);
+        font-size: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+      }
+
+      .input-wrapper {
+        width: 100%;
+
+        input {
+          border: none;
+          background: none;
+          outline: none;
+          border-bottom: 0.5px solid var(--border-color-dark);
+          width: 100%;
+          padding: 5px 0;
+          font-family: var(--font-regular);
+          color: var(--text-color);
+          font-size: 16px;
+          transition: 0.1s;
+
+          &::placeholder {
+            color: var(--placeholder-color);
+          }
+
+          &:focus {
+            border-bottom: 0.5px solid var(--border-color-black);
+          }
+        }
+      }
+    }
+
+    .footer {
+      margin-bottom: 5px;
+
+      .buttons-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        column-gap: 5px;
+
+        .button {
+          font-family: var(--font-semiBold);
+          color: var(--title-color);
+          border: 0.5px solid var(--border-color);
+          padding: 5px 15px;
+          font-size: 15px;
+          cursor: pointer;
+          border-radius: 5px;
+          background: var(--element-background);
+
+          &[data-primary] {
+            background-color: var(--element-color);
+            color: white;
+          }
+        }
+      }
+    }
+
+    .footer-margin {
+      margin-bottom: 25px;
+    }
   }
 
   .loading-animation {
