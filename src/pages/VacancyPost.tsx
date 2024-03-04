@@ -6,10 +6,10 @@ import parse from "html-react-parser";
 import { skills } from "icons";
 import { appData } from "constant";
 import { Link } from "react-router-dom";
-import { Comment } from "components";
+import { Comment, CommentEditor } from "components";
 
 const VacancyPost: FC = () => {
-  const { data, error, comments, profile } = backend.vacancy();
+  const { data, error, comments, id } = backend.vacancy();
 
   if (!data || error) return;
 
@@ -88,55 +88,25 @@ const VacancyPost: FC = () => {
               <h2>Comments </h2>
               <i>{comments.count}</i>
             </div>
-            <div className="new-comment">
-              <div className="body">
-                <div className="img">
-                  {profile.img ? <img src={profile.img} alt="" /> : profile.name[0]?.toUpperCase()}
-                </div>
-                <div className="input-wrapper">
-                  <input
-                    type="text"
-                    value={comments.value}
-                    onChange={(e) => comments.setValue(e.target.value)}
-                    onFocus={() => comments.setFocus(true)}
-                    placeholder={"Enter Comment"}
-                  />
-                </div>
-              </div>
-              {comments.focus ? (
-                <div className="footer">
-                  <div className="buttons-wrapper">
-                    <button className="button" onClick={() => comments.setFocus(false)}>
-                      Cancel
-                    </button>
-                    <button className="button" data-primary onClick={() => comments.setFocus(false)}>
-                      Leave Comment
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="footer-margin"></div>
-              )}
-            </div>
+            <CommentEditor />
             {/*  */}
             <ul>
               {comments.list
                 ? comments.list?.map((item: any, index: number) => {
                     return (
                       <li key={index}>
-                        <Comment element={item} />
+                        <Comment element={item} id={id} />
                       </li>
                     );
                   })
                 : null}
             </ul>
             {/*  */}
-            {comments.loading ? (
-              <div className="loading-animation">
-                <div className="loader"></div>
-                <p>Loading...</p>
-              </div>
-            ) : null}
+            <div className="loading-animation" data-loading={comments.loading}>
+              <div className="loader"></div>
+              <p>Loading...</p>
+            </div>
+            {/*  */}
             <div ref={comments.observer}></div>
           </Section_3>
         </Content>
@@ -286,14 +256,14 @@ const Section_2 = styled.div`
       width: 100%;
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
 
       li {
         .content {
           display: flex;
           align-items: center;
-          height: 40px;
-          padding: 7px;
+          height: 35px;
+          padding: 6px;
           border: 1px solid var(--border-color);
           background: var(--element-background);
           border-radius: 5px;
@@ -342,9 +312,10 @@ const Section_3 = styled.div`
 
     .body {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       column-gap: 10px;
       margin-bottom: 10px;
+      width: 100%;
 
       .img {
         height: 35px;
@@ -359,15 +330,16 @@ const Section_3 = styled.div`
         border-radius: 50%;
       }
 
-      .input-wrapper {
-        width: 100%;
+      .comment-input-wrapper {
+        flex: 1;
+        overflow: hidden;
 
-        input {
+        .comment-input {
           border: none;
           background: none;
           outline: none;
+          resize: none;
           border-bottom: 0.5px solid var(--border-color-dark);
-          width: 100%;
           padding: 5px 0;
           font-family: var(--font-regular);
           color: var(--text-color);
@@ -424,7 +396,12 @@ const Section_3 = styled.div`
     display: flex;
     align-items: center;
     column-gap: 16px;
-    padding: 10px;
+    padding: 5px;
+    visibility: hidden;
+
+    &[data-loading="true"] {
+      visibility: visible;
+    }
 
     .loader {
       width: 26px;

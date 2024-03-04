@@ -1,22 +1,9 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { VacancyCard } from "components";
 import backend from "backend";
 import styled from "styled-components";
 
 const VacancyList: FC = () => {
-  const [expanded, setExpanded] = useState(() => {
-    if (localStorage.getItem("extended") === "true") return true;
-    return false;
-  });
-
-  useEffect(() => {
-    if (!expanded) {
-      localStorage.setItem("extended", "false");
-    } else {
-      localStorage.setItem("extended", "true");
-    }
-  }, [expanded]);
-
   const { data, count, loading, error, pagination } = backend.vacancies();
 
   return (
@@ -24,14 +11,6 @@ const VacancyList: FC = () => {
       <Content>
         <div className="top-content">
           <div className="count">{count} items found</div>
-          <div className="btn-group">
-            <button onClick={() => setExpanded(true)} data-active={expanded}>
-              <span className="material-symbols-rounded">checklist</span>
-            </button>
-            <button onClick={() => setExpanded(false)} data-active={!expanded}>
-              <span className="material-symbols-rounded">list</span>
-            </button>
-          </div>
         </div>
         <div>
           <Data>
@@ -40,7 +19,7 @@ const VacancyList: FC = () => {
                 data.map((el: any, idx: any) => (
                   <li key={idx}>
                     <div className="content">
-                      <VacancyCard key={idx} element={el} index={idx} expanded={expanded} />
+                      <VacancyCard key={idx} element={el} index={idx} />
                     </div>
                   </li>
                 ))}

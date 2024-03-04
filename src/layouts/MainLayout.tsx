@@ -1,11 +1,14 @@
 import { FC } from "react";
-import { Home, Profile, Vacancy } from "pages";
+import { Home, Login, Profile, Vacancy } from "pages";
 import styled from "styled-components";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { Navigation } from "layouts";
 import { Sidebar } from "components";
 
 const MainLayout: FC = () => {
+  const location = useLocation();
+  if (location.pathname === "/login") return <Login />;
+
   return (
     <Container>
       <Content>
@@ -18,6 +21,7 @@ const MainLayout: FC = () => {
             <Route path="/" element={<Home />}></Route>
             <Route path="/search/vacancy" element={<Vacancy />}></Route>
             <Route path="/profile/:id" element={<Profile />}></Route>
+            <Route path="/login" element={<Login />}></Route>
           </Routes>
         </MainContent>
       </Content>
@@ -41,10 +45,22 @@ const Left = styled.div`
   width: 20vw;
   min-width: 350px;
   overflow: hidden;
+
+  @media screen and (max-width: 1100px) {
+    display: none;
+  }
 `;
 const MainContent = styled.div`
   width: 100%;
   background-color: var(--content-background);
+
+  @media screen and (max-width: 1100px) {
+    padding: 0 30px;
+  }
+
+  @media screen and (max-width: 700px) {
+    padding: 0;
+  }
 
   .main-container {
     max-width: 1100px;

@@ -55,11 +55,11 @@ const Sidebar: FC = () => {
             </ul>
           </div>
           <div className="p-2">
-            <button className="btn">
+            <NavLink to={"/login"} className="btn">
               <div className="account">
                 <img src="" alt="" />
               </div>
-            </button>
+            </NavLink>
           </div>
         </Left>
         <Right>

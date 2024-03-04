@@ -86,17 +86,19 @@ const vacancy = createSlice({
         console.log("Failed to fetch data:", error);
       }
     });
-    builder.addCase(comments.fulfilled, (state, action) => {
+    builder.addCase(LoadComments.fulfilled, (state, action) => {
       const { key, data, count } = action.payload;
 
       if (data && !state.comments.data[key]) {
         state.comments.data[key] = data;
       }
-      if (count) {
-        state.comments.count[key] = count;
+      if (count && count?.[0].count) {
+        state.comments.count[key] = count?.[0].count;
+      } else {
+        state.comments.count[key] = 0;
       }
     });
-    builder.addCase(loadMoreComments.fulfilled, (state, action) => {
+    builder.addCase(GetComments.fulfilled, (state, action) => {
       if (action.payload) {
         const { key, data } = action.payload;
 
@@ -109,6 +111,50 @@ const vacancy = createSlice({
         }
       }
     });
+    builder.addCase(PostComment.fulfilled, (state, action) => {
+      if (action.payload) {
+        const { key, data } = action.payload;
+
+        if (data) {
+          const comment = data[0];
+          comment.likes_count = 0;
+          comment.user_liked = false;
+          state.comments.data[key] = [comment, ...state.comments.data[key]];
+          state.comments.count[key] += 1;
+        }
+      }
+    });
+    builder.addCase(UpdateComment.fulfilled, (state, action) => {
+      if (action.payload) {
+        const { data, id, key } = action.payload;
+        const list = state.comments.data[key];
+
+        if (data && id && list) {
+          const newArr = list.map((e: any) => (e.id === id ? data[0] : e));
+          state.comments.data[key] = newArr;
+        }
+      }
+    });
+    builder.addCase(DeleteComment.fulfilled, (state, action) => {
+      if (action.payload) {
+        const { data, id, key } = action.payload;
+        const list = state.comments.data[key];
+
+        if (data && id && list) {
+          const newArr = list.filter((e: any) => e.id !== id);
+          state.comments.data[key] = newArr;
+          state.comments.count[key] -= 1;
+        }
+      }
+    });
+    builder.addCase(PostCommentLike.fulfilled, (state, action) => {
+      const { comment_id, key } = action.payload;
+      const list = state.comments.data[key];
+      const index = list?.findIndex((e: { id: number }) => e.id === comment_id);
+      list[index].user_liked = list[index].user_liked ? list[index]?.user_liked : null;
+
+      state.comments.data[key] = list;
+    });
   },
 });
 
@@ -118,8 +164,13 @@ export const { vacancyListError, vacancyListLoading, vacancyData, vacancyError, 
 export default vacancy.reducer;
 
 /********************************************************************************************************************/
-const element = createAsyncThunk("vacancy", async (id: string, { dispatch }) => {
-  dispatch(comments(id));
+const config = {
+  commentsPerLoad: 6,
+};
+
+/********************************************************************************************************************/
+const element = createAsyncThunk("vacancy", async (id: number, { dispatch }) => {
+  dispatch(LoadComments(id));
 
   const { data, error } = await supabase
     .from("vacancies")
@@ -129,44 +180,106 @@ const element = createAsyncThunk("vacancy", async (id: string, { dispatch }) => 
   return { key: id, data, error };
 });
 
-const comments = createAsyncThunk("comments", async (id: string) => {
-  let query = supabase
-    .from("comments")
-    .select("*, user: user_id (name: user_name, img)", { count: "exact" })
-    .order("id", { ascending: true })
-    .eq("vacancy_id", id);
+const LoadComments = createAsyncThunk("LoadComments", async (vacancy_id: number, { getState }) => {
+  const state = getState() as RootState;
+  const list = state.vacancy.comments.data[vacancy_id] || [];
+  const last_id = list[list.length - 1]?.id || null;
+  const user_id = state.profile.id;
 
-  const { data, count } = await query.limit(5);
+  const params = { p_post_id: vacancy_id, p_from_id: last_id, p_limit: config.commentsPerLoad, p_user_id: user_id };
 
-  return { key: id, data, count };
+  const { data } = await supabase.rpc("get_comments", params);
+
+  const { data: count } = await supabase.from("comments").select("count").eq("vacancy_id", vacancy_id);
+
+  return { key: vacancy_id, data, count };
 });
 
-const loadMoreComments = createAsyncThunk("loadMoreComments", async (id: string, { getState, dispatch }) => {
+const GetComments = createAsyncThunk("GetComments", async (vacancy_id: string, { getState, dispatch }) => {
   const state = getState() as RootState;
-  const mainState = state.vacancy.comments.data[id] || [];
-  const stateCount = state.vacancy.comments.count[id] || false;
+  const user_id = state.profile.id;
+  const mainState = state.vacancy.comments.data[vacancy_id] || [];
+  const last_id = mainState[mainState.length - 1]?.id;
+
+  const stateCount = state.vacancy.comments.count[vacancy_id] || false;
 
   if (!stateCount || stateCount <= mainState.length) {
     return;
   }
 
   dispatch(vacancy.actions.commentsLoading(true));
-  let query = supabase.from("comments").select("*, user: user_id (name: user_name)").eq("vacancy_id", id);
-
-  if (mainState.length > 0) {
-    const latestId = mainState[mainState.length - 1].id;
-    query = query.gt("id", latestId);
-  }
-
-  const { data } = await query.limit(5);
+  const params = { p_post_id: vacancy_id, p_from_id: last_id, p_limit: config.commentsPerLoad, p_user_id: user_id };
+  const { data } = await supabase.rpc("get_comments", params);
 
   dispatch(vacancy.actions.commentsLoading(false));
 
-  return { key: id, data };
+  return { key: vacancy_id, data };
 });
+
+const PostComment = createAsyncThunk(
+  "PostComment",
+  async (args: { vacancy_id: number; value: string }, { getState }) => {
+    const state = getState() as RootState;
+    const user_id = state.profile.id;
+
+    const { value, vacancy_id } = args;
+
+    if (vacancy_id) {
+      const { data } = await supabase
+        .from("comments")
+        .insert({ vacancy_id, text: value, user_id })
+        .select("*, user_data: users(id: user_id, name: user_name, img)");
+
+      return { key: vacancy_id, data };
+    }
+  }
+);
+
+const UpdateComment = createAsyncThunk(
+  "UpdateComment",
+  async (args: { id: number; value: string; vacancy_id: number }) => {
+    const { value, id, vacancy_id } = args;
+    const { data } = await supabase
+      .from("comments")
+      .update({ text: value, changed: true })
+      .eq("id", id)
+      .select("*, user_data: users(id: user_id, name: user_name, img)");
+
+    return { key: vacancy_id, data, id };
+  }
+);
+
+const DeleteComment = createAsyncThunk("DeleteComment", async (args: { id: number; vacancy_id: number }) => {
+  const { id, vacancy_id } = args;
+  const { data } = await supabase.from("comments").delete().eq("id", id).select();
+
+  return { key: vacancy_id, data, id };
+});
+
+const PostCommentLike = createAsyncThunk(
+  "PostCommentLike",
+  async (args: { id: number; vacancy_id: number; comment_id: number }, { getState }) => {
+    const { id, vacancy_id, comment_id } = args;
+    const state = getState() as RootState;
+    const user_id = state.profile.id;
+
+    if (!id) {
+      supabase.from("comment_likes").upsert({ user_id, comment_id }).then();
+    } else {
+      supabase.from("comment_likes").delete().eq("id", id).then();
+    }
+
+    return { comment_id, key: vacancy_id };
+  }
+);
 
 export const vacancyApi = {
   element,
-  comments,
-  loadMoreComments,
+  comments: {
+    get: GetComments,
+    post: PostComment,
+    update: UpdateComment,
+    delete: DeleteComment,
+    like: PostCommentLike,
+  },
 };

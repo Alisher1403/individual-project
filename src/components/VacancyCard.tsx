@@ -6,10 +6,9 @@ import { Link } from "react-router-dom";
 interface ComponentProps {
   element: any;
   index: number;
-  expanded?: boolean;
 }
 
-const VacancyCard: FC<ComponentProps> = ({ element, expanded = true }) => {
+const VacancyCard: FC<ComponentProps> = ({ element }) => {
   return (
     <Container key={element.id}>
       <Link to={{ search: `${window.location.search}&vacancy_post=${element.id}` }}>
@@ -29,7 +28,7 @@ const VacancyCard: FC<ComponentProps> = ({ element, expanded = true }) => {
               </button>
             </div>
           </div>
-          {expanded && element.subtitle && <div className="s2">{element.subtitle}</div>}
+          <div className="s2">{element.subtitle}</div>
           <div className="s3">
             <div className="left">
               <div>{formData.timeAgo(element.created_at)}</div>

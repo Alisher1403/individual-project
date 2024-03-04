@@ -1,38 +1,96 @@
-import { FC } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import parse from "html-react-parser";
 import { formData } from "../constant/formData";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "store";
+import { Options } from "ui";
+import CommentEditor from "./CommentEditor";
+import { api } from "store/reducers";
+import { useSearchParams } from "hooks";
 
-interface iComment {
+interface Props {
   element: any;
+  id: number;
 }
 
-const Comment: FC<iComment> = ({ element }) => {
+const Comment: FC<Props> = ({ element }) => {
+  const vacancy_id = useSearchParams().get("vacancy_post");
+  const dispatch: AppDispatch = useDispatch();
+  const userId = useSelector((state: RootState) => state.profile.id);
+  const [edit, setEdit] = useState(false);
+  const timeAgo = useMemo(() => formData.timeAgo(element.created_at), [element.created_at]);
+  const [liked, setLiked] = useState(element.user_liked);
+  const [componentReady, setComponentReady] = useState(false);
+
+  function setLike() {
+    setLiked(!liked);
+  }
+
+  useEffect(() => {
+    let timer: any;
+    setComponentReady(true);
+
+    if (componentReady) {
+      timer = setTimeout(() => {
+        dispatch(api.vacancy.comments.like({ id: element.user_liked, comment_id: element.id, vacancy_id }));
+      }, 1000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [liked]);
+
   return (
     <Container>
-      <Content>
-        <div className="logo">
-          {element.user.img ? <img src={element.user.img} alt="" /> : element.user.name[0].toUpperCase()}
-        </div>
-        <div className="main">
-          <div className="header">
-            <div className="name">{element.user.name}</div>
-            <div>{formData.timeAgo(element.created_at)}</div>
+      {edit ? (
+        <CommentEditor onCancel={() => setEdit(false)} open={true} element={element} />
+      ) : (
+        <Content>
+          <div className="logo">
+            {element?.user_data.img ? (
+              <img src={element?.user_data.img} alt="" />
+            ) : (
+              element?.user_data.name[0].toUpperCase()
+            )}
           </div>
-          <div className="body">
-            <div className="text">{parse(element.text)}</div>
+          <div className="main-wrapper">
+            <div>
+              <div className="main">
+                <div className="header">
+                  <div className="name">{element.user_data?.name}</div>
+                  <div>{timeAgo}</div>
+                  <div>{element?.changed ? "(changed)" : ""}</div>
+                </div>
+                <div className="body">
+                  <div className="text">{element.text}</div>
+                </div>
+                <div className="footer">
+                  <button className="btn" onClick={() => setLike()}>
+                    <span className={`material-symbols-rounded icon ${liked ? "filled" : ""}`}>thumb_up</span>
+                  </button>
+                  <button className="btn">
+                    <span className="material-symbols-rounded icon">thumb_down</span>
+                  </button>
+                  <button className="btn">Respond</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              {element.user_data.id === userId ? (
+                <Options
+                  options={[
+                    { icon: "edit", label: "Edit", onClick: () => setEdit(true) },
+                    {
+                      icon: "delete",
+                      label: "Delete",
+                      onClick: () => dispatch(api.vacancy.comments.delete({ id: element.id, vacancy_id })),
+                    },
+                  ]}
+                />
+              ) : null}
+            </div>
           </div>
-          <div className="footer">
-            <button className="btn">
-              <span className="material-symbols-rounded icon">thumb_up</span>
-            </button>
-            <button className="btn">
-              <span className="material-symbols-rounded icon">thumb_down</span>
-            </button>
-            <button className="btn">Respond</button>
-          </div>
-        </div>
-      </Content>
+        </Content>
+      )}
     </Container>
   );
 };
@@ -42,67 +100,77 @@ export default Comment;
 const Container = styled.div``;
 
 const Content = styled.div`
-  padding: 10px 0;
+  padding: 15px 0;
   color: var(--text-color);
   display: flex;
   align-items: flex-start;
-  column-gap: 10px;
+  column-gap: 15px;
+  border-bottom: 1px solid var(--border-color-light);
 
   .logo {
-    width: 30px;
+    width: 40px;
     margin-top: 2px;
     aspect-ratio: 1/1;
-    background-color: var(--element-color);
+    background-color: var(--element-background-dark);
     border-radius: 50%;
     overflow: hidden;
-    color: white;
+    color: var(--title-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 14px;
+    font-size: 25px;
+    line-height: 0;
     user-select: none;
-    font-family: var(--font-semiBold);
+    font-family: var(--font-regular);
   }
 
-  .main {
-    .header {
-      display: flex;
-      column-gap: 10px;
-      font-size: 14px;
-      margin-bottom: 3px;
-      font-family: var(--font-regular);
+  .main-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 
-      .name {
-        font-family: var(--font-semiBold);
-        color: var(--title-color);
-        font-weight: 700;
-      }
-    }
-
-    .body {
-      font-size: 16px;
-      font-family: var(--font-regular);
-    }
-
-    .footer {
-      display: flex;
-      align-items: center;
-      column-gap: 15px;
-      margin-top: 5px;
-
-      .btn {
-        background: none;
-        border: none;
+    .main {
+      .header {
         display: flex;
-        justify-content: center;
+        column-gap: 10px;
+        font-size: 12px;
         align-items: center;
-        cursor: pointer;
-        font-size: 14px;
-        color: var(--title-color);
+        margin-bottom: 3px;
         font-family: var(--font-regular);
 
-        .icon {
-          font-size: 22px;
+        .name {
+          font-family: var(--font-semiBold);
+          color: var(--title-color);
+          font-weight: 700;
+          font-size: 16px;
+        }
+      }
+
+      .body {
+        font-size: 14px;
+        font-family: var(--font-regular);
+      }
+
+      .footer {
+        display: flex;
+        align-items: center;
+        column-gap: 15px;
+        margin-top: 15px;
+
+        .btn {
+          background: none;
+          border: none;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          font-size: 13px;
+          color: var(--title-color);
+          font-family: var(--font-regular);
+
+          .icon {
+            font-size: 20px;
+          }
         }
       }
     }

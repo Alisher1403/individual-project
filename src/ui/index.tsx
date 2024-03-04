@@ -6,8 +6,9 @@ import CheckSelect from "./CheckSelect";
 import Select from "./Select";
 import InputStateful from "./InputStateful";
 import Grid from "./Grid";
+import Options from "./Options";
 
-export { Input, RadioSelect, CheckSelect, Select, InputStateful, Grid };
+export { Input, RadioSelect, CheckSelect, Select, InputStateful, Grid, Options };
 
 const UIContext = createContext({} as { id: number; setId: (id: number) => void });
 

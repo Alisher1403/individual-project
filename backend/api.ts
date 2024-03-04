@@ -143,21 +143,17 @@ const vacancy = () => {
   const dispatch: AppDispatch = useDispatch();
   const id = searchParams.get("vacancy_post");
 
-  const [newComment, setNewComment] = useState("");
-  const [newCommentFocus, setNewCommentFocus] = useState(false);
-
   const element = useSelector((state: RootState) => state.vacancy.element.data[id!]);
   const commentsList = useSelector((state: RootState) => state.vacancy.comments.data[id!]);
   const commentsCount = useSelector((state: RootState) => state.vacancy.comments.count[id!]);
   const commentsLoading = useSelector((state: RootState) => state.vacancy.comments.loading);
-  const profile = useSelector((state: RootState) => state.profile);
   const [commentsObserver, InCommentsObserver] = useInView({
     triggerOnce: false,
   });
 
   useEffect(() => {
     if (InCommentsObserver) {
-      comments.load();
+      comments.get();
     }
   }, [InCommentsObserver]);
 
@@ -175,17 +171,13 @@ const vacancy = () => {
     list: commentsList,
     count: commentsCount,
     loading: commentsLoading,
-    value: newComment,
-    setValue: setNewComment,
     observer: commentsObserver,
-    focus: newCommentFocus,
-    setFocus: setNewCommentFocus,
-    load() {
-      dispatch(api.vacancy.loadMoreComments(id));
+    get() {
+      dispatch(api.vacancy.comments.get(id));
     },
   };
 
-  return { data, error, comments, profile };
+  return { data, error, comments, id };
 };
 
 /******************************** SEARCHBAR API *************************************/

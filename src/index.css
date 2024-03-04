@@ -8,6 +8,7 @@
   --element-color: #7487eb;
   --element-color-hover: #3a53cf;
   --element-background: white;
+  --element-background-dark: rgb(231, 231, 231);
   --element-background-hover: #ededef;
   --content-background: #f7f7f7;
 
@@ -39,6 +40,7 @@
 
   /* icon */
   --icon-color: #87878a;
+  --icon-color-dark: #404040;
   --icon-hover-bg: white;
 
   /* button */
@@ -48,7 +50,7 @@
   /* border */
   --border-style: 1px solid var(--border-color);
   --border-color: rgb(212, 212, 212);
-  --border-color-light: #c2c4c3;
+  --border-color-light: rgb(213, 213, 213);
   --border-color-dark: #bcbcbc;
   --border-color-black: #929292;
   --border-width: 2px;
