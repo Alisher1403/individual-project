@@ -60,11 +60,16 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background-color: var(--content-background);
 `;
 
 const Content = styled.div`
-  max-width: 400px;
+  max-width: 420px;
   width: 100%;
+  border: 1px solid var(--border-color);
+  padding: 40px 50px;
+  background-color: var(--element-background);
+  border-radius: 7px;
 
   .title {
     font-size: 50px;
@@ -93,10 +98,12 @@ const Content = styled.div`
     .form-content {
       display: flex;
       flex-direction: column;
+      align-items: center;
       row-gap: 10px;
 
       .input-container {
         margin: 5px 0;
+        width: 100%;
 
         .input-label {
           font-size: 14px;
@@ -106,8 +113,7 @@ const Content = styled.div`
         }
 
         .input-wrapper {
-          width: 100%;
-          height: 40px;
+          height: 35px;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -119,7 +125,8 @@ const Content = styled.div`
           input {
             border: none;
             outline: none;
-            padding: 10px;
+            height: 100%;
+            padding: 0 10px;
             outline: none;
             width: 100%;
             background: none;
@@ -155,7 +162,7 @@ const Content = styled.div`
       color: white;
       border-radius: 7px;
       margin-top: 25px;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
       cursor: pointer;
     }
   }

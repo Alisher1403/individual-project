@@ -54,16 +54,17 @@ const MainContent = styled.div`
   width: 100%;
   background-color: var(--content-background);
 
-  @media screen and (max-width: 1100px) {
-    padding: 0 30px;
-  }
-
-  @media screen and (max-width: 700px) {
-    padding: 0;
-  }
-
   .main-container {
     max-width: 1100px;
     margin: 0 auto;
+    padding: 0 20px;
+
+    @media screen and (max-width: 1100px) {
+      padding: 0 30px;
+    }
+
+    @media screen and (max-width: 700px) {
+      padding: 0 15px;
+    }
   }
 `;

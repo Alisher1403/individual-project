@@ -102,12 +102,11 @@ const VacancyPost: FC = () => {
                 : null}
             </ul>
             {/*  */}
-            <div className="loading-animation" data-loading={comments.loading}>
+            <div className="loading-animation" ref={comments.observer} data-loading={comments.loading}>
               <div className="loader"></div>
               <p>Loading...</p>
             </div>
             {/*  */}
-            <div ref={comments.observer}></div>
           </Section_3>
         </Content>
       </div>
@@ -222,6 +221,8 @@ const Section_2 = styled.div`
     font-size: 15px;
     margin-bottom: 10px;
     color: var(--title-color-light);
+    font-family: var(--font-bold);
+    font-weight: normal;
   }
 
   .description {
@@ -231,6 +232,8 @@ const Section_2 = styled.div`
     h2 {
       font-size: 16px;
       color: var(--title-color);
+      font-family: var(--font-bold);
+      font-weight: normal;
       margin-top: 20px;
       margin-bottom: 3px;
     }
@@ -303,89 +306,11 @@ const Section_3 = styled.div`
 
     h2 {
       color: var(--title-color);
-      font-size: 20px;
-    }
-  }
-
-  .new-comment {
-    width: 100%;
-
-    .body {
-      display: flex;
-      align-items: flex-start;
-      column-gap: 10px;
-      margin-bottom: 10px;
-      width: 100%;
-
-      .img {
-        height: 35px;
-        aspect-ratio: 1/1;
-        background: var(--element-color);
-        color: white;
-        font-family: var(--font-semiBold);
-        font-size: 16px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 50%;
-      }
-
-      .comment-input-wrapper {
-        flex: 1;
-        overflow: hidden;
-
-        .comment-input {
-          border: none;
-          background: none;
-          outline: none;
-          resize: none;
-          border-bottom: 0.5px solid var(--border-color-dark);
-          padding: 5px 0;
-          font-family: var(--font-regular);
-          color: var(--text-color);
-          font-size: 16px;
-          transition: 0.1s;
-
-          &::placeholder {
-            color: var(--placeholder-color);
-          }
-
-          &:focus {
-            border-bottom: 0.5px solid var(--border-color-black);
-          }
-        }
-      }
-    }
-
-    .footer {
-      margin-bottom: 5px;
-
-      .buttons-wrapper {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        column-gap: 5px;
-
-        .button {
-          font-family: var(--font-semiBold);
-          color: var(--title-color);
-          border: 0.5px solid var(--border-color);
-          padding: 5px 15px;
-          font-size: 15px;
-          cursor: pointer;
-          border-radius: 5px;
-          background: var(--element-background);
-
-          &[data-primary] {
-            background-color: var(--element-color);
-            color: white;
-          }
-        }
-      }
-    }
-
-    .footer-margin {
-      margin-bottom: 25px;
+      font-family: var(--font-bold);
+      font-size: 18px;
+      font-weight: normal;
+      font-family: var(--font-bold);
+      font-weight: normal;
     }
   }
 

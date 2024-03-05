@@ -7,6 +7,7 @@ import { Options } from "ui";
 import CommentEditor from "./CommentEditor";
 import { api } from "store/reducers";
 import { useSearchParams } from "hooks";
+import parse from "html-react-parser";
 
 interface Props {
   element: any;
@@ -45,7 +46,7 @@ const Comment: FC<Props> = ({ element }) => {
         <CommentEditor onCancel={() => setEdit(false)} open={true} element={element} />
       ) : (
         <Content>
-          <div className="logo">
+          <div className="img">
             {element?.user_data.img ? (
               <img src={element?.user_data.img} alt="" />
             ) : (
@@ -61,7 +62,7 @@ const Comment: FC<Props> = ({ element }) => {
                   <div>{element?.changed ? "(changed)" : ""}</div>
                 </div>
                 <div className="body">
-                  <div className="text">{element.text}</div>
+                  <div className="text">{parse(element.text)}</div>
                 </div>
                 <div className="footer">
                   <button className="btn" onClick={() => setLike()}>
@@ -104,10 +105,10 @@ const Content = styled.div`
   color: var(--text-color);
   display: flex;
   align-items: flex-start;
-  column-gap: 15px;
   border-bottom: 1px solid var(--border-color-light);
 
-  .logo {
+  .img {
+    min-width: 40px;
     width: 40px;
     margin-top: 2px;
     aspect-ratio: 1/1;
@@ -122,6 +123,14 @@ const Content = styled.div`
     line-height: 0;
     user-select: none;
     font-family: var(--font-regular);
+    margin-right: 15px;
+
+    @media screen and (max-width: 700px) {
+      min-width: 30px;
+      width: 30px;
+      font-size: 18px;
+      margin-right: 7px;
+    }
   }
 
   .main-wrapper {
@@ -132,7 +141,7 @@ const Content = styled.div`
     .main {
       .header {
         display: flex;
-        column-gap: 10px;
+        column-gap: 7px;
         font-size: 12px;
         align-items: center;
         margin-bottom: 3px;
@@ -141,8 +150,12 @@ const Content = styled.div`
         .name {
           font-family: var(--font-semiBold);
           color: var(--title-color);
-          font-weight: 700;
+          font-weight: normal;
           font-size: 16px;
+
+          @media screen and (max-width: 700px) {
+            font-size: 13px;
+          }
         }
       }
 

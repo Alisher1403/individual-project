@@ -154,6 +154,7 @@ const vacancy = () => {
   useEffect(() => {
     if (InCommentsObserver) {
       comments.get();
+      console.log(2);
     }
   }, [InCommentsObserver]);
 

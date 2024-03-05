@@ -210,6 +210,7 @@ const GetComments = createAsyncThunk("GetComments", async (vacancy_id: string, {
   dispatch(vacancy.actions.commentsLoading(true));
   const params = { p_post_id: vacancy_id, p_from_id: last_id, p_limit: config.commentsPerLoad, p_user_id: user_id };
   const { data } = await supabase.rpc("get_comments", params);
+  console.log(data);
 
   dispatch(vacancy.actions.commentsLoading(false));
 

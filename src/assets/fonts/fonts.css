@@ -21,3 +21,9 @@
   src: url(./Nunito-SemiBold.ttf);
   font-display: swap;
 }
+
+@font-face {
+  font-family: "Nunito-Bold";
+  src: url(./Nunito-Bold.ttf);
+  font-display: swap;
+}
