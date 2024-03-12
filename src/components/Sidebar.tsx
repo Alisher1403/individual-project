@@ -52,6 +52,12 @@ const Sidebar: FC = () => {
                   <p className="btn-label">Jobs</p>
                 </NavLink>
               </li>
+              <li>
+                <NavLink to={"/create"} className="btn">
+                  <span className="material-symbols-rounded icon">add_circle</span>
+                  <p className="btn-label">New</p>
+                </NavLink>
+              </li>
             </ul>
           </div>
           <div className="p-2">

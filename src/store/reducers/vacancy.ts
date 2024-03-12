@@ -117,8 +117,9 @@ const vacancy = createSlice({
 
         if (data) {
           const comment = data[0];
-          comment.likes_count = 0;
-          comment.user_liked = false;
+          comment.like_count = 0;
+          comment.dislike_count = 0;
+          comment.liked = false;
           state.comments.data[key] = [comment, ...state.comments.data[key]];
           state.comments.count[key] += 1;
         }
@@ -130,8 +131,10 @@ const vacancy = createSlice({
         const list = state.comments.data[key];
 
         if (data && id && list) {
-          const newArr = list.map((e: any) => (e.id === id ? data[0] : e));
-          state.comments.data[key] = newArr;
+          const index = list.findIndex((e: any) => e.id === id);
+          const newItem = Object.assign(list[index], data[0]);
+          list[index] = newItem;
+          state.comments.data[key] = list;
         }
       }
     });
@@ -142,16 +145,19 @@ const vacancy = createSlice({
 
         if (data && id && list) {
           const newArr = list.filter((e: any) => e.id !== id);
+
           state.comments.data[key] = newArr;
+
           state.comments.count[key] -= 1;
         }
       }
     });
+
     builder.addCase(PostCommentLike.fulfilled, (state, action) => {
       const { comment_id, key } = action.payload;
       const list = state.comments.data[key];
       const index = list?.findIndex((e: { id: number }) => e.id === comment_id);
-      list[index].user_liked = list[index].user_liked ? list[index]?.user_liked : null;
+      list[index].liked = list[index].liked ? list[index]?.liked : null;
 
       state.comments.data[key] = list;
     });
@@ -184,7 +190,7 @@ const LoadComments = createAsyncThunk("LoadComments", async (vacancy_id: number,
   const state = getState() as RootState;
   const list = state.vacancy.comments.data[vacancy_id] || [];
   const last_id = list[list.length - 1]?.id || null;
-  const user_id = state.profile.id;
+  const user_id = state.user.id;
 
   const params = { p_post_id: vacancy_id, p_from_id: last_id, p_limit: config.commentsPerLoad, p_user_id: user_id };
 
@@ -197,7 +203,7 @@ const LoadComments = createAsyncThunk("LoadComments", async (vacancy_id: number,
 
 const GetComments = createAsyncThunk("GetComments", async (vacancy_id: string, { getState, dispatch }) => {
   const state = getState() as RootState;
-  const user_id = state.profile.id;
+  const user_id = state.user.id;
   const mainState = state.vacancy.comments.data[vacancy_id] || [];
   const last_id = mainState[mainState.length - 1]?.id;
 
@@ -210,7 +216,6 @@ const GetComments = createAsyncThunk("GetComments", async (vacancy_id: string, {
   dispatch(vacancy.actions.commentsLoading(true));
   const params = { p_post_id: vacancy_id, p_from_id: last_id, p_limit: config.commentsPerLoad, p_user_id: user_id };
   const { data } = await supabase.rpc("get_comments", params);
-  console.log(data);
 
   dispatch(vacancy.actions.commentsLoading(false));
 
@@ -221,7 +226,7 @@ const PostComment = createAsyncThunk(
   "PostComment",
   async (args: { vacancy_id: number; value: string }, { getState }) => {
     const state = getState() as RootState;
-    const user_id = state.profile.id;
+    const user_id = state.user.id;
 
     const { value, vacancy_id } = args;
 
@@ -259,15 +264,34 @@ const DeleteComment = createAsyncThunk("DeleteComment", async (args: { id: numbe
 
 const PostCommentLike = createAsyncThunk(
   "PostCommentLike",
-  async (args: { id: number; vacancy_id: number; comment_id: number }, { getState }) => {
-    const { id, vacancy_id, comment_id } = args;
+  async (args: { vacancy_id: number; comment_id: number; liked: "like" | "dislike" | null }, { getState }) => {
+    const { vacancy_id, comment_id, liked } = args;
     const state = getState() as RootState;
-    const user_id = state.profile.id;
+    const user_id = state.user.id;
 
-    if (!id) {
-      supabase.from("comment_likes").upsert({ user_id, comment_id }).then();
-    } else {
-      supabase.from("comment_likes").delete().eq("id", id).then();
+    function deleteLike() {
+      supabase.from("comment_likes").delete().eq("comment_id", comment_id).eq("user_id", user_id).then();
+    }
+
+    function setLike(dislike: boolean) {
+      supabase
+        .from("comment_likes")
+        .delete()
+        .eq("comment_id", comment_id)
+        .eq("user_id", user_id)
+        .then(() => {
+          supabase.from("comment_likes").insert({ user_id, comment_id, dislike }).then();
+        });
+    }
+
+    if (user_id) {
+      if (liked === "like") {
+        setLike(false);
+      } else if (liked === "dislike") {
+        setLike(true);
+      } else {
+        deleteLike();
+      }
     }
 
     return { comment_id, key: vacancy_id };

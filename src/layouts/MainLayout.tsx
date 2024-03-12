@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Home, Login, Profile, Vacancy } from "pages";
+import { Create, Home, Login, Profile, Vacancy } from "pages";
 import styled from "styled-components";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { Navigation } from "layouts";
@@ -21,6 +21,7 @@ const MainLayout: FC = () => {
             <Route path="/" element={<Home />}></Route>
             <Route path="/search/vacancy" element={<Vacancy />}></Route>
             <Route path="/profile/:id" element={<Profile />}></Route>
+            <Route path="/create" element={<Create />}></Route>
             <Route path="/login" element={<Login />}></Route>
           </Routes>
         </MainContent>

@@ -91,15 +91,15 @@ const VacancyPost: FC = () => {
             <CommentEditor />
             {/*  */}
             <ul>
-              {comments.list
-                ? comments.list?.map((item: any, index: number) => {
-                    return (
-                      <li key={index}>
-                        <Comment element={item} id={id} />
-                      </li>
-                    );
-                  })
-                : null}
+              {comments.list?.length > 0 ? (
+                comments.list.map((item: any) => (
+                  <li key={item.id}>
+                    <Comment element={item} id={id} />
+                  </li>
+                ))
+              ) : (
+                <p>No comments available</p>
+              )}
             </ul>
             {/*  */}
             <div className="loading-animation" ref={comments.observer} data-loading={comments.loading}>

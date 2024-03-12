@@ -13,7 +13,7 @@ interface Props {
 
 const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
   const vacancy_id = useSearchParams().get("vacancy_post");
-  const profile = useSelector((state: RootState) => state.profile);
+  const profile = useSelector((state: RootState) => state.user);
   const ref = useRef<HTMLDivElement | null>(null);
   const [disabled, setDisabled] = useState(false);
   const [focus, setFocus] = useState(open);
@@ -146,11 +146,11 @@ const Container = styled.div`
           background: none;
           outline: none;
           resize: none;
-          border-bottom: 0.5px solid var(--border-color-dark);
+          border-bottom: 1px solid var(--border-color-dark);
           padding: 5px 0;
           font-family: var(--font-regular);
           color: var(--text-color);
-          font-size: 16px;
+          font-size: 14px;
           transition: 0.1s;
 
           &::placeholder {

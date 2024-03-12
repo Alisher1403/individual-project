@@ -130,6 +130,15 @@ const Content = styled.div`
             outline: none;
             width: 100%;
             background: none;
+
+            &:-webkit-autofill {
+              box-shadow: 0 0 0 30px var(--content-background) inset;
+            }
+
+            /* Firefox */
+            &:-moz-autofill {
+              box-shadow: 0 0 0 30px var(--content-background) inset;
+            }
           }
 
           button {

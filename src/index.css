@@ -2,7 +2,7 @@
 
 :root {
   /* Main */
-  --main-bg: #ffffff;
+  --main-bg: #f7f7f7;
 
   /* common */
   --element-color: #7487eb;
@@ -10,7 +10,7 @@
   --element-background: white;
   --element-background-dark: rgb(231, 231, 231);
   --element-background-hover: #ededef;
-  --content-background: #f7f7f7;
+  --content-background: var(--main-bg);
 
   /* fonts */
   --font-light: "Nunito-Light";
@@ -21,7 +21,7 @@
 
   /* title */
   --h3-size: 23px;
-  --title-color: #454545;
+  --title-color: rgb(56, 56, 56);
   --title-color-dark: #262626;
   --title-font: "Nunito-Medium";
 
@@ -58,6 +58,13 @@
 
   /* background */
   --card-hover-bg: #c5c5c545;
+
+  /* input */
+  --option-background: rgb(227, 239, 255);
+  --input-focus-color: #3a53cf;
+  --input-color: var(--text-color);
+  --input-color-active: rgb(31, 31, 31);
+  --input-background: var(--element-background);
 
   /* placeholder */
   --placeholder-color: #a8aabc;

@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-const profile = createSlice({
+const user = createSlice({
   name: "user",
   initialState: {
     data: {} as any,
     id: "56d26b6c-085c-4003-8381-6109937a7d18",
-    userType: "applicant",
+    userType: "employer",
     name: "Alisher",
     img: null,
   },
@@ -17,5 +17,5 @@ const profile = createSlice({
   },
 });
 
-export const { setUser } = profile.actions;
-export default profile.reducer;
+export const { setUser } = user.actions;
+export default user.reducer;

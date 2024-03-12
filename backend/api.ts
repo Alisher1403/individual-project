@@ -154,7 +154,6 @@ const vacancy = () => {
   useEffect(() => {
     if (InCommentsObserver) {
       comments.get();
-      console.log(2);
     }
   }, [InCommentsObserver]);
 
@@ -197,7 +196,7 @@ const searchbar = () => {
   const [searchListHeight, setSearchListHeight] = useState<number>();
 
   // Redux Selector
-  const userData = useSelector((state: RootState) => state.profile);
+  const userData = useSelector((state: RootState) => state.user);
 
   // State for fetched search items from the database
   const [searched, setSearched] = useState<string[]>([]);

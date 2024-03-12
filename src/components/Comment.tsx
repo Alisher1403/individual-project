@@ -17,15 +17,41 @@ interface Props {
 const Comment: FC<Props> = ({ element }) => {
   const vacancy_id = useSearchParams().get("vacancy_post");
   const dispatch: AppDispatch = useDispatch();
-  const userId = useSelector((state: RootState) => state.profile.id);
+  const userId = useSelector((state: RootState) => state.user.id);
   const [edit, setEdit] = useState(false);
   const timeAgo = useMemo(() => formData.timeAgo(element.created_at), [element.created_at]);
-  const [liked, setLiked] = useState(element.user_liked);
+  const [liked, setLiked] = useState<"like" | "dislike" | null>(element.liked);
   const [componentReady, setComponentReady] = useState(false);
 
-  function setLike() {
-    setLiked(!liked);
-  }
+  const like = {
+    set(state: typeof liked): void {
+      setLiked((prevLiked) => (prevLiked === state ? null : state));
+    },
+    count(state: typeof liked) {
+      const isLike = liked === "like";
+      const isDislike = liked === "dislike";
+      const isElementLiked = element.liked === "like";
+      const isElementDisliked = element.liked === "dislike";
+
+      let likeCount = isLike
+        ? isElementLiked
+          ? element.like_count
+          : element.like_count + 1
+        : isElementLiked
+        ? element.like_count - 1
+        : element.like_count;
+
+      let dislikeCount = isDislike
+        ? isElementDisliked
+          ? element.dislike_count
+          : element.dislike_count + 1
+        : isElementDisliked
+        ? element.dislike_count - 1
+        : element.dislike_count;
+
+      return state === "like" ? likeCount : dislikeCount;
+    },
+  };
 
   useEffect(() => {
     let timer: any;
@@ -33,7 +59,7 @@ const Comment: FC<Props> = ({ element }) => {
 
     if (componentReady) {
       timer = setTimeout(() => {
-        dispatch(api.vacancy.comments.like({ id: element.user_liked, comment_id: element.id, vacancy_id }));
+        dispatch(api.vacancy.comments.like({ comment_id: element.id, vacancy_id, liked }));
       }, 1000);
     }
 
@@ -65,11 +91,17 @@ const Comment: FC<Props> = ({ element }) => {
                   <div className="text">{parse(element.text)}</div>
                 </div>
                 <div className="footer">
-                  <button className="btn" onClick={() => setLike()}>
-                    <span className={`material-symbols-rounded icon ${liked ? "filled" : ""}`}>thumb_up</span>
+                  <button className="btn" onClick={() => like.set("like")}>
+                    <p>{like.count("like")}</p>
+                    <span className={`material-symbols-rounded icon ${liked === "like" ? "filled" : ""}`}>
+                      thumb_up
+                    </span>
                   </button>
-                  <button className="btn">
-                    <span className="material-symbols-rounded icon">thumb_down</span>
+                  <button className="btn" onClick={() => like.set("dislike")}>
+                    <p>{like.count("dislike")}</p>
+                    <span className={`material-symbols-rounded icon ${liked === "dislike" ? "filled" : ""}`}>
+                      thumb_down
+                    </span>
                   </button>
                   <button className="btn">Respond</button>
                 </div>
