@@ -3,14 +3,15 @@ import styled from "styled-components";
 import { specializations } from "constant";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { Select, Input } from "antd";
+import { Select, Input, Modal, Button, Form } from "antd";
 import { skills } from "icons";
 import parse from "html-react-parser";
 
 const VacancyCreate: FC = () => {
   const stored = localStorage.getItem("vacancy");
   // sessionStorage.removeItem("vacancy");
-  const [post, setPost] = useState(JSON.parse(stored!));
+  const [post, setPost] = useState(JSON.parse(stored!) || {});
+  const [modal, setModal] = useState(false);
 
   const vacancy = {
     post,
@@ -37,28 +38,54 @@ const VacancyCreate: FC = () => {
         </Indicator>
 
         <Section>
-          <InputWrapper>
-            <h4>Title</h4>
-            <Input value={vacancy.post?.title} onChange={(event) => vacancy.set("title", event.target.value)} />
-          </InputWrapper>
-          <InputWrapper>
-            <h4>Location</h4>
-            <Input value={vacancy.post?.title} onChange={(event) => vacancy.set("title", event.target.value)} />
-          </InputWrapper>
+          <Form>
+            <InputWrapper>
+              <div className="image">
+                <img src={vacancy.post?.img ?? ""} />
+              </div>
+              <label htmlFor="img">
+                <Button style={{ pointerEvents: "none" }}>Select Image</Button>
+              </label>
+
+              <input
+                id="img"
+                type="file"
+                accept="image/*"
+                className="file"
+                title="hello"
+                onChange={(e) => {
+                  if (e.target?.files && e.target?.files[0]) {
+                    let src = URL.createObjectURL(e.target.files[0]);
+                    vacancy.set("img", src);
+                  }
+                }}
+              />
+            </InputWrapper>
+            <InputWrapper>
+              <label>Title</label>
+              <Input value={vacancy.post?.title} onChange={(event) => vacancy.set("title", event.target.value)} />
+            </InputWrapper>
+            <InputWrapper>
+              <label>Location</label>
+              <Input value={vacancy.post?.title} onChange={(event) => vacancy.set("title", event.target.value)} />
+            </InputWrapper>
+          </Form>
         </Section>
 
         <Section>
-          <Select
-            defaultValue={""}
-            value={vacancy.post?.specialization}
-            onChange={(value) => vacancy.set("specialization", value)}
-            className="specialization-select"
-            getPopupContainer={getPopupContainer}
-          >
-            {Object.entries(specializations).map(([key, item]) => (
-              <Select.Option key={key}>{item.label}</Select.Option>
-            ))}
-          </Select>
+          <Form>
+            <Select
+              defaultValue={""}
+              value={vacancy.post?.specialization}
+              onChange={(value) => vacancy.set("specialization", value)}
+              className="specialization-select"
+              getPopupContainer={getPopupContainer}
+            >
+              {Object.entries(specializations).map(([key, item]) => (
+                <Select.Option key={key}>{item.label}</Select.Option>
+              ))}
+            </Select>
+          </Form>
         </Section>
 
         <Section>
@@ -66,30 +93,47 @@ const VacancyCreate: FC = () => {
             data={vacancy.post?.description}
             onChange={(_, e) => vacancy.set("description", e.getData())}
             editor={ClassicEditor}
+            config={{
+              simpleUpload: {
+                uploadUrl: "",
+              },
+            }}
           />
         </Section>
 
         <Section>
-          <SkillsSelect>
-            <Select
-              defaultValue={""}
-              mode="tags"
-              value={vacancy.post?.skills}
-              onChange={(value) => vacancy.set("skills", value)}
-              className="multi-select"
-              getPopupContainer={getPopupContainer}
-              placement="bottomLeft"
-            >
-              {Object.entries(skills).map(([key, item]) => (
-                <Select.Option key={key}>
-                  <div className="option">
-                    <div className="icon">{parse(item.icon)}</div>
-                    <p className="name">{item.name}</p>
-                  </div>
-                </Select.Option>
-              ))}
-            </Select>
-          </SkillsSelect>
+          <Form>
+            <SkillsSelect>
+              <Select
+                defaultValue={""}
+                mode="tags"
+                value={vacancy.post?.skills || []}
+                onChange={(value) => vacancy.set("skills", value)}
+                className="multi-select"
+                getPopupContainer={getPopupContainer}
+                placement="bottomLeft"
+              >
+                {Object.entries(skills).map(([key, item]) => (
+                  <Select.Option key={key}>
+                    <div className="option">
+                      <div className="icon">{parse(item.icon)}</div>
+                      <p className="name">{item.name}</p>
+                    </div>
+                  </Select.Option>
+                ))}
+              </Select>
+            </SkillsSelect>
+          </Form>
+        </Section>
+
+        <Section>
+          <Form>
+            <InputWrapper>
+              <label>Country</label>
+              <Button onClick={() => setModal(true)}>Select Location</Button>
+            </InputWrapper>
+            <Modal open={modal} title={"Select Country"} centered onCancel={() => setModal(false)}></Modal>
+          </Form>
         </Section>
       </Content>
     </Container>
@@ -102,6 +146,25 @@ const Container = styled.div``;
 
 const Content = styled.div`
   padding: 20px 0;
+
+  .ant-btn {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    font-size: 14px;
+
+    .ant-btn-icon {
+      margin: 0;
+      padding: 0;
+      margin-inline-end: 0;
+
+      .icon {
+        font-size: 23px;
+        margin: -3px;
+        margin-right: 1px;
+      }
+    }
+  }
 
   .ant-input {
     color: var(--text-color);
@@ -176,12 +239,41 @@ const Section = styled.div`
 
 const InputWrapper = styled.div`
   padding: 5px 0;
-  h4 {
+  label {
     font-family: var(--font-semiBold);
     color: var(--title-color-dark);
     font-weight: normal;
     font-size: 13px;
     margin-bottom: 4px;
+  }
+
+  label {
+    z-index: -1;
+
+    &[for="img"] {
+      cursor: pointer;
+    }
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+  .image {
+    height: 100px;
+    width: 100px;
+    background: var(--element-background-dark);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
   }
 `;
 
