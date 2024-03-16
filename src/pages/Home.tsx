@@ -219,5 +219,9 @@ const Section = styled.div`
     width: 100%;
     display: flex;
     justify-content: center;
+    background-color: var(--element-background);
+    border: 1px solid var(--border-color);
+    padding: 30px 20px;
+    border-radius: 5px;
   }
 `;
