@@ -146,8 +146,8 @@ const Top = styled.div`
     transition: 0.3s;
 
     input {
-      font-family: var(--text-font);
-      color: var(--font-semiBold);
+      font-family: var(--font-regular);
+      color: var(--text-color);
       font-size: 16px;
       padding: 6px 0;
       border: none;

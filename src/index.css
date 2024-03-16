@@ -13,11 +13,11 @@
   --content-background: var(--main-bg);
 
   /* fonts */
-  --font-light: "Nunito-Light";
-  --font-regular: "Nunito-Regular";
-  --font-medium: "Nunito-Medium";
-  --font-semiBold: "Nunito-SemiBold";
-  --font-bold: "Nunito-Bold";
+  --font-light: "Font-Light";
+  --font-regular: "Font-Regular";
+  --font-medium: "Font-Medium";
+  --font-semiBold: "Font-SemiBold";
+  --font-bold: "Font-Bold";
 
   /* title */
   --h3-size: 23px;

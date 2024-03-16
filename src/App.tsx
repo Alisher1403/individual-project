@@ -5,6 +5,11 @@ import { UIProvider } from "ui";
 import "./index.css";
 import "./App.css";
 import { MainLayout } from "layouts";
+import "swiper/css";
+import "swiper/css/autoplay";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-fade";
 
 function App() {
   return (
