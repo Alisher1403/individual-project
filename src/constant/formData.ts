@@ -200,7 +200,7 @@ function timeAgo(ts: string): string {
   const postedDate: Date = new Date(ts);
   const currentDate: Date = new Date();
 
-  const timeDifference: number = Math.round((currentDate.getTime() - postedDate.getTime()) / 1000);
+  const timeDifference: number = Math.abs(Math.round((currentDate.getTime() - postedDate.getTime()) / 1000));
 
   const minute: number = 60;
   const hour: number = 60 * minute;

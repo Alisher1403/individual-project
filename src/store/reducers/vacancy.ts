@@ -54,7 +54,7 @@ const vacancy = createSlice({
     vacancyListLoading(state, action: PayloadAction<boolean>) {
       state.list.loading = action.payload;
     },
-    setVacancyPageData(state, action: PayloadAction<{ key: string; data: any[] }>) {
+    setVacancyListData(state, action: PayloadAction<{ key: string; data: any[] }>) {
       const { pageData } = state.list;
       const { key, data } = action.payload;
       pageData[key] = data;
@@ -62,7 +62,7 @@ const vacancy = createSlice({
     setVacancyCount(state, action: PayloadAction<{ key: string; value: number }>) {
       state.list.count[action.payload.key] = action.payload.value;
     },
-    vacancyData(state, action: PayloadAction<{ key: string; data: object }>) {
+    vacancyData(state, action: PayloadAction<{ key: string; data: any }>) {
       const { key, data } = action.payload;
       state.element.data[key] = data;
     },
@@ -72,20 +72,41 @@ const vacancy = createSlice({
     commentsLoading(state, action: PayloadAction<boolean>) {
       state.comments.loading = action.payload;
     },
+    setVacancyReaction(state, action: PayloadAction<{ vacancy_id: string; type: string }>) {
+      const { vacancy_id, type } = action.payload;
+      const vacancy = state.element.data[vacancy_id];
+
+      if (vacancy.reaction[0]?.type === type) {
+        vacancy.reaction = [{ type: null }];
+      } else {
+        vacancy.reaction = [{ type }];
+      }
+    },
   },
   extraReducers: (builder) => {
-    builder.addCase(element.fulfilled, (state, action) => {
+    builder.addCase(getVacancy.fulfilled, (state, action) => {
       const { key, data, error } = action.payload;
 
       try {
-        if (!state.element.data[key] && data) {
-          state.element.data[key] = data[0];
+        if (data) {
+          const returnData = data[0];
+
+          if (returnData?.reaction[0]?.type === "like") {
+            returnData.likes[0].count -= 1;
+          }
+          if (returnData?.reaction[0]?.type === "dislike") {
+            returnData.dislikes[0].count -= 1;
+          }
+
+          state.element.data[key] = returnData;
         }
+
         if (error) throw error;
       } catch (error) {
         console.log("Failed to fetch data:", error);
       }
     });
+
     builder.addCase(LoadComments.fulfilled, (state, action) => {
       const { key, data, count } = action.payload;
 
@@ -98,6 +119,7 @@ const vacancy = createSlice({
         state.comments.count[key] = 0;
       }
     });
+
     builder.addCase(GetComments.fulfilled, (state, action) => {
       if (action.payload) {
         const { key, data } = action.payload;
@@ -111,6 +133,7 @@ const vacancy = createSlice({
         }
       }
     });
+
     builder.addCase(PostComment.fulfilled, (state, action) => {
       if (action.payload) {
         const { key, data } = action.payload;
@@ -125,6 +148,7 @@ const vacancy = createSlice({
         }
       }
     });
+
     builder.addCase(UpdateComment.fulfilled, (state, action) => {
       if (action.payload) {
         const { data, id, key } = action.payload;
@@ -138,6 +162,7 @@ const vacancy = createSlice({
         }
       }
     });
+
     builder.addCase(DeleteComment.fulfilled, (state, action) => {
       if (action.payload) {
         const { data, id, key } = action.payload;
@@ -147,7 +172,6 @@ const vacancy = createSlice({
           const newArr = list.filter((e: any) => e.id !== id);
 
           state.comments.data[key] = newArr;
-
           state.comments.count[key] -= 1;
         }
       }
@@ -164,8 +188,15 @@ const vacancy = createSlice({
   },
 });
 
-export const { vacancyListError, vacancyListLoading, vacancyData, vacancyError, setVacancyCount, setVacancyPageData } =
-  vacancy.actions;
+export const {
+  vacancyListError,
+  vacancyListLoading,
+  vacancyData,
+  vacancyError,
+  setVacancyCount,
+  setVacancyListData,
+  setVacancyReaction,
+} = vacancy.actions;
 
 export default vacancy.reducer;
 
@@ -175,18 +206,27 @@ const config = {
 };
 
 /********************************************************************************************************************/
-const element = createAsyncThunk("vacancy", async (id: number, { dispatch }) => {
+const getVacancy = createAsyncThunk("getVacancy", async (id: string, { dispatch, getState }) => {
   dispatch(LoadComments(id));
+  const state = getState() as RootState;
+  const user_id = state.user.id;
 
   const { data, error } = await supabase
     .from("vacancies")
-    .select(`*, likes (count), dislikes (count), views (count)`)
-    .eq("id", id);
+    .select(
+      `*, views (count), applied: applicants(id), appliedCount: applicants(count), 
+      reaction: vacancy_reactions(type), likes: vacancy_reactions(count), dislikes: vacancy_reactions(count)`
+    )
+    .eq("id", id)
+    .eq("applicants.user_id", user_id)
+    .eq("reaction.user_id", user_id)
+    .eq("likes.type", "like")
+    .eq("dislikes.type", "dislike");
 
   return { key: id, data, error };
 });
 
-const LoadComments = createAsyncThunk("LoadComments", async (vacancy_id: number, { getState }) => {
+const LoadComments = createAsyncThunk("LoadComments", async (vacancy_id: string, { getState }) => {
   const state = getState() as RootState;
   const list = state.vacancy.comments.data[vacancy_id] || [];
   const last_id = list[list.length - 1]?.id || null;
@@ -224,7 +264,7 @@ const GetComments = createAsyncThunk("GetComments", async (vacancy_id: string, {
 
 const PostComment = createAsyncThunk(
   "PostComment",
-  async (args: { vacancy_id: number; value: string }, { getState }) => {
+  async (args: { vacancy_id: string; value: string }, { getState }) => {
     const state = getState() as RootState;
     const user_id = state.user.id;
 
@@ -243,7 +283,7 @@ const PostComment = createAsyncThunk(
 
 const UpdateComment = createAsyncThunk(
   "UpdateComment",
-  async (args: { id: number; value: string; vacancy_id: number }) => {
+  async (args: { id: string; value: string; vacancy_id: string }) => {
     const { value, id, vacancy_id } = args;
     const { data } = await supabase
       .from("comments")
@@ -255,7 +295,7 @@ const UpdateComment = createAsyncThunk(
   }
 );
 
-const DeleteComment = createAsyncThunk("DeleteComment", async (args: { id: number; vacancy_id: number }) => {
+const DeleteComment = createAsyncThunk("DeleteComment", async (args: { id: string; vacancy_id: string }) => {
   const { id, vacancy_id } = args;
   const { data } = await supabase.from("comments").delete().eq("id", id).select();
 
@@ -264,7 +304,7 @@ const DeleteComment = createAsyncThunk("DeleteComment", async (args: { id: numbe
 
 const PostCommentLike = createAsyncThunk(
   "PostCommentLike",
-  async (args: { vacancy_id: number; comment_id: number; liked: "like" | "dislike" | null }, { getState }) => {
+  async (args: { vacancy_id: string; comment_id: number; liked: "like" | "dislike" | null }, { getState }) => {
     const { vacancy_id, comment_id, liked } = args;
     const state = getState() as RootState;
     const user_id = state.user.id;
@@ -298,8 +338,54 @@ const PostCommentLike = createAsyncThunk(
   }
 );
 
+const PostApplicant = createAsyncThunk("PostApplicant", async (vacancy_id: string, { getState, dispatch }) => {
+  const state = getState() as RootState;
+  const user_id = state.user.id;
+  if (!user_id || !vacancy_id) return;
+
+  await supabase
+    .from("applicants")
+    .insert({ vacancy_id, user_id })
+    .then(() => dispatch(getVacancy(vacancy_id)));
+});
+
+const PostVacancyLike = createAsyncThunk("PostApplicant", async (vacancy_id: string, { getState }) => {
+  const state = getState() as RootState;
+  const user_id = state.user.id;
+  const vacancy = state.vacancy.element.data[vacancy_id];
+  const reactionType = vacancy?.reaction[0]?.type;
+
+  if (!user_id || !vacancy_id) return;
+
+  async function postLike(type: string) {
+    await supabase
+      .from("vacancy_reactions")
+      .delete()
+      .eq("user_id", user_id)
+      .eq("vacancy_id", vacancy_id)
+      .then(async () => {
+        await supabase.from("vacancy_reactions").insert({ vacancy_id, user_id, type });
+      });
+  }
+
+  async function deleteLike() {
+    await supabase.from("vacancy_reactions").delete().eq("user_id", user_id).eq("vacancy_id", vacancy_id);
+    await supabase.from("vacancy_reactions").delete().eq("user_id", user_id).eq("vacancy_id", vacancy_id);
+  }
+
+  if (reactionType === "like" || reactionType === "dislike") {
+    postLike(reactionType);
+  } else {
+    deleteLike();
+  }
+});
+
 export const vacancyApi = {
-  element,
+  get: getVacancy,
+  applicants: {
+    post: PostApplicant,
+  },
+  like: PostVacancyLike,
   comments: {
     get: GetComments,
     post: PostComment,

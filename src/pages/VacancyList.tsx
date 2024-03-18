@@ -2,6 +2,7 @@ import { FC } from "react";
 import { VacancyCard } from "components";
 import backend from "backend";
 import styled from "styled-components";
+import Filter from "../layouts/Filter";
 
 const VacancyList: FC = () => {
   const { data, count, loading, error, pagination } = backend.vacancies();
@@ -9,60 +10,66 @@ const VacancyList: FC = () => {
   return (
     <Container className="main-container">
       <Content>
-        <div className="top-content">
-          <div className="count">{count} items found</div>
-        </div>
-        <div>
-          <Data>
-            <ul>
-              {data &&
-                data.map((el: any, idx: any) => (
-                  <li key={idx}>
-                    <div className="content">
-                      <VacancyCard key={idx} element={el} index={idx} />
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          </Data>
-
-          {loading && <div>Loading Vacancies...</div>}
-          {error && <div>Error</div>}
-
-          <div className="inline">
-            <Pagination className="inline">
+        <Aside>
+          <h3>Filters</h3>
+          <Filter />
+        </Aside>
+        <Main>
+          <div className="top-content">
+            <div className="count">{count} items found</div>
+          </div>
+          <div>
+            <Data>
               <ul>
-                {pagination.first && (
-                  <li>
-                    <button data-primary onClick={() => pagination.prev()}>
-                      <span className="material-symbols-rounded">chevron_left</span>
-                    </button>
-                  </li>
-                )}
-
-                {pagination.list &&
-                  pagination.list.map((_, index) => (
-                    <li key={index}>
-                      <button
-                        data-current={index + 1 === pagination.current}
-                        onClick={() => pagination.page(index + 1)}
-                      >
-                        {index + 1}
-                      </button>
+                {data &&
+                  data.map((el: any, idx: any) => (
+                    <li key={idx}>
+                      <div className="content">
+                        <VacancyCard key={idx} element={el} index={idx} />
+                      </div>
                     </li>
                   ))}
-
-                {pagination.last && (
-                  <li>
-                    <button data-primary onClick={() => pagination.next()}>
-                      <span className="material-symbols-rounded">chevron_right</span>
-                    </button>
-                  </li>
-                )}
               </ul>
-            </Pagination>
+            </Data>
+
+            {loading && <div>Loading Vacancies...</div>}
+            {error && <div>Error</div>}
+
+            <div className="inline">
+              <Pagination className="inline">
+                <ul>
+                  {pagination.first && (
+                    <li>
+                      <button data-primary onClick={() => pagination.prev()}>
+                        <span className="material-symbols-rounded">chevron_left</span>
+                      </button>
+                    </li>
+                  )}
+
+                  {pagination.list &&
+                    pagination.list.map((_, index) => (
+                      <li key={index}>
+                        <button
+                          data-current={index + 1 === pagination.current}
+                          onClick={() => pagination.page(index + 1)}
+                        >
+                          {index + 1}
+                        </button>
+                      </li>
+                    ))}
+
+                  {pagination.last && (
+                    <li>
+                      <button data-primary onClick={() => pagination.next()}>
+                        <span className="material-symbols-rounded">chevron_right</span>
+                      </button>
+                    </li>
+                  )}
+                </ul>
+              </Pagination>
+            </div>
           </div>
-        </div>
+        </Main>
       </Content>
     </Container>
   );
@@ -96,6 +103,26 @@ const Data = styled.div`
 `;
 
 const Content = styled.div`
+  display: grid;
+  grid-template-columns: 300px auto;
+  column-gap: 15px;
+  position: relative;
+`;
+
+const Aside = styled.aside`
+  position: sticky;
+  height: 100vh;
+  top: 0;
+
+  h3 {
+    font-family: var(--font-semiBold);
+    color: var(--title-color);
+    font-size: 18px;
+    padding: 15px;
+  }
+`;
+
+const Main = styled.div`
   width: 100%;
   height: 100%;
 

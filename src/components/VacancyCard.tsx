@@ -11,7 +11,7 @@ interface ComponentProps {
 const VacancyCard: FC<ComponentProps> = ({ element }) => {
   return (
     <Container key={element.id}>
-      <Link to={{ search: `${window.location.search}&vacancy_post=${element.id}` }}>
+      <Link to={`/vacancy/${element.id}`}>
         <Content>
           <div className="s1">
             <div className="logo">

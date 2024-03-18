@@ -2,11 +2,11 @@ import backend from "backend";
 import { FC } from "react";
 import styled from "styled-components";
 import { Searchbar } from "layouts";
-import { formData } from "../constant/formData";
 import { home } from "constant";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Chart } from "react-chartjs-2";
 import "chart.js/auto";
+import { Link } from "react-router-dom";
 
 const Home: FC = () => {
   const { data } = backend.home();
@@ -69,7 +69,7 @@ const Home: FC = () => {
                   return (
                     <li key={e.name}>
                       <div className="content">
-                        <h3>{formData.specialization.get(e.name)}</h3>
+                        <h3>{e.name}</h3>
                         <div>{content.specialization(e)}</div>
                       </div>
                     </li>
@@ -81,24 +81,25 @@ const Home: FC = () => {
             <h2>Top hiring companies</h2>
             <div className="swiper-content">
               <Swiper slidesPerView={4.5} spaceBetween={7}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((_, index) => {
+                {data.topCompanies?.map((item, index: number) => {
                   return (
                     <SwiperSlide key={index}>
-                      <div className="swiper-card">
-                        <div className="card-content">
-                          <h4 className="card-title">Manufacturing</h4>
-                          <p className="card-subtitle">800+ applications</p>
-                          <ul className="card-list">
-                            {[1, 2, 3, 4].map((_, idx) => {
-                              return (
-                                <li key={idx}>
-                                  <div className="card-list-item"></div>
-                                </li>
-                              );
-                            })}
-                          </ul>
+                      <Link to={{ pathname: "/top-companies", search: "specialization=manufacturing" }}>
+                        <div className="swiper-card">
+                          <div className="card-content">
+                            <h4 className="card-title">{item.name}</h4>
+                            <ul className="card-list">
+                              {item.companies.map((_, idx) => {
+                                return (
+                                  <li key={idx}>
+                                    <div className="card-list-item"></div>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     </SwiperSlide>
                   );
                 })}

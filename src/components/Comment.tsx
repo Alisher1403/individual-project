@@ -6,16 +6,16 @@ import { AppDispatch, RootState } from "store";
 import { Options } from "ui";
 import CommentEditor from "./CommentEditor";
 import { api } from "store/reducers";
-import { useSearchParams } from "hooks";
 import parse from "html-react-parser";
+import { useParams } from "react-router-dom";
 
 interface Props {
   element: any;
-  id: number;
+  id: string;
 }
 
 const Comment: FC<Props> = ({ element }) => {
-  const vacancy_id = useSearchParams().get("vacancy_post");
+  const vacancy_id = useParams()?.id || "";
   const dispatch: AppDispatch = useDispatch();
   const userId = useSelector((state: RootState) => state.user.id);
   const [edit, setEdit] = useState(false);

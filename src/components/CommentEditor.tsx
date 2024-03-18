@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store";
 import styled from "styled-components";
 import { api } from "store/reducers";
-import useSearchParams from "../hooks/useSearchParams";
+import { useParams } from "react-router-dom";
 
 interface Props {
   onCancel?: () => void;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
-  const vacancy_id = useSearchParams().get("vacancy_post");
+  const vacancy_id = useParams()?.id || "";
   const profile = useSelector((state: RootState) => state.user);
   const ref = useRef<HTMLDivElement | null>(null);
   const [disabled, setDisabled] = useState(false);

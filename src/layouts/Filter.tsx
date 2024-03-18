@@ -69,7 +69,6 @@ const Container = styled.div`
   overflow-y: scroll;
   height: 100%;
   top: 0;
-  padding: 15px;
 
   &::-webkit-scrollbar {
     display: none;
@@ -83,10 +82,15 @@ const Container = styled.div`
   }
 `;
 
-const Content = styled.div``;
+const Content = styled.div`
+  border-right: 0.5px solid var(--border-color);
+  border-bottom: 0.5px solid var(--border-color);
+`;
 
 const Section = styled.div`
-  padding: 10px 0;
+  padding: 15px;
+  border-top: 0.5px solid var(--border-color);
+  position: relative;
 
   .section-title {
     font-family: var(--font-semiBold);

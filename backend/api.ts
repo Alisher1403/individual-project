@@ -1,12 +1,18 @@
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "hooks";
-import { setVacancyCount, setVacancyPageData, vacancyListError, vacancyListLoading } from "store/reducers/vacancy";
+import {
+  setVacancyCount,
+  setVacancyReaction,
+  setVacancyListData,
+  vacancyListError,
+  vacancyListLoading,
+} from "store/reducers/vacancy";
 import { useSelector } from "react-redux";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "backend";
 import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
 
 /******************************** VACANCIES API *************************************/
@@ -105,7 +111,7 @@ const vacancies = () => {
         throw error;
       } else {
         dispatch(vacancyListLoading(false));
-        dispatch(setVacancyPageData({ key: dataKey, data }));
+        dispatch(setVacancyListData({ key: dataKey, data }));
 
         if (count) {
           dispatch(setVacancyCount({ key: dataKey, value: count }));
@@ -139,14 +145,16 @@ const vacancies = () => {
 };
 
 const vacancy = () => {
-  const searchParams = useSearchParams();
+  const params = useParams();
   const dispatch: AppDispatch = useDispatch();
-  const id = searchParams.get("vacancy_post");
+  const id = params?.id || "";
 
   const element = useSelector((state: RootState) => state.vacancy.element.data[id!]);
   const commentsList = useSelector((state: RootState) => state.vacancy.comments.data[id!]);
   const commentsCount = useSelector((state: RootState) => state.vacancy.comments.count[id!]);
   const commentsLoading = useSelector((state: RootState) => state.vacancy.comments.loading);
+  const likeTimer = useRef<any>();
+
   const [commentsObserver, InCommentsObserver] = useInView({
     triggerOnce: false,
   });
@@ -160,12 +168,55 @@ const vacancy = () => {
   const data = useMemo(() => element, [element]);
   const { error } = useSelector((state: RootState) => state.vacancy.element);
 
-  /** ====================== **/
   useEffect(() => {
     if (id && !data) {
-      dispatch(api.vacancy.element(id));
+      dispatch(api.vacancy.get(id));
     }
   }, [id]);
+
+  const methods = {
+    apply() {
+      dispatch(api.vacancy.applicants.post(id));
+    },
+    like() {
+      dispatch(setVacancyReaction({ vacancy_id: id, type: "like" }));
+      clearTimeout(likeTimer.current);
+      likeTimer.current = setTimeout(() => {
+        dispatch(api.vacancy.like(id));
+      }, 1000);
+    },
+    dislike() {
+      dispatch(setVacancyReaction({ vacancy_id: id, type: "dislike" }));
+      clearTimeout(likeTimer.current);
+      likeTimer.current = setTimeout(() => {
+        dispatch(api.vacancy.like(id));
+      }, 1000);
+    },
+    reactionsCount() {
+      const reaction = element.reaction[0]?.type;
+      const likesCount = data.likes[0]?.count;
+      const dislikesCount = data.dislikes[0]?.count;
+      let likes;
+      let dislikes;
+
+      if (reaction === "like") {
+        likes = likesCount + 1;
+      } else {
+        likes = likesCount;
+      }
+
+      if (reaction === "dislike") {
+        dislikes = dislikesCount + 1;
+      } else {
+        dislikes = dislikesCount;
+      }
+
+      return {
+        likes,
+        dislikes,
+      };
+    },
+  };
 
   const comments = {
     list: commentsList,
@@ -177,7 +228,7 @@ const vacancy = () => {
     },
   };
 
-  return { data, error, comments, id };
+  return { data, error, comments, id, methods };
 };
 
 /******************************** SEARCHBAR API *************************************/
@@ -411,7 +462,10 @@ const home = () => {
   const data = useSelector((state: RootState) => state.home);
 
   useEffect(() => {
-    dispatch(api.home.categories());
+    async function fetch() {
+      dispatch(api.home.categories.getList());
+    }
+    fetch();
   }, []);
 
   return { data };

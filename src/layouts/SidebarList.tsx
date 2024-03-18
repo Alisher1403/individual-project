@@ -1,28 +1,27 @@
 import backend from "backend";
 import { FC } from "react";
 import styled from "styled-components";
-import { useSearchParams } from "hooks";
 import { formData } from "../constant/formData";
+import { NavLink } from "react-router-dom";
 
 const SidebarList: FC = () => {
   const { data } = backend.vacancies();
-  const searchParams = useSearchParams();
-  const post = searchParams.get("vacancy_post");
 
   if (!data) return;
+
   return (
     <Container>
       <List>
         {data.map((elem, index) => {
           return (
-            <li key={index} data-selected={+post === elem.id}>
-              <button onClick={() => searchParams.set({ vacancy_post: elem.id })}>
+            <li key={index}>
+              <NavLink to={`/vacancy/${elem.id}`}>
                 <div>
                   <h3>{elem.title}</h3>
                   <p>{elem.company}</p>
                   <p>{formData.salary.get(elem)}</p>
                 </div>
-              </button>
+              </NavLink>
             </li>
           );
         })}
@@ -38,6 +37,10 @@ const Container = styled.div`
 `;
 
 const List = styled.ul`
+  display: flex;
+  flex-direction: column;
+  row-gap: 7px;
+
   li {
     &:hover {
       background: var(--element-background-hover);
@@ -56,32 +59,25 @@ const List = styled.ul`
       }
     }
 
-    button {
-      background: none;
-      border: none;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
+    a {
+      &[aria-current="page"] {
+        div {
+          border-right: 3px solid var(--element-color);
+          background: var(--element-background-hover);
+        }
+      }
 
       div {
+        background-color: var(--element-background);
+        border: 1px solid var(--border-color);
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
         display: flex;
         padding: 15px;
         flex-direction: column;
         align-items: flex-start;
-        position: relative;
         row-gap: 5px;
-
-        &::after {
-          content: "";
-          height: 100%;
-          display: none;
-          width: 3px;
-          background: var(--element-color);
-          right: 0;
-          top: 0;
-          bottom: 0;
-          position: absolute;
-        }
 
         h3 {
           font-size: 15px;
@@ -91,6 +87,7 @@ const List = styled.ul`
 
         p {
           color: var(--text-color);
+          font-size: 14px;
         }
       }
     }

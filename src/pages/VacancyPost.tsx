@@ -7,17 +7,17 @@ import { skills } from "icons";
 import { appData } from "constant";
 import { Link } from "react-router-dom";
 import { Comment, CommentEditor } from "components";
+import SidebarList from "../layouts/SidebarList";
 
 const VacancyPost: FC = () => {
-  const { data, error, comments, id } = backend.vacancy();
+  const { data, error, comments, id, methods } = backend.vacancy();
 
   if (!data || error) return;
 
   return (
     <Container className="main-container">
-      <div>
-        {/*  */}
-        <Content>
+      <Content>
+        <Main>
           <Section_1>
             <div className="p-1">
               <div className="logo">
@@ -40,13 +40,62 @@ const VacancyPost: FC = () => {
                 <div>{formData.timeAgo(data.created_at)}</div>
                 <div>{formData.emp_type.get(data.emp_type)}</div>
                 <div>
-                  <span className="material-symbols-rounded">visibility</span>
+                  <span className="material-symbols-rounded icon">visibility</span>
                   {data.views[0].count}
                 </div>
+              </div>
+              <div className="right">
+                <button className="apply-btn" disabled={!!data?.applied[0]} onClick={methods.apply}>
+                  {data.applied[0] ? (
+                    <div className="apply-btn-content">
+                      <span className="material-symbols-rounded icon">done</span> Applied
+                    </div>
+                  ) : (
+                    <div className="apply-btn-content">Apply</div>
+                  )}
+                </button>
               </div>
             </div>
           </Section_1>
           {/*  */}
+          <Section_4>
+            <div className="content">
+              <div className="left">
+                <button className="btn">
+                  <div className="btn-content">
+                    <span className="material-symbols-rounded icon">group_add</span>
+                    <span>{data?.appliedCount[0].count} Applied</span>
+                  </div>
+                </button>
+              </div>
+              <div className="right">
+                <button className="btn">
+                  <div className="btn-content">
+                    <span className="material-symbols-rounded icon">chat</span>
+                    <span>Open Chat</span>
+                  </div>
+                </button>
+                <button className="btn" onClick={methods.like}>
+                  <div className="btn-content">
+                    <span className={`material-symbols-rounded icon ${data.reaction[0]?.type === "like" && "filled"}`}>
+                      thumb_up
+                    </span>
+                    <span>{methods.reactionsCount().likes}</span>
+                  </div>
+                </button>
+                <button className="btn" onClick={methods.dislike}>
+                  <div className="btn-content">
+                    <span
+                      className={`material-symbols-rounded icon ${data.reaction[0]?.type === "dislike" && "filled"}`}
+                    >
+                      thumb_down
+                    </span>
+                    <span>{methods.reactionsCount().dislikes}</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </Section_4>
           <Section_2>
             {data.description && (
               <div className="p-1">
@@ -108,8 +157,11 @@ const VacancyPost: FC = () => {
             </div>
             {/*  */}
           </Section_3>
-        </Content>
-      </div>
+        </Main>
+        <Aside>
+          <SidebarList />
+        </Aside>
+      </Content>
     </Container>
   );
 };
@@ -126,13 +178,22 @@ const Container = styled.div`
   }
 `;
 
-const Content = styled.div``;
+const Content = styled.div`
+  display: grid;
+  grid-template-columns: auto 350px;
+  column-gap: 30px;
+  padding: 30px 0;
+`;
+
+const Aside = styled.aside``;
+const Main = styled.div``;
 
 const Section_1 = styled.div`
   padding: 20px;
+  padding-bottom: 15px;
   background: var(--element-background);
   border: 1px solid var(--border-color);
-  margin: 10px 0;
+  margin-bottom: 10px;
 
   .p-1 {
     display: grid;
@@ -195,6 +256,9 @@ const Section_1 = styled.div`
     border-top: 1px solid var(--border-color-dark);
     padding-top: 10px;
     margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     .left {
       display: flex;
@@ -203,12 +267,49 @@ const Section_1 = styled.div`
         display: flex;
         align-items: center;
         text-transform: lowercase;
+        column-gap: 2px;
         border-left: 1px solid var(--border-color);
         padding: 0 15px;
 
         &:first-child {
           border: none;
           padding-left: 0;
+        }
+
+        .icon {
+          margin-bottom: -2px;
+        }
+      }
+    }
+
+    .right {
+      .apply-btn {
+        font-family: var(--font-bold);
+        background-color: var(--element-color);
+        border: 1px solid var(--element-color);
+        font-size: 15px;
+        padding: 0 35px;
+        height: 30px;
+        border-radius: 3px;
+        cursor: pointer;
+
+        * {
+          color: white;
+        }
+
+        &[disabled] {
+          background-color: transparent;
+          color: var(--element-color);
+
+          * {
+            color: var(--element-color);
+          }
+        }
+
+        .apply-btn-content {
+          display: flex;
+          align-items: center;
+          column-gap: 2px;
         }
       }
     }
@@ -330,6 +431,59 @@ const Section_3 = styled.div`
 
     .loader {
       width: 26px;
+    }
+  }
+`;
+
+const Section_4 = styled.div`
+  .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .left,
+    .right {
+      display: flex;
+      column-gap: 7px;
+    }
+
+    .info {
+      display: flex;
+      align-items: center;
+      column-gap: 5px;
+      font-size: 15px;
+      color: var(--text-color);
+
+      .icon {
+        font-size: 22px;
+        color: var(--text-color);
+      }
+    }
+
+    .btn {
+      background: var(--element-background);
+      border: 1px solid var(--border-color);
+      padding: 6px 15px;
+      border-radius: 3px;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--element-background-hover);
+      }
+
+      .btn-content {
+        display: flex;
+        align-items: center;
+        column-gap: 5px;
+        font-size: 15px;
+        color: var(--text-color);
+        font-family: var(--font-semiBold);
+
+        .icon {
+          font-size: 20px;
+          color: var(--text-color);
+        }
+      }
     }
   }
 `;
