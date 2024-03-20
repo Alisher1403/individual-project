@@ -3,13 +3,19 @@ import { supabase } from "backend";
 
 const user = createSlice({
   name: "user",
-  initialState: null as { [key: string]: any } | null,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(authUser.fulfilled, (_, action) => {
-      return action.payload;
-    });
+  // initialState: null as { [key: string]: any } | null,
+  initialState: {
+    id: "56d26b6c-085c-4003-8381-6109937a7d18",
+    type: "applicant",
+    img: "",
+    name: "",
   },
+  reducers: {},
+  // extraReducers: (builder) => {
+  //   builder.addCase(authUser.fulfilled, (_, action) => {
+  //     return action.payload;
+  //   });
+  // },
 });
 
 export default user.reducer;
