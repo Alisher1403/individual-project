@@ -58,7 +58,7 @@ const Home: FC = () => {
   };
 
   return (
-    <Container>
+    <Container className="main-container">
       <Content>
         <Searchbar />
         <main>
@@ -120,12 +120,11 @@ const Home: FC = () => {
 
 export default Home;
 
-const Container = styled.div`
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 50px 20px;
+const Container = styled.div``;
+
+const Content = styled.div`
+  padding: 30px 0;
 `;
-const Content = styled.div``;
 
 const Section = styled.div`
   margin-top: 30px;

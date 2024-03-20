@@ -1,8 +1,9 @@
 import { FC } from "react";
-import { Create, Home, Login, Profile, TopCompanies, VacancyList, VacancyPost } from "pages";
+import { Create, Home, Login, Profile, TopCompanies, VacancyList, VacancyPost, Chat } from "pages";
 import styled from "styled-components";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { Navigation } from "layouts";
+
 const MainLayout: FC = () => {
   const location = useLocation();
   if (location.pathname === "/login") return <Login />;
@@ -20,6 +21,7 @@ const MainLayout: FC = () => {
             <Route path="/create" element={<Create />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route path="/top-companies" element={<TopCompanies />}></Route>
+            <Route path="/chat/:id" element={<Chat />}></Route>
           </Routes>
         </MainContent>
       </Content>
@@ -32,10 +34,12 @@ export default MainLayout;
 const Container = styled.div`
   position: relative;
 `;
+
 const Content = styled.div`
   display: flex;
   position: relative;
 `;
+
 const MainContent = styled.div`
   width: 100%;
   background-color: var(--content-background);

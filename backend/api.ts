@@ -8,14 +8,22 @@ import {
   vacancyListLoading,
 } from "store/reducers/vacancy";
 import { useSelector } from "react-redux";
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "backend";
 import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
 
 /******************************** VACANCIES API *************************************/
+
+const app = () => {
+  const dispatch = useDispatch() as AppDispatch;
+
+  useEffect(() => {
+    dispatch(api.user.auth());
+  }, []);
+};
 
 const vacancies = () => {
   // Redux
@@ -154,6 +162,7 @@ const vacancy = () => {
   const commentsCount = useSelector((state: RootState) => state.vacancy.comments.count[id!]);
   const commentsLoading = useSelector((state: RootState) => state.vacancy.comments.loading);
   const likeTimer = useRef<any>();
+  const user = useSelector((state: RootState) => state.user);
 
   const [commentsObserver, InCommentsObserver] = useInView({
     triggerOnce: false,
@@ -228,7 +237,7 @@ const vacancy = () => {
     },
   };
 
-  return { data, error, comments, id, methods };
+  return { data, error, comments, id, methods, user };
 };
 
 /******************************** SEARCHBAR API *************************************/
@@ -238,7 +247,6 @@ const searchbar = () => {
   const searchParams = useSearchParams();
   const text = searchParams.get("text");
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [value, setValue] = useState<string>(text || "");
   const [focus, setFocus] = useState(false);
@@ -288,11 +296,7 @@ const searchbar = () => {
       event.preventDefault();
     }
 
-    if (location.pathname === "/") {
-      navigate({ pathname: "/search/vacancy", search: `text=${value}&page=1` });
-    } else {
-      searchParams.set({ text: value, page: "1" });
-    }
+    navigate({ pathname: "/search/vacancy", search: `text=${value}&page=1` });
 
     setFocus(false);
     inputRef.current?.blur();
@@ -304,7 +308,11 @@ const searchbar = () => {
   // Function to refetch search list
   async function refetch(data: string[]) {
     try {
-      await supabase.from("users").update({ searched: data }).eq("user_id", userData.id).select("*");
+      if (userData && userData?.id) {
+        await supabase.from("users").update({ searched: data }).eq("user_id", userData.id).select("*");
+      } else {
+        localStorage.setItem("searched", JSON.stringify(data));
+      }
     } catch (e) {
       console.error(e);
     }
@@ -341,12 +349,22 @@ const searchbar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data, error } = await supabase.from("users").select("searched").eq("user_id", userData.id).range(0, 10);
+        if (userData && userData?.id) {
+          const { data, error } = await supabase
+            .from("users")
+            .select("searched")
+            .eq("user_id", userData.id)
+            .range(0, 10);
 
-        if (data) {
-          setSearched(data[0]?.searched || []);
+          if (data) {
+            setSearched(data[0]?.searched || []);
+          }
+          if (error) throw error;
+        } else {
+          const localSearched = localStorage.getItem("searched") || "";
+          const localSearchedList = JSON.parse(localSearched);
+          setSearched(localSearchedList);
         }
-        if (error) throw error;
       } catch (error) {
         console.error(error);
       }
@@ -471,4 +489,56 @@ const home = () => {
   return { data };
 };
 
-export default { vacancies, vacancy, searchbar, home };
+const chats = () => {
+  const params = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch() as AppDispatch;
+  const vacancy_id = params?.id;
+  const user_id = useSelector((state: RootState) => state.user?.id);
+
+  useEffect(() => {
+    if (!user_id) {
+      navigate("/");
+    }
+  }, []);
+
+  const messagesRef = useRef<HTMLDivElement>(null);
+  const key = `${vacancy_id}${user_id}`;
+  const messagesList = useSelector((state: RootState) => state.chats.messages[key]);
+
+  function scrollToBottom() {
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop = messagesRef.current?.scrollHeight;
+    }
+  }
+
+  const [messageObserver, InMessageObserver] = useInView({
+    triggerOnce: false,
+  });
+
+  const messages = {
+    observer: messageObserver,
+    inObserver: InMessageObserver,
+    loading: true,
+    ref: messagesRef,
+    list: messagesList,
+  };
+
+  if (messages.inObserver) {
+    // console.log(true);
+  }
+
+  useLayoutEffect(() => {
+    scrollToBottom();
+  }, []);
+
+  useEffect(() => {
+    if (vacancy_id) {
+      dispatch(api.chats.messages.get({ vacancy_id }));
+    }
+  }, []);
+
+  return { messages, user_id };
+};
+
+export default { vacancies, vacancy, searchbar, home, chats, app };

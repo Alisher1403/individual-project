@@ -1,9 +1,30 @@
+import { supabase } from "backend";
 import { FC, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const Login: FC = () => {
   const [passwordType, setPasswordType] = useState("password");
+  const [userExists, setUserExists] = useState(false);
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  async function signIn() {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword(form);
+      if (error) {
+        throw error;
+      }
+      console.log(data);
+      localStorage.setItem("session", JSON.stringify(data?.session));
+      return data;
+    } catch (error: any) {
+      console.error("Sign-up error:", error.message);
+      setUserExists(true);
+    }
+  }
 
   return (
     <Container>
@@ -11,18 +32,37 @@ const Login: FC = () => {
         <h1 className="title">Sign In</h1>
         <h2 className="subtitle">Enter your email and password to access your account</h2>
 
-        <form>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            signIn();
+          }}
+        >
           <div className="form-content">
-            <div className="input-container">
+            <div className="input-container" data-error={userExists}>
               <h3 className="input-label">Email</h3>
               <div className="input-wrapper">
-                <input type="email" required />
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  onChange={(e) => {
+                    setUserExists(false);
+                    setForm({ ...form, email: e.target.value });
+                  }}
+                />
               </div>
+              <span className="error-message">This user already exists</span>
             </div>
             <div className="input-container">
               <h3 className="input-label">Password</h3>
               <div className="input-wrapper">
-                <input type={passwordType} required />
+                <input
+                  type={passwordType}
+                  name="password"
+                  required
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                />
                 <button
                   onClick={(e) => {
                     e.preventDefault();
@@ -105,11 +145,29 @@ const Content = styled.div`
         margin: 5px 0;
         width: 100%;
 
+        &[data-error="true"] {
+          .error-message {
+            display: block;
+          }
+
+          .input-wrapper {
+            border-color: red;
+          }
+        }
+
         .input-label {
           font-size: 14px;
           font-family: var(--font-medium);
           font-weight: normal;
           margin-bottom: 8px;
+        }
+
+        .error-message {
+          color: red;
+          font-family: var(--font-light);
+          font-size: 14px;
+          display: none;
+          margin-top: 3px;
         }
 
         .input-wrapper {

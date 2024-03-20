@@ -10,8 +10,11 @@ import "swiper/css/autoplay";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
+import backend from "backend";
 
 function App() {
+  backend.app();
+
   return (
     <BrowserRouter>
       <ThemeProvider theme={Theme}>

@@ -10,7 +10,7 @@ import { Comment, CommentEditor } from "components";
 import SidebarList from "../layouts/SidebarList";
 
 const VacancyPost: FC = () => {
-  const { data, error, comments, id, methods } = backend.vacancy();
+  const { data, error, comments, id, methods, user } = backend.vacancy();
 
   if (!data || error) return;
 
@@ -69,13 +69,13 @@ const VacancyPost: FC = () => {
                 </button>
               </div>
               <div className="right">
-                <button className="btn">
+                <Link to={`/chat/${id}`} data-disabled={!user?.id} className="btn">
                   <div className="btn-content">
                     <span className="material-symbols-rounded icon">chat</span>
                     <span>Open Chat</span>
                   </div>
-                </button>
-                <button className="btn" onClick={methods.like}>
+                </Link>
+                <button className="btn" disabled={!user?.id} onClick={methods.like}>
                   <div className="btn-content">
                     <span className={`material-symbols-rounded icon ${data.reaction[0]?.type === "like" && "filled"}`}>
                       thumb_up
@@ -83,7 +83,7 @@ const VacancyPost: FC = () => {
                     <span>{methods.reactionsCount().likes}</span>
                   </div>
                 </button>
-                <button className="btn" onClick={methods.dislike}>
+                <button className="btn" disabled={!user?.id} onClick={methods.dislike}>
                   <div className="btn-content">
                     <span
                       className={`material-symbols-rounded icon ${data.reaction[0]?.type === "dislike" && "filled"}`}
@@ -277,7 +277,8 @@ const Section_1 = styled.div`
         }
 
         .icon {
-          margin-bottom: -2px;
+          margin-bottom: -1px;
+          color: var(--text-color);
         }
       }
     }
@@ -469,6 +470,10 @@ const Section_4 = styled.div`
 
       &:hover {
         background: var(--element-background-hover);
+      }
+
+      &[data-disabled="true"] {
+        pointer-events: none;
       }
 
       .btn-content {

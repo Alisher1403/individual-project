@@ -3,6 +3,7 @@
 :root {
   /* Main */
   --main-bg: #f7f7f7;
+  --navigation-height: 80px;
 
   /* common */
   --element-color: #7487eb;

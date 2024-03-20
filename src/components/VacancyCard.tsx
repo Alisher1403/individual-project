@@ -34,7 +34,7 @@ const VacancyCard: FC<ComponentProps> = ({ element }) => {
               <div>{formData.timeAgo(element.created_at)}</div>
               <div>{formData.emp_type.get(element.emp_type)}</div>
               <div>
-                <span className="material-symbols-rounded">visibility</span>
+                <span className="material-symbols-rounded icon">visibility</span>
                 {element.views[0].count}
               </div>
             </div>
@@ -129,10 +129,16 @@ const Content = styled.div`
         text-transform: lowercase;
         border-left: 1px solid var(--border-color);
         padding: 0 15px;
+        column-gap: 2px;
 
         &:first-child {
           border: none;
           padding-left: 0;
+        }
+
+        .icon {
+          margin-bottom: -1px;
+          color: var(--text-color);
         }
       }
     }

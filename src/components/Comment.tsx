@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { formData } from "../constant/formData";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,6 +8,7 @@ import CommentEditor from "./CommentEditor";
 import { api } from "store/reducers";
 import parse from "html-react-parser";
 import { useParams } from "react-router-dom";
+import { setCommentReaction } from "store/reducers/vacancy";
 
 interface Props {
   element: any;
@@ -17,54 +18,51 @@ interface Props {
 const Comment: FC<Props> = ({ element }) => {
   const vacancy_id = useParams()?.id || "";
   const dispatch: AppDispatch = useDispatch();
-  const userId = useSelector((state: RootState) => state.user.id);
+  const user = useSelector((state: RootState) => state.user);
   const [edit, setEdit] = useState(false);
   const timeAgo = useMemo(() => formData.timeAgo(element.created_at), [element.created_at]);
-  const [liked, setLiked] = useState<"like" | "dislike" | null>(element.liked);
-  const [componentReady, setComponentReady] = useState(false);
+  const likeTimer = useRef<any>();
 
-  const like = {
-    set(state: typeof liked): void {
-      setLiked((prevLiked) => (prevLiked === state ? null : state));
+  const methods = {
+    like() {
+      dispatch(setCommentReaction({ comment_id: element.id, vacancy_id, type: "like" }));
+      clearTimeout(likeTimer.current);
+      likeTimer.current = setTimeout(() => {
+        dispatch(api.vacancy.comments.like({ vacancy_id, comment_id: element.id }));
+      }, 1000);
     },
-    count(state: typeof liked) {
-      const isLike = liked === "like";
-      const isDislike = liked === "dislike";
-      const isElementLiked = element.liked === "like";
-      const isElementDisliked = element.liked === "dislike";
+    dislike() {
+      dispatch(setCommentReaction({ comment_id: element.id, vacancy_id, type: "dislike" }));
+      clearTimeout(likeTimer.current);
+      likeTimer.current = setTimeout(() => {
+        dispatch(api.vacancy.comments.like({ vacancy_id, comment_id: element.id }));
+      }, 1000);
+    },
+    reactionsCount() {
+      const reaction = element.reaction[0]?.type;
+      const likesCount = element.likes[0]?.count;
+      const dislikesCount = element.dislikes[0]?.count;
+      let likes;
+      let dislikes;
 
-      let likeCount = isLike
-        ? isElementLiked
-          ? element.like_count
-          : element.like_count + 1
-        : isElementLiked
-        ? element.like_count - 1
-        : element.like_count;
+      if (reaction === "like") {
+        likes = likesCount + 1;
+      } else {
+        likes = likesCount;
+      }
 
-      let dislikeCount = isDislike
-        ? isElementDisliked
-          ? element.dislike_count
-          : element.dislike_count + 1
-        : isElementDisliked
-        ? element.dislike_count - 1
-        : element.dislike_count;
+      if (reaction === "dislike") {
+        dislikes = dislikesCount + 1;
+      } else {
+        dislikes = dislikesCount;
+      }
 
-      return state === "like" ? likeCount : dislikeCount;
+      return {
+        likes,
+        dislikes,
+      };
     },
   };
-
-  useEffect(() => {
-    let timer: any;
-    setComponentReady(true);
-
-    if (componentReady) {
-      timer = setTimeout(() => {
-        dispatch(api.vacancy.comments.like({ comment_id: element.id, vacancy_id, liked }));
-      }, 1000);
-    }
-
-    return () => clearTimeout(timer);
-  }, [liked]);
 
   return (
     <Container>
@@ -73,17 +71,13 @@ const Comment: FC<Props> = ({ element }) => {
       ) : (
         <Content>
           <div className="img">
-            {element?.user_data.img ? (
-              <img src={element?.user_data.img} alt="" />
-            ) : (
-              element?.user_data.name[0].toUpperCase()
-            )}
+            {element?.user.img ? <img src={element?.user.img} alt="" /> : element?.user.name[0].toUpperCase()}
           </div>
           <div className="main-wrapper">
             <div>
               <div className="main">
                 <div className="header">
-                  <div className="name">{element.user_data?.name}</div>
+                  <div className="name">{element.user?.name}</div>
                   <div>{timeAgo}</div>
                   <div>{element?.changed ? "(changed)" : ""}</div>
                 </div>
@@ -91,15 +85,23 @@ const Comment: FC<Props> = ({ element }) => {
                   <div className="text">{parse(element.text)}</div>
                 </div>
                 <div className="footer">
-                  <button className="btn" onClick={() => like.set("like")}>
-                    <p>{like.count("like")}</p>
-                    <span className={`material-symbols-rounded icon ${liked === "like" ? "filled" : ""}`}>
+                  <button className="btn" disabled={!user?.id} onClick={() => methods.like()}>
+                    <p>{methods.reactionsCount().likes}</p>
+                    <span
+                      className={`material-symbols-rounded icon ${
+                        element?.reaction?.[0]?.type === "like" ? "filled" : ""
+                      }`}
+                    >
                       thumb_up
                     </span>
                   </button>
-                  <button className="btn" onClick={() => like.set("dislike")}>
-                    <p>{like.count("dislike")}</p>
-                    <span className={`material-symbols-rounded icon ${liked === "dislike" ? "filled" : ""}`}>
+                  <button className="btn" disabled={!user?.id} onClick={() => methods.dislike()}>
+                    <p>{methods.reactionsCount().dislikes}</p>
+                    <span
+                      className={`material-symbols-rounded icon ${
+                        element?.reaction?.[0]?.type === "dislike" ? "filled" : ""
+                      }`}
+                    >
                       thumb_down
                     </span>
                   </button>
@@ -108,7 +110,7 @@ const Comment: FC<Props> = ({ element }) => {
               </div>
             </div>
             <div>
-              {element.user_data.id === userId ? (
+              {user && element.user.id === user?.id ? (
                 <Options
                   options={[
                     { icon: "edit", label: "Edit", onClick: () => setEdit(true) },

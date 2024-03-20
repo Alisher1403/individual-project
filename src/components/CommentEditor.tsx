@@ -13,7 +13,7 @@ interface Props {
 
 const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
   const vacancy_id = useParams()?.id || "";
-  const profile = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.user);
   const ref = useRef<HTMLDivElement | null>(null);
   const [disabled, setDisabled] = useState(false);
   const [focus, setFocus] = useState(open);
@@ -62,39 +62,43 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
     }
   }
 
-  return (
-    <Container>
-      <div className="new-comment">
-        <div className="body">
-          <div className="img">{profile.img ? <img src={profile.img} alt="" /> : profile.name[0]?.toUpperCase()}</div>
-          <div className="comment-input-wrapper">
-            <div
-              className="comment-input"
-              contentEditable={true}
-              onInput={onInput}
-              ref={ref}
-              role="textbox"
-              onFocus={() => setFocus(true)}
-            ></div>
-          </div>
-        </div>
-        {focus ? (
-          <div className="footer">
-            <div className="buttons-wrapper">
-              <button className="button" onClick={cancel}>
-                Cancel
-              </button>
-              <button className="button" disabled={disabled} data-primary onClick={submit}>
-                Leave Comment
-              </button>
+  if (user && user.id) {
+    return (
+      <Container>
+        <div className="new-comment">
+          <div className="body">
+            <div className="img">{user?.img ? <img src={user?.img} alt="" /> : user?.name?.[0]?.toUpperCase()}</div>
+            <div className="comment-input-wrapper">
+              <div
+                className="comment-input"
+                contentEditable={true}
+                onInput={onInput}
+                ref={ref}
+                role="textbox"
+                onFocus={() => setFocus(true)}
+              ></div>
             </div>
           </div>
-        ) : (
-          <div className="footer-margin"></div>
-        )}
-      </div>
-    </Container>
-  );
+          {focus ? (
+            <div className="footer">
+              <div className="buttons-wrapper">
+                <button className="button" onClick={cancel}>
+                  Cancel
+                </button>
+                <button className="button" disabled={disabled} data-primary onClick={submit}>
+                  Leave Comment
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="footer-margin"></div>
+          )}
+        </div>
+      </Container>
+    );
+  } else {
+    return <h2 className="warning">Login to write comments</h2>;
+  }
 };
 
 export default CommentEditor;

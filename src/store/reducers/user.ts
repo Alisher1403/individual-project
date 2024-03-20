@@ -1,21 +1,46 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { supabase } from "backend";
 
 const user = createSlice({
   name: "user",
-  initialState: {
-    data: {} as any,
-    id: "56d26b6c-085c-4003-8381-6109937a7d18",
-    userType: "employer",
-    name: "Alisher",
-    img: null,
-  },
-  reducers: {
-    setUser(state, action: PayloadAction<{ key: string; data: object }>) {
-      state.data[action.payload.key] = action.payload.data;
-    },
+  initialState: null as { [key: string]: any } | null,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(authUser.fulfilled, (_, action) => {
+      return action.payload;
+    });
   },
 });
 
-export const { setUser } = user.actions;
 export default user.reducer;
+
+const authUser = createAsyncThunk("authUser", async () => {
+  try {
+    const { data: jwt } = await supabase.auth.getSession();
+
+    if (jwt.session) {
+      const session = jwt.session;
+
+      const {
+        data: { user: userData },
+      } = await supabase.auth.getUser(session.access_token);
+
+      const { error: refreshError } = await supabase.auth.refreshSession(session);
+
+      if (refreshError) {
+        throw new Error("Failed to refresh session");
+      }
+
+      return userData;
+    } else {
+      return null;
+    }
+  } catch (error: any) {
+    console.error("Error fetching user data or refreshing session:", error);
+    return { error: error.message };
+  }
+});
+
+export const userApi = {
+  auth: authUser,
+};

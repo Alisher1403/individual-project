@@ -25,6 +25,13 @@ const Navigation: FC = () => {
           </ul>
         </Section>
         {location.pathname !== "/" && <Searchbar />}
+        <Section>
+          <ul className="links-list">
+            <li>
+              <NavLink to={`/login`}>Log out</NavLink>
+            </li>
+          </ul>
+        </Section>
       </Content>
     </Container>
   );
@@ -40,7 +47,7 @@ const Container = styled.nav`
   z-index: 100;
   max-width: 1350px;
   width: 100%;
-  height: 80px;
+  height: var(--navigation-height);
   display: flex;
   align-items: center;
   padding: 0 10px;
@@ -49,6 +56,7 @@ const Container = styled.nav`
 const Content = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
 `;
 const Section = styled.div`

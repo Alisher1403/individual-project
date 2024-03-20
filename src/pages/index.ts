@@ -6,5 +6,6 @@ import Login from "./Login";
 import VacancyCreate from "./VacancyCreate";
 import Create from "./Create";
 import TopCompanies from "./TopCompanies";
+import Chat from "./Chat";
 
-export { VacancyList, VacancyPost, Profile, Home, Login, VacancyCreate, Create, TopCompanies };
+export { VacancyList, VacancyPost, Profile, Home, Login, VacancyCreate, Create, TopCompanies, Chat };

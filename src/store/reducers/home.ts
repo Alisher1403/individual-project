@@ -36,9 +36,9 @@ const home = createSlice({
 export default home.reducer;
 
 /********************************************************/
-const getCategories = createAsyncThunk<Category[], void>("categories", async (_, { dispatch }) => {
+const getCategories = createAsyncThunk<Category[], void>("categories", async () => {
   const { data } = await supabase.rpc("get_specialization_count");
-  await dispatch(getTopCompanies(data));
+
   return data;
 });
 

@@ -82,6 +82,19 @@ const vacancy = createSlice({
         vacancy.reaction = [{ type }];
       }
     },
+    setCommentReaction(state, action: PayloadAction<{ vacancy_id: string; comment_id: string; type: string }>) {
+      const { vacancy_id, comment_id, type } = action.payload;
+      const list = state.comments.data[vacancy_id];
+
+      const index = list?.findIndex((e: any) => e.id === comment_id);
+      const comment = list[index];
+
+      if (comment.reaction[0]?.type === type) {
+        comment.reaction = [{ type: null }];
+      } else {
+        comment.reaction = [{ type }];
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getVacancy.fulfilled, (state, action) => {
@@ -126,7 +139,7 @@ const vacancy = createSlice({
 
         if (data) {
           const uniqueArray = Array.from(
-            new Set([...state.comments.data[key], ...data].map((item) => JSON.stringify(item)))
+            new Set([...state.comments.data[key], data].map((item) => JSON.stringify(item)))
           ).map((item) => JSON.parse(item));
 
           state.comments.data[key] = uniqueArray;
@@ -176,15 +189,6 @@ const vacancy = createSlice({
         }
       }
     });
-
-    builder.addCase(PostCommentLike.fulfilled, (state, action) => {
-      const { comment_id, key } = action.payload;
-      const list = state.comments.data[key];
-      const index = list?.findIndex((e: { id: number }) => e.id === comment_id);
-      list[index].liked = list[index].liked ? list[index]?.liked : null;
-
-      state.comments.data[key] = list;
-    });
   },
 });
 
@@ -196,6 +200,7 @@ export const {
   setVacancyCount,
   setVacancyListData,
   setVacancyReaction,
+  setCommentReaction,
 } = vacancy.actions;
 
 export default vacancy.reducer;
@@ -209,41 +214,55 @@ const config = {
 const getVacancy = createAsyncThunk("getVacancy", async (id: string, { dispatch, getState }) => {
   dispatch(LoadComments(id));
   const state = getState() as RootState;
-  const user_id = state.user.id;
+  const user_id = state.user?.id;
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("vacancies")
     .select(
       `*, views (count), applied: applicants(id), appliedCount: applicants(count), 
       reaction: vacancy_reactions(type), likes: vacancy_reactions(count), dislikes: vacancy_reactions(count)`
     )
     .eq("id", id)
-    .eq("applicants.user_id", user_id)
-    .eq("reaction.user_id", user_id)
     .eq("likes.type", "like")
     .eq("dislikes.type", "dislike");
+
+  if (user_id) {
+    query = query.eq("applicants.user_id", user_id).eq("reaction.user_id", user_id);
+  }
+
+  const { data, error } = await query;
 
   return { key: id, data, error };
 });
 
 const LoadComments = createAsyncThunk("LoadComments", async (vacancy_id: string, { getState }) => {
   const state = getState() as RootState;
-  const list = state.vacancy.comments.data[vacancy_id] || [];
-  const last_id = list[list.length - 1]?.id || null;
-  const user_id = state.user.id;
-
-  const params = { p_post_id: vacancy_id, p_from_id: last_id, p_limit: config.commentsPerLoad, p_user_id: user_id };
-
-  const { data } = await supabase.rpc("get_comments", params);
+  const user_id = state.user?.id;
 
   const { data: count } = await supabase.from("comments").select("count").eq("vacancy_id", vacancy_id);
+
+  let query = supabase
+    .from("comments")
+    .select(
+      "*, user: user_metadata(id, name, img), dislikes: comment_reactions(count), likes: comment_reactions(count), reaction: comment_reactions(type)"
+    )
+    .eq("vacancy_id", vacancy_id)
+    .eq("dislikes.type", "dislike")
+    .eq("likes.type", "like");
+
+  if (user_id) {
+    query = query.eq("reaction.user_id", user_id);
+  }
+
+  const { data } = await query;
+  console.log(data);
 
   return { key: vacancy_id, data, count };
 });
 
 const GetComments = createAsyncThunk("GetComments", async (vacancy_id: string, { getState, dispatch }) => {
   const state = getState() as RootState;
-  const user_id = state.user.id;
+  const user_id = state.user?.id;
   const mainState = state.vacancy.comments.data[vacancy_id] || [];
   const last_id = mainState[mainState.length - 1]?.id;
 
@@ -254,8 +273,24 @@ const GetComments = createAsyncThunk("GetComments", async (vacancy_id: string, {
   }
 
   dispatch(vacancy.actions.commentsLoading(true));
-  const params = { p_post_id: vacancy_id, p_from_id: last_id, p_limit: config.commentsPerLoad, p_user_id: user_id };
-  const { data } = await supabase.rpc("get_comments", params);
+
+  let query = supabase
+    .from("comments")
+    .select(
+      "*, user: user_metadata(id, name, img), dislikes: comment_reactions(count), likes: comment_reactions(count), reaction: comment_reactions(type)"
+    )
+    .eq("vacancy_id", vacancy_id)
+    .eq("dislikes.type", "dislike")
+    .eq("likes.type", "like")
+    .lte("id", last_id)
+    .order("id", { ascending: false })
+    .limit(config.commentsPerLoad);
+
+  if (user_id) {
+    query = query.eq("reaction.user_id", user_id);
+  }
+
+  const data = await query;
 
   dispatch(vacancy.actions.commentsLoading(false));
 
@@ -265,16 +300,17 @@ const GetComments = createAsyncThunk("GetComments", async (vacancy_id: string, {
 const PostComment = createAsyncThunk(
   "PostComment",
   async (args: { vacancy_id: string; value: string }, { getState }) => {
-    const state = getState() as RootState;
-    const user_id = state.user.id;
-
     const { value, vacancy_id } = args;
+    const state = getState() as RootState;
+    const user_id = state.user?.id;
+
+    if (!user_id || !vacancy_id) return;
 
     if (vacancy_id) {
       const { data } = await supabase
         .from("comments")
         .insert({ vacancy_id, text: value, user_id })
-        .select("*, user_data: users(id: user_id, name: user_name, img)");
+        .select("*, user: users(id, name, img)");
 
       return { key: vacancy_id, data };
     }
@@ -289,7 +325,7 @@ const UpdateComment = createAsyncThunk(
       .from("comments")
       .update({ text: value, changed: true })
       .eq("id", id)
-      .select("*, user_data: users(id: user_id, name: user_name, img)");
+      .select("*, user: users(id, name, img)");
 
     return { key: vacancy_id, data, id };
   }
@@ -304,43 +340,45 @@ const DeleteComment = createAsyncThunk("DeleteComment", async (args: { id: strin
 
 const PostCommentLike = createAsyncThunk(
   "PostCommentLike",
-  async (args: { vacancy_id: string; comment_id: number; liked: "like" | "dislike" | null }, { getState }) => {
-    const { vacancy_id, comment_id, liked } = args;
+  async (args: { comment_id: string; vacancy_id: string }, { getState }) => {
+    const { comment_id, vacancy_id } = args;
+
     const state = getState() as RootState;
-    const user_id = state.user.id;
+    const user_id = state.user?.id;
+    const list = state.vacancy.comments.data[vacancy_id];
+    const index = list?.findIndex((e: any) => e.id === comment_id);
+    const comment = list[index];
+    const reactionType = comment?.reaction?.[0]?.type;
 
-    function deleteLike() {
-      supabase.from("comment_likes").delete().eq("comment_id", comment_id).eq("user_id", user_id).then();
-    }
+    if (!user_id || !comment_id) return;
 
-    function setLike(dislike: boolean) {
-      supabase
-        .from("comment_likes")
+    async function postLike(type: string) {
+      await supabase
+        .from("comment_reactions")
         .delete()
-        .eq("comment_id", comment_id)
         .eq("user_id", user_id)
-        .then(() => {
-          supabase.from("comment_likes").insert({ user_id, comment_id, dislike }).then();
+        .eq("comment_id", comment_id)
+        .then(async () => {
+          await supabase.from("comment_reactions").insert({ comment_id, user_id, type });
         });
     }
 
-    if (user_id) {
-      if (liked === "like") {
-        setLike(false);
-      } else if (liked === "dislike") {
-        setLike(true);
-      } else {
-        deleteLike();
-      }
+    async function deleteLike() {
+      await supabase.from("comment_reactions").delete().eq("user_id", user_id).eq("comment_id", comment_id);
     }
 
-    return { comment_id, key: vacancy_id };
+    if (reactionType === "like" || reactionType === "dislike") {
+      postLike(reactionType);
+    } else {
+      deleteLike();
+    }
   }
 );
 
 const PostApplicant = createAsyncThunk("PostApplicant", async (vacancy_id: string, { getState, dispatch }) => {
   const state = getState() as RootState;
-  const user_id = state.user.id;
+  const user_id = state.user?.id;
+
   if (!user_id || !vacancy_id) return;
 
   await supabase
@@ -351,7 +389,7 @@ const PostApplicant = createAsyncThunk("PostApplicant", async (vacancy_id: strin
 
 const PostVacancyLike = createAsyncThunk("PostApplicant", async (vacancy_id: string, { getState }) => {
   const state = getState() as RootState;
-  const user_id = state.user.id;
+  const user_id = state.user?.id;
   const vacancy = state.vacancy.element.data[vacancy_id];
   const reactionType = vacancy?.reaction[0]?.type;
 
@@ -364,12 +402,11 @@ const PostVacancyLike = createAsyncThunk("PostApplicant", async (vacancy_id: str
       .eq("user_id", user_id)
       .eq("vacancy_id", vacancy_id)
       .then(async () => {
-        await supabase.from("vacancy_reactions").insert({ vacancy_id, user_id, type });
+        await supabase.from("vacancy_reactions").upsert({ vacancy_id, user_id, type });
       });
   }
 
   async function deleteLike() {
-    await supabase.from("vacancy_reactions").delete().eq("user_id", user_id).eq("vacancy_id", vacancy_id);
     await supabase.from("vacancy_reactions").delete().eq("user_id", user_id).eq("vacancy_id", vacancy_id);
   }
 
@@ -382,10 +419,10 @@ const PostVacancyLike = createAsyncThunk("PostApplicant", async (vacancy_id: str
 
 export const vacancyApi = {
   get: getVacancy,
+  like: PostVacancyLike,
   applicants: {
     post: PostApplicant,
   },
-  like: PostVacancyLike,
   comments: {
     get: GetComments,
     post: PostComment,
