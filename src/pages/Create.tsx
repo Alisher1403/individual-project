@@ -4,7 +4,7 @@ import { RootState } from "store";
 import { VacancyCreate } from "pages";
 
 const Create: FC = () => {
-  const userType = useSelector((state: RootState) => state.user.userType);
+  const userType = useSelector((state: RootState) => state?.user?.userType);
 
   if (userType === "applicant") {
     return <div></div>;
