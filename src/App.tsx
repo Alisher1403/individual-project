@@ -13,18 +13,19 @@ import "swiper/css/effect-fade";
 import backend from "backend";
 
 function App() {
-  backend.app();
+  const { startApp } = backend.app();
 
-  return (
-    <BrowserRouter>
-      <ThemeProvider theme={Theme}>
-        <UIProvider>
-          <GlobalStyle />
-          <MainLayout />
-        </UIProvider>
-      </ThemeProvider>
-    </BrowserRouter>
-  );
+  if (startApp)
+    return (
+      <BrowserRouter>
+        <ThemeProvider theme={Theme}>
+          <UIProvider>
+            <GlobalStyle />
+            <MainLayout />
+          </UIProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    );
 }
 
 export default App;

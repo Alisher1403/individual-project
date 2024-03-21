@@ -26,7 +26,7 @@ const Chat: FC = () => {
             </ul>
           </Messages>
           <Input className="input-wrapper">
-            <form>
+            <form onSubmit={(e) => e.preventDefault()}>
               <div className="content">
                 <input type="text" />
               </div>

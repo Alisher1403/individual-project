@@ -19,10 +19,18 @@ import { useInView } from "react-intersection-observer";
 
 const app = () => {
   const dispatch = useDispatch() as AppDispatch;
+  const [startApp, setStartApp] = useState(false);
 
   useEffect(() => {
-    dispatch(api.user.auth());
+    async function getUser() {
+      dispatch(api.user.auth()).then(() => {
+        setStartApp(true);
+      });
+    }
+    getUser();
   }, []);
+
+  return { startApp };
 };
 
 const vacancies = () => {
@@ -162,7 +170,7 @@ const vacancy = () => {
   const commentsCount = useSelector((state: RootState) => state.vacancy.comments.count[id!]);
   const commentsLoading = useSelector((state: RootState) => state.vacancy.comments.loading);
   const likeTimer = useRef<any>();
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.user.data);
 
   const [commentsObserver, InCommentsObserver] = useInView({
     triggerOnce: false,
@@ -255,7 +263,7 @@ const searchbar = () => {
   const [searchListHeight, setSearchListHeight] = useState<number>();
 
   // Redux Selector
-  const userData = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.user.data);
 
   // State for fetched search items from the database
   const [searched, setSearched] = useState<string[]>([]);
@@ -308,8 +316,8 @@ const searchbar = () => {
   // Function to refetch search list
   async function refetch(data: string[]) {
     try {
-      if (userData && userData?.id) {
-        await supabase.from("users").update({ searched: data }).eq("user_id", userData.id).select("*");
+      if (user && user?.id) {
+        await supabase.from("users").update({ searched: data }).eq("user_id", user.id).select("*");
       } else {
         localStorage.setItem("searched", JSON.stringify(data));
       }
@@ -349,11 +357,11 @@ const searchbar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (userData && userData?.id) {
+        if (user && user?.id) {
           const { data, error } = await supabase
-            .from("users")
+            .from("user_metadata")
             .select("searched")
-            .eq("user_id", userData.id)
+            .eq("id", user.id)
             .range(0, 10);
 
           if (data) {
@@ -494,7 +502,7 @@ const chats = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch() as AppDispatch;
   const vacancy_id = params?.id;
-  const user_id = useSelector((state: RootState) => state.user?.id);
+  const user_id = useSelector((state: RootState) => state.user.data?.id);
 
   useEffect(() => {
     if (!user_id) {

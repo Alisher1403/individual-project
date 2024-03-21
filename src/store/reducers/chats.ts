@@ -27,6 +27,7 @@ const chats = createSlice({
         }
       }
     });
+    builder.addCase(postMessag.fulfilled, () => {});
   },
 });
 
@@ -35,7 +36,7 @@ export default chats.reducer;
 const getMessages = createAsyncThunk("getMessages", async (args: { vacancy_id: string }, { getState }) => {
   const { vacancy_id } = args;
   const state = getState() as RootState;
-  const user_id = state.user?.id;
+  const user_id = state.user.data?.id;
   const key = `${vacancy_id}${user_id}`;
 
   if (!user_id) return;
@@ -55,6 +56,8 @@ export const chatsApi = {
     get: getMessages,
   },
 };
+
+const postMessag = createAsyncThunk("postMessage", async () => {});
 
 // Type guard for ChatPayload
 function isChatPayload(payload: any): payload is ChatPayload {

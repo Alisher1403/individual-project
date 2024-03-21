@@ -13,7 +13,7 @@ interface Props {
 
 const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
   const vacancy_id = useParams()?.id || "";
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.user.data);
   const ref = useRef<HTMLDivElement | null>(null);
   const [disabled, setDisabled] = useState(false);
   const [focus, setFocus] = useState(open);
@@ -46,16 +46,16 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
     }
   }, []);
 
-  async function submit() {
+  function submit() {
     const value = ref.current?.innerHTML;
 
     if (value) {
       if (element) {
-        await dispatch(api.vacancy.comments.update({ vacancy_id, id: element.id, value: value.trim() })).then(() => {
+        dispatch(api.vacancy.comments.update({ vacancy_id, id: element.id, value: value.trim() })).then(() => {
           cancel();
         });
       } else {
-        await dispatch(api.vacancy.comments.post({ vacancy_id, value: value.trim() })).then(() => {
+        dispatch(api.vacancy.comments.post({ vacancy_id, value: value.trim() })).then(() => {
           cancel();
         });
       }

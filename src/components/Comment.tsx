@@ -18,7 +18,7 @@ interface Props {
 const Comment: FC<Props> = ({ element }) => {
   const vacancy_id = useParams()?.id || "";
   const dispatch: AppDispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.user.data);
   const [edit, setEdit] = useState(false);
   const timeAgo = useMemo(() => formData.timeAgo(element.created_at), [element.created_at]);
   const likeTimer = useRef<any>();
