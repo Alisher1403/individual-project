@@ -450,5 +450,5 @@ export const vacancyApi = {
     update: UpdateComment,
     delete: DeleteComment,
     like: PostCommentLike,
-  },
+  }, 
 };
