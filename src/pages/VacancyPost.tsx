@@ -13,6 +13,8 @@ const VacancyPost: FC = () => {
   const { data, error, comments, id, methods, user } = backend.vacancy();
 
   if (!data || error) return;
+  console.log(data);
+  
 
   return (
     <Container className="main-container">
@@ -30,7 +32,9 @@ const VacancyPost: FC = () => {
               </div>
               <div className="options">
                 <button>
-                  <span className="material-symbols-rounded icon">bookmark</span>
+                  <span className="material-symbols-rounded icon">
+                    bookmark
+                  </span>
                 </button>
               </div>
             </div>
@@ -40,15 +44,24 @@ const VacancyPost: FC = () => {
                 <div>{formData.timeAgo(data.created_at)}</div>
                 <div>{formData.emp_type.get(data.emp_type)}</div>
                 <div>
-                  <span className="material-symbols-rounded icon">visibility</span>
+                  <span className="material-symbols-rounded icon">
+                    visibility
+                  </span>
                   {data.views[0].count}
                 </div>
               </div>
               <div className="right">
-                <button className="apply-btn" disabled={!!data?.applied[0]} onClick={methods.apply}>
+                <button
+                  className="apply-btn"
+                  disabled={!!data?.applied[0]}
+                  onClick={methods.apply}
+                >
                   {data.applied[0] ? (
                     <div className="apply-btn-content">
-                      <span className="material-symbols-rounded icon">done</span> Applied
+                      <span className="material-symbols-rounded icon">
+                        done
+                      </span>{" "}
+                      Applied
                     </div>
                   ) : (
                     <div className="apply-btn-content">Apply</div>
@@ -63,30 +76,50 @@ const VacancyPost: FC = () => {
               <div className="left">
                 <button className="btn">
                   <div className="btn-content">
-                    <span className="material-symbols-rounded icon">group_add</span>
+                    <span className="material-symbols-rounded icon">
+                      group_add
+                    </span>
                     <span>{data?.appliedCount[0].count} Applied</span>
                   </div>
                 </button>
               </div>
               <div className="right">
-                <Link to={`/chat/${id}`} data-disabled={!user?.id} className="btn">
+                <Link
+                  to={`/chat/${id}`}
+                  data-disabled={!user?.id}
+                  className="btn"
+                >
                   <div className="btn-content">
                     <span className="material-symbols-rounded icon">chat</span>
                     <span>Open Chat</span>
                   </div>
                 </Link>
-                <button className="btn" disabled={!user?.id} onClick={methods.like}>
+                <button
+                  className="btn"
+                  disabled={!user?.id}
+                  onClick={methods.like}
+                >
                   <div className="btn-content">
-                    <span className={`material-symbols-rounded icon ${data.reaction[0]?.type === "like" && "filled"}`}>
+                    <span
+                      className={`material-symbols-rounded icon ${
+                        data.reaction[0]?.type === "like" && "filled"
+                      }`}
+                    >
                       thumb_up
                     </span>
                     <span>{methods.reactionsCount().likes}</span>
                   </div>
                 </button>
-                <button className="btn" disabled={!user?.id} onClick={methods.dislike}>
+                <button
+                  className="btn"
+                  disabled={!user?.id}
+                  onClick={methods.dislike}
+                >
                   <div className="btn-content">
                     <span
-                      className={`material-symbols-rounded icon ${data.reaction[0]?.type === "dislike" && "filled"}`}
+                      className={`material-symbols-rounded icon ${
+                        data.reaction[0]?.type === "dislike" && "filled"
+                      }`}
                     >
                       thumb_down
                     </span>
@@ -106,25 +139,27 @@ const VacancyPost: FC = () => {
               <div className="p-1">
                 <h3>{appData.titles.skillsRequired}</h3>
                 <ul data-skills>
-                  {data.skills.map((item: keyof typeof skills, index: number) => {
-                    const { icon, name } = skills[item] || {};
-                    const hasIcon = icon && name;
+                  {data.skills.map(
+                    (item: keyof typeof skills, index: number) => {
+                      const { icon, name } = skills[item] || {};
+                      const hasIcon = icon && name;
 
-                    return (
-                      <li key={index} data-list="skills">
-                        <div className="content">
-                          {hasIcon ? (
-                            <>
-                              <div className="icon">{parse(icon)}</div>
-                              <p className="name">{name}</p>
-                            </>
-                          ) : (
-                            <p className="name">{item}</p>
-                          )}
-                        </div>
-                      </li>
-                    );
-                  })}
+                      return (
+                        <li key={index} data-list="skills">
+                          <div className="content">
+                            {hasIcon ? (
+                              <>
+                                <div className="icon">{parse(icon)}</div>
+                                <p className="name">{name}</p>
+                              </>
+                            ) : (
+                              <p className="name">{item}</p>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    }
+                  )}
                 </ul>
               </div>
             ) : null}
@@ -151,7 +186,11 @@ const VacancyPost: FC = () => {
               )}
             </ul>
             {/*  */}
-            <div className="loading-animation" ref={comments.observer} data-loading={comments.loading}>
+            <div
+              className="loading-animation"
+              ref={comments.observer}
+              data-loading={comments.loading}
+            >
               <div className="loader"></div>
               <p>Loading...</p>
             </div>
