@@ -4,6 +4,8 @@ import { AppDispatch, RootState } from "store";
 import styled from "styled-components";
 import { api } from "store/reducers";
 import { useParams } from "react-router-dom";
+import { requireLogin } from "store/reducers/user";
+import { imagesBucket } from "backend";
 
 interface Props {
   onCancel?: () => void;
@@ -14,6 +16,7 @@ interface Props {
 const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
   const vacancy_id = useParams()?.id || "";
   const user = useSelector((state: RootState) => state.user.data);
+  const userMetadata = useSelector((state: RootState) => state.user.metadata);
   const ref = useRef<HTMLDivElement | null>(null);
   const [disabled, setDisabled] = useState(false);
   const [focus, setFocus] = useState(open);
@@ -51,11 +54,19 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
 
     if (value) {
       if (element) {
-        dispatch(api.vacancy.comments.update({ vacancy_id, id: element.id, value: value.trim() })).then(() => {
+        dispatch(
+          api.vacancy.comments.update({
+            vacancy_id,
+            id: element.id,
+            value: value.trim(),
+          })
+        ).then(() => {
           cancel();
         });
       } else {
-        dispatch(api.vacancy.comments.post({ vacancy_id, value: value.trim() })).then(() => {
+        dispatch(
+          api.vacancy.comments.post({ vacancy_id, value: value.trim() })
+        ).then(() => {
           cancel();
         });
       }
@@ -67,7 +78,13 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
       <Container>
         <div className="new-comment">
           <div className="body">
-            <div className="img">{user?.img ? <img src={user?.img} alt="" /> : user?.name?.[0]?.toUpperCase()}</div>
+            <div className="img">
+              {userMetadata?.img ? (
+                <img src={imagesBucket + userMetadata?.img} alt="" />
+              ) : (
+                userMetadata?.name[0]
+              )}
+            </div>
             <div className="comment-input-wrapper">
               <div
                 className="comment-input"
@@ -85,7 +102,12 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
                 <button className="button" onClick={cancel}>
                   Cancel
                 </button>
-                <button className="button" disabled={disabled} data-primary onClick={submit}>
+                <button
+                  className="button"
+                  disabled={disabled}
+                  data-primary
+                  onClick={submit}
+                >
                   Leave Comment
                 </button>
               </div>
@@ -97,7 +119,17 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
       </Container>
     );
   } else {
-    return <h2 className="warning">Login to write comments</h2>;
+    return (
+      <Container>
+        <button
+          className="warning"
+          onClick={() => dispatch(requireLogin(true))}
+        >
+          <span className="material-symbols-rounded icon">add</span>
+          <span>Leave a Comment</span>
+        </button>
+      </Container>
+    );
   }
 };
 
@@ -132,6 +164,14 @@ const Container = styled.div`
         user-select: none;
         font-family: var(--font-regular);
         margin-right: 15px;
+        text-transform: uppercase;
+        overflow: hidden;
+
+        img {
+          height: 100%;
+          width: 100px;
+          object-fit: cover;
+        }
 
         @media screen and (max-width: 700px) {
           min-width: 30px;
@@ -197,6 +237,39 @@ const Container = styled.div`
 
     .footer-margin {
       margin-bottom: 25px;
+    }
+  }
+
+  .warning {
+    border: 1px solid var(--border-color-dark);
+    background: none;
+    padding: 7px 13px;
+    padding-left: 5px;
+    cursor: pointer;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    column-gap: 1px;
+
+    &:hover {
+      border-color: var(--element-color-hover);
+
+      * {
+        color: var(--element-color-hover);
+      }
+    }
+
+    * {
+      color: var(--text-color);
+    }
+
+    .icon {
+      line-height: 0;
+      font-size: 25px;
+    }
+
+    span {
+      font-size: 14px;
     }
   }
 `;

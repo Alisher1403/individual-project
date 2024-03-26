@@ -3,9 +3,14 @@ import styled from "styled-components";
 import { Searchbar } from "layouts";
 import { NavLink, useLocation } from "react-router-dom";
 import Logo from "../components/Logo";
+import { api } from "store/reducers";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "store";
 
 const Navigation: FC = () => {
   const location = useLocation();
+  const dispatch = useDispatch() as AppDispatch;
+
   return (
     <Container>
       <Content>
@@ -26,11 +31,10 @@ const Navigation: FC = () => {
         </Section>
         {location.pathname !== "/" && <Searchbar />}
         <Section>
-          <ul className="links-list">
-            <li>
-              <NavLink to={`/login`}>Log out</NavLink>
-            </li>
-          </ul>
+          <div className="links-list">
+            <NavLink to={`/login`}>IN</NavLink>
+            <button onClick={() => dispatch(api.user.signOut())}>OUT</button>
+          </div>
         </Section>
       </Content>
     </Container>
@@ -62,7 +66,7 @@ const Content = styled.div`
 const Section = styled.div`
   .links-list {
     display: flex;
-    column-gap: 30px;
+    column-gap: 15px;
     align-items: center;
 
     li {

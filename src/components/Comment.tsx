@@ -9,6 +9,8 @@ import { api } from "store/reducers";
 import parse from "html-react-parser";
 import { useParams } from "react-router-dom";
 import { setCommentReaction } from "store/reducers/vacancy";
+import { requireLogin } from "store/reducers/user";
+import { imagesBucket } from "backend";
 
 interface Props {
   element: any;
@@ -20,26 +22,54 @@ const Comment: FC<Props> = ({ element }) => {
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.data);
   const [edit, setEdit] = useState(false);
-  const timeAgo = useMemo(() => formData.timeAgo(element.created_at), [element.created_at]);
+  const [imageLoaded, setImageLoaded] = useState(true);
+  const timeAgo = useMemo(
+    () => formData.timeAgo(element.created_at),
+    [element.created_at]
+  );
   const likeTimer = useRef<any>();
 
   const methods = {
     like() {
-      dispatch(setCommentReaction({ comment_id: element.id, vacancy_id, type: "like" }));
-      clearTimeout(likeTimer.current);
-      likeTimer.current = setTimeout(() => {
-        dispatch(api.vacancy.comments.like({ vacancy_id, comment_id: element.id }));
-      }, 1000);
+      if (user?.id) {
+        dispatch(
+          setCommentReaction({
+            comment_id: element.id,
+            vacancy_id,
+            type: "like",
+          })
+        );
+        clearTimeout(likeTimer.current);
+        likeTimer.current = setTimeout(() => {
+          dispatch(
+            api.vacancy.comments.like({ vacancy_id, comment_id: element.id })
+          );
+        }, 1000);
+      } else {
+        dispatch(requireLogin(true));
+      }
     },
     dislike() {
-      dispatch(setCommentReaction({ comment_id: element.id, vacancy_id, type: "dislike" }));
-      clearTimeout(likeTimer.current);
-      likeTimer.current = setTimeout(() => {
-        dispatch(api.vacancy.comments.like({ vacancy_id, comment_id: element.id }));
-      }, 1000);
+      if (user?.id) {
+        dispatch(
+          setCommentReaction({
+            comment_id: element.id,
+            vacancy_id,
+            type: "dislike",
+          })
+        );
+        clearTimeout(likeTimer.current);
+        likeTimer.current = setTimeout(() => {
+          dispatch(
+            api.vacancy.comments.like({ vacancy_id, comment_id: element.id })
+          );
+        }, 1000);
+      } else {
+        dispatch(requireLogin(true));
+      }
     },
     reactionsCount() {
-      const reaction = element.reaction[0]?.type;
+      const reaction = element?.reaction?.[0]?.type;
       const likesCount = element.likes[0]?.count;
       const dislikesCount = element.dislikes[0]?.count;
       let likes;
@@ -67,11 +97,23 @@ const Comment: FC<Props> = ({ element }) => {
   return (
     <Container>
       {edit ? (
-        <CommentEditor onCancel={() => setEdit(false)} open={true} element={element} />
+        <CommentEditor
+          onCancel={() => setEdit(false)}
+          open={true}
+          element={element}
+        />
       ) : (
         <Content>
           <div className="img">
-            {element?.user.img ? <img src={element?.user.img} alt="" /> : element?.user.name[0].toUpperCase()}
+            {element?.user.img && imageLoaded ? (
+              <img
+                src={imagesBucket + element?.user.img}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(false)}
+              />
+            ) : (
+              element?.user.name[0].toUpperCase()
+            )}
           </div>
           <div className="main-wrapper">
             <div>
@@ -85,21 +127,25 @@ const Comment: FC<Props> = ({ element }) => {
                   <div className="text">{parse(element.text)}</div>
                 </div>
                 <div className="footer">
-                  <button className="btn" disabled={!user?.id} onClick={() => methods.like()}>
+                  <button className="btn" onClick={() => methods.like()}>
                     <p>{methods.reactionsCount().likes}</p>
                     <span
                       className={`material-symbols-rounded icon ${
-                        element?.reaction?.[0]?.type === "like" ? "filled" : ""
+                        element?.reaction?.[0]?.type === "like" && user?.id
+                          ? "filled"
+                          : ""
                       }`}
                     >
                       thumb_up
                     </span>
                   </button>
-                  <button className="btn" disabled={!user?.id} onClick={() => methods.dislike()}>
+                  <button className="btn" onClick={() => methods.dislike()}>
                     <p>{methods.reactionsCount().dislikes}</p>
                     <span
                       className={`material-symbols-rounded icon ${
-                        element?.reaction?.[0]?.type === "dislike" ? "filled" : ""
+                        element?.reaction?.[0]?.type === "dislike" && user?.id
+                          ? "filled"
+                          : ""
                       }`}
                     >
                       thumb_down
@@ -113,11 +159,21 @@ const Comment: FC<Props> = ({ element }) => {
               {user && element.user.id === user?.id ? (
                 <Options
                   options={[
-                    { icon: "edit", label: "Edit", onClick: () => setEdit(true) },
+                    {
+                      icon: "edit",
+                      label: "Edit",
+                      onClick: () => setEdit(true),
+                    },
                     {
                       icon: "delete",
                       label: "Delete",
-                      onClick: () => dispatch(api.vacancy.comments.delete({ id: element.id, vacancy_id })),
+                      onClick: () =>
+                        dispatch(
+                          api.vacancy.comments.delete({
+                            id: element.id,
+                            vacancy_id,
+                          })
+                        ),
                     },
                   ]}
                 />
@@ -158,6 +214,13 @@ const Content = styled.div`
     user-select: none;
     font-family: var(--font-regular);
     margin-right: 15px;
+    overflow: hidden;
+
+    img {
+      height: 100%;
+      width: 100px;
+      object-fit: cover;
+    }
 
     @media screen and (max-width: 700px) {
       min-width: 30px;
@@ -184,6 +247,9 @@ const Content = styled.div`
         .name {
           font-family: var(--font-semiBold);
           color: var(--title-color);
+          max-width: 180px;
+          overflow: hidden;
+          text-overflow: ellipsis;
           font-weight: normal;
           font-size: 16px;
 

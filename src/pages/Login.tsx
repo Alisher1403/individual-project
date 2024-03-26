@@ -1,9 +1,15 @@
-import { supabase } from "backend";
 import { FC, useState } from "react";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { AppDispatch } from "store";
+import { api } from "store/reducers";
 import styled from "styled-components";
 
 const Login: FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch() as AppDispatch;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const type = searchParams.get("type");
   const [passwordType, setPasswordType] = useState("password");
   const [userExists, setUserExists] = useState(false);
   const [form, setForm] = useState({
@@ -12,84 +18,182 @@ const Login: FC = () => {
   });
 
   async function signIn() {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword(form);
-      if (error) {
-        throw error;
+    dispatch(api.user.signIn(form)).then((e) => {
+      if (e.payload) {
+        setUserExists(false);
+        navigate("/");
+      } else {
+        setUserExists(true);
       }
-      console.log(data);
-      localStorage.setItem("session", JSON.stringify(data?.session));
-      return data;
-    } catch (error: any) {
-      console.error("Sign-up error:", error.message);
-      setUserExists(true);
+    });
+  }
+
+  async function signUp() {
+    dispatch(api.user.signUp(form)).then((e) => {
+      if (e.payload) {
+        setUserExists(false);
+        navigate("/profile");
+      } else {
+        setUserExists(true);
+      }
+    });
+  }
+
+  function switchType() {
+    setForm({ email: "", password: "" });
+    if (type === "sign-up") {
+      setSearchParams({ type: "log-in" });
+    } else {
+      setSearchParams({ type: "sign-up" });
     }
   }
 
-  return (
-    <Container>
-      <Content>
-        <h1 className="title">Sign In</h1>
-        <h2 className="subtitle">Enter your email and password to access your account</h2>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            signIn();
-          }}
-        >
-          <div className="form-content">
-            <div className="input-container" data-error={userExists}>
-              <h3 className="input-label">Email</h3>
-              <div className="input-wrapper">
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  onChange={(e) => {
-                    setUserExists(false);
-                    setForm({ ...form, email: e.target.value });
-                  }}
-                />
+  function getContent() {
+    if (type === "sign-up") {
+      return (
+        <Content>
+          <h1 className="title">Sign Up</h1>
+          <h2 className="subtitle">
+            Enter your email and password to create a new account
+          </h2>
+          <form
+            autoComplete="off"
+            onSubmit={(e) => {
+              e.preventDefault();
+              signUp();
+            }}
+          >
+            <div className="form-content">
+              <div className="input-container" data-error={userExists}>
+                <h3 className="input-label">Email</h3>
+                <div className="input-wrapper">
+                  <input
+                    type="email"
+                    name="email"
+                    autoComplete="off"
+                    required
+                    onChange={(e) => {
+                      setUserExists(false);
+                      setForm({ ...form, email: e.target.value });
+                    }}
+                  />
+                </div>
+                <span className="error-message">This user already exists</span>
               </div>
-              <span className="error-message">This user already exists</span>
-            </div>
-            <div className="input-container">
-              <h3 className="input-label">Password</h3>
-              <div className="input-wrapper">
-                <input
-                  type={passwordType}
-                  name="password"
-                  required
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                />
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (passwordType === "password") {
-                      setPasswordType("text");
-                    } else {
-                      setPasswordType("password");
+              <div className="input-container">
+                <h3 className="input-label">Password</h3>
+                <div className="input-wrapper">
+                  <input
+                    type={passwordType}
+                    name="password"
+                    autoComplete="off"
+                    required
+                    onChange={(e) =>
+                      setForm({ ...form, password: e.target.value })
                     }
-                  }}
-                >
-                  <span className="material-symbols-rounded icon">visibility</span>
-                </button>
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (passwordType === "password") {
+                        setPasswordType("text");
+                      } else {
+                        setPasswordType("password");
+                      }
+                    }}
+                  >
+                    <span className="material-symbols-rounded icon">
+                      visibility
+                    </span>
+                  </button>
+                </div>
               </div>
+
+              <button type="submit" className="submit-button">
+                Sign Up
+              </button>
             </div>
+          </form>
 
-            <button type="submit" className="submit-button">
-              Sign In
-            </button>
-          </div>
-        </form>
+          <h2 className="subtitle">
+            Already have an account?{" "}
+            <button onClick={() => switchType()}>Sign In</button>
+          </h2>
+        </Content>
+      );
+    } else {
+      return (
+        <Content>
+          <h1 className="title">Sign In</h1>
+          <h2 className="subtitle">
+            Enter your email and password to access your account
+          </h2>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              signIn();
+            }}
+          >
+            <div className="form-content">
+              <div className="input-container" data-error={userExists}>
+                <h3 className="input-label">Email</h3>
+                <div className="input-wrapper">
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    onChange={(e) => {
+                      setUserExists(false);
+                      setForm({ ...form, email: e.target.value });
+                    }}
+                  />
+                </div>
+                <span className="error-message">This user already exists</span>
+              </div>
+              <div className="input-container">
+                <h3 className="input-label">Password</h3>
+                <div className="input-wrapper">
+                  <input
+                    type={passwordType}
+                    name="password"
+                    required
+                    onChange={(e) =>
+                      setForm({ ...form, password: e.target.value })
+                    }
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (passwordType === "password") {
+                        setPasswordType("text");
+                      } else {
+                        setPasswordType("password");
+                      }
+                    }}
+                  >
+                    <span className="material-symbols-rounded icon">
+                      visibility
+                    </span>
+                  </button>
+                </div>
+              </div>
 
-        <h2 className="subtitle">
-          Don't have an account? <Link to={{ search: "new=true" }}>Sign Up</Link>
-        </h2>
-      </Content>
-    </Container>
-  );
+              <button type="submit" className="submit-button">
+                Sign In
+              </button>
+            </div>
+          </form>
+
+          <h2 className="subtitle">
+            Don't have an account?{" "}
+            <button onClick={() => switchType()}>Sign Up</button>
+          </h2>
+        </Content>
+      );
+    }
+  }
+
+  return <Container>{getContent()}</Container>;
 };
 
 export default Login;
@@ -127,8 +231,13 @@ const Content = styled.div`
     text-align: center;
     color: var(--title-color-dark);
 
-    a {
+    button {
       color: var(--link-color);
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 16px;
+      cursor: pointer;
     }
   }
 

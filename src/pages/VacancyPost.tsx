@@ -13,8 +13,6 @@ const VacancyPost: FC = () => {
   const { data, error, comments, id, methods, user } = backend.vacancy();
 
   if (!data || error) return;
-  console.log(data);
-  
 
   return (
     <Container className="main-container">
@@ -53,10 +51,11 @@ const VacancyPost: FC = () => {
               <div className="right">
                 <button
                   className="apply-btn"
-                  disabled={!!data?.applied[0]}
+                  data-applied={!!data?.applied?.[0]}
+                  disabled={!!data?.applied?.[0]}
                   onClick={methods.apply}
                 >
-                  {data.applied[0] ? (
+                  {data?.applied?.[0] && user?.id ? (
                     <div className="apply-btn-content">
                       <span className="material-symbols-rounded icon">
                         done
@@ -79,7 +78,7 @@ const VacancyPost: FC = () => {
                     <span className="material-symbols-rounded icon">
                       group_add
                     </span>
-                    <span>{data?.appliedCount[0].count} Applied</span>
+                    <span>{data?.applicants[0].count} Applied</span>
                   </div>
                 </button>
               </div>
@@ -94,15 +93,13 @@ const VacancyPost: FC = () => {
                     <span>Open Chat</span>
                   </div>
                 </Link>
-                <button
-                  className="btn"
-                  disabled={!user?.id}
-                  onClick={methods.like}
-                >
+                <button className="btn" onClick={methods.like}>
                   <div className="btn-content">
                     <span
                       className={`material-symbols-rounded icon ${
-                        data.reaction[0]?.type === "like" && "filled"
+                        data.reaction[0]?.type === "like" &&
+                        user?.id &&
+                        "filled"
                       }`}
                     >
                       thumb_up
@@ -110,15 +107,13 @@ const VacancyPost: FC = () => {
                     <span>{methods.reactionsCount().likes}</span>
                   </div>
                 </button>
-                <button
-                  className="btn"
-                  disabled={!user?.id}
-                  onClick={methods.dislike}
-                >
+                <button className="btn" onClick={methods.dislike}>
                   <div className="btn-content">
                     <span
                       className={`material-symbols-rounded icon ${
-                        data.reaction[0]?.type === "dislike" && "filled"
+                        data.reaction[0]?.type === "dislike" &&
+                        user?.id &&
+                        "filled"
                       }`}
                     >
                       thumb_down
@@ -337,7 +332,7 @@ const Section_1 = styled.div`
           color: white;
         }
 
-        &[disabled] {
+        &[data-applied="true"] {
           background-color: transparent;
           color: var(--element-color);
 

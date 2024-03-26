@@ -8,12 +8,21 @@ import {
   vacancyListLoading,
 } from "store/reducers/vacancy";
 import { useSelector } from "react-redux";
-import { FormEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { supabase } from "backend";
 import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
 import { useNavigate, useParams } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
+import { requireLogin } from "store/reducers/user";
 
 /******************************** VACANCIES API *************************************/
 
@@ -67,7 +76,10 @@ const vacancies = () => {
     }
 
     // Calculate the list of pages based on the total count and range
-    const pagesCount = Array.from({ length: Math.ceil(mainDataCount / range) }, (_, i) => i + 1);
+    const pagesCount = Array.from(
+      { length: Math.ceil(mainDataCount / range) },
+      (_, i) => i + 1
+    );
     setMainPagesList(pagesCount);
   }, [mainDataCount]);
 
@@ -106,7 +118,9 @@ const vacancies = () => {
           if (params.value && params.value.length > 0) {
             let matchQuery;
             if (Array.isArray(params.value)) {
-              matchQuery = params.value.map((e) => `${params.column}.ilike.${e}`).join(",");
+              matchQuery = params.value
+                .map((e) => `${params.column}.ilike.${e}`)
+                .join(",");
               query = query.or(matchQuery);
             } else {
               query = query.or(`${params.column}.ilike.${params.value}`);
@@ -116,12 +130,17 @@ const vacancies = () => {
       };
 
       // Apply additional filters from search parameters
-      useFilter.like({ value: allSearchParams.experience, column: "experience" });
+      useFilter.like({
+        value: allSearchParams.experience,
+        column: "experience",
+      });
       useFilter.or({ value: allSearchParams.emp_type, column: "emp_type" });
       useFilter.or({ value: allSearchParams.education, column: "education" });
 
       // Fetch data from the API
-      const { data, error, count } = await query.range(fromIndex, toIndex).order("id", { ascending: false });
+      const { data, error, count } = await query
+        .range(fromIndex, toIndex)
+        .order("id", { ascending: false });
 
       if (error) {
         throw error;
@@ -149,7 +168,9 @@ const vacancies = () => {
   const pagination = {
     list: mainPagesList,
     current: +page,
-    last: mainPagesList.length > 0 && mainPagesList[mainPagesList.length - 1] > +page,
+    last:
+      mainPagesList.length > 0 &&
+      mainPagesList[mainPagesList.length - 1] > +page,
     first: +page > 1 && mainData,
     page: (index: number) => searchParams.set({ page: `${index}` }),
     prev: () => searchParams.set({ page: `${+page - 1}` }),
@@ -165,10 +186,18 @@ const vacancy = () => {
   const dispatch: AppDispatch = useDispatch();
   const id = params?.id || "";
 
-  const element = useSelector((state: RootState) => state.vacancy.element.data[id!]);
-  const commentsList = useSelector((state: RootState) => state.vacancy.comments.data[id!]);
-  const commentsCount = useSelector((state: RootState) => state.vacancy.comments.count[id!]);
-  const commentsLoading = useSelector((state: RootState) => state.vacancy.comments.loading);
+  const element = useSelector(
+    (state: RootState) => state.vacancy.element.data[id!]
+  );
+  const commentsList = useSelector(
+    (state: RootState) => state.vacancy.comments.data[id!]
+  );
+  const commentsCount = useSelector(
+    (state: RootState) => state.vacancy.comments.count[id!]
+  );
+  const commentsLoading = useSelector(
+    (state: RootState) => state.vacancy.comments.loading
+  );
   const likeTimer = useRef<any>();
   const user = useSelector((state: RootState) => state.user.data);
 
@@ -193,21 +222,33 @@ const vacancy = () => {
 
   const methods = {
     apply() {
-      dispatch(api.vacancy.applicants.post(id));
+      if (user?.id) {
+        dispatch(api.vacancy.applicants.post(id));
+      } else {
+        dispatch(requireLogin(true));
+      }
     },
     like() {
-      dispatch(setVacancyReaction({ vacancy_id: id, type: "like" }));
-      clearTimeout(likeTimer.current);
-      likeTimer.current = setTimeout(() => {
-        dispatch(api.vacancy.like(id));
-      }, 1000);
+      if (user?.id) {
+        dispatch(setVacancyReaction({ vacancy_id: id, type: "like" }));
+        clearTimeout(likeTimer.current);
+        likeTimer.current = setTimeout(() => {
+          dispatch(api.vacancy.like(id));
+        }, 1000);
+      } else {
+        dispatch(requireLogin(true));
+      }
     },
     dislike() {
-      dispatch(setVacancyReaction({ vacancy_id: id, type: "dislike" }));
-      clearTimeout(likeTimer.current);
-      likeTimer.current = setTimeout(() => {
-        dispatch(api.vacancy.like(id));
-      }, 1000);
+      if (user?.id) {
+        dispatch(setVacancyReaction({ vacancy_id: id, type: "dislike" }));
+        clearTimeout(likeTimer.current);
+        likeTimer.current = setTimeout(() => {
+          dispatch(api.vacancy.like(id));
+        }, 1000);
+      } else {
+        dispatch(requireLogin(true));
+      }
     },
     reactionsCount() {
       const reaction = element.reaction[0]?.type;
@@ -275,7 +316,10 @@ const searchbar = () => {
   // Search history utility object
   const searchHistory = {
     // Delete function to remove an item from the search history
-    delete: async function (elem: string, event: React.MouseEvent<HTMLDivElement>) {
+    delete: async function (
+      elem: string,
+      event: React.MouseEvent<HTMLDivElement>
+    ) {
       event.stopPropagation();
       if (!searched) return;
 
@@ -317,7 +361,11 @@ const searchbar = () => {
   async function refetch(data: string[]) {
     try {
       if (user && user?.id) {
-        await supabase.from("users").update({ searched: data }).eq("user_id", user.id).select("*");
+        await supabase
+          .from("user_metadata")
+          .update({ searched: data })
+          .eq("id", user.id)
+          .select("*");
       } else {
         localStorage.setItem("searched", JSON.stringify(data));
       }
@@ -339,9 +387,14 @@ const searchbar = () => {
             const count = record.data[0].count;
             await supabase
               .from("search")
-              .upsert([{ created_at: currentTimestamp, name, count: count + 1 }], { onConflict: "name" });
+              .upsert(
+                [{ created_at: currentTimestamp, name, count: count + 1 }],
+                { onConflict: "name" }
+              );
           } else {
-            await supabase.from("search").upsert([{ created_at: currentTimestamp, name, count: 1 }]);
+            await supabase
+              .from("search")
+              .upsert([{ created_at: currentTimestamp, name, count: 1 }]);
           }
         });
     }
@@ -512,7 +565,9 @@ const chats = () => {
 
   const messagesRef = useRef<HTMLDivElement>(null);
   const key = `${vacancy_id}${user_id}`;
-  const messagesList = useSelector((state: RootState) => state.chats.messages[key]);
+  const messagesList = useSelector(
+    (state: RootState) => state.chats.messages[key]
+  );
 
   function scrollToBottom() {
     if (messagesRef.current) {

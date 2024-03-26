@@ -1,8 +1,19 @@
 import { FC } from "react";
-import { Create, Home, Login, Profile, TopCompanies, VacancyList, VacancyPost, Chat } from "pages";
+import {
+  Create,
+  Home,
+  Login,
+  Profile,
+  TopCompanies,
+  VacancyList,
+  VacancyPost,
+  Chat,
+  EditAccount,
+} from "pages";
 import styled from "styled-components";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { Navigation } from "layouts";
+import { RequireLogin } from "components";
 
 const MainLayout: FC = () => {
   const location = useLocation();
@@ -10,6 +21,7 @@ const MainLayout: FC = () => {
 
   return (
     <Container>
+      <RequireLogin />
       <Content>
         <MainContent>
           <Navigation />
@@ -22,6 +34,7 @@ const MainLayout: FC = () => {
             <Route path="/login" element={<Login />}></Route>
             <Route path="/top-companies" element={<TopCompanies />}></Route>
             <Route path="/chat/:id" element={<Chat />}></Route>
+            <Route path="/profile" element={<EditAccount />}></Route>
           </Routes>
         </MainContent>
       </Content>
