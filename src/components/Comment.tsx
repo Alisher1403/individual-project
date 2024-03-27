@@ -111,9 +111,8 @@ const Comment: FC<Props> = ({ element }) => {
                 onLoad={() => setImageLoaded(true)}
                 onError={() => setImageLoaded(false)}
               />
-            ) : (
-              element?.user.name[0].toUpperCase()
-            )}
+            ) : null}
+            <span>{element?.user.name[0]}</span>
           </div>
           <div className="main-wrapper">
             <div>
@@ -209,12 +208,17 @@ const Content = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 25px;
-    line-height: 0;
-    user-select: none;
-    font-family: var(--font-regular);
     margin-right: 15px;
     overflow: hidden;
+    position: relative;
+    z-index: 2;
+
+    @media screen and (max-width: 700px) {
+      min-width: 30px;
+      width: 30px;
+      font-size: 18px;
+      margin-right: 7px;
+    }
 
     img {
       height: 100%;
@@ -222,11 +226,14 @@ const Content = styled.div`
       object-fit: cover;
     }
 
-    @media screen and (max-width: 700px) {
-      min-width: 30px;
-      width: 30px;
-      font-size: 18px;
-      margin-right: 7px;
+    span {
+      font-size: 25px;
+      line-height: 0;
+      user-select: none;
+      position: absolute;
+      z-index: -1;
+      font-family: var(--font-regular);
+      text-transform: uppercase;
     }
   }
 

@@ -1,15 +1,18 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import styled from "styled-components";
 import { Searchbar } from "layouts";
 import { NavLink, useLocation } from "react-router-dom";
 import Logo from "../components/Logo";
 import { api } from "store/reducers";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "store";
+import { imagesBucket } from "backend";
 
 const Navigation: FC = () => {
   const location = useLocation();
   const dispatch = useDispatch() as AppDispatch;
+  const metadata = useSelector((state: RootState) => state.user.metadata);
+  const [imageLoadded, setImageLoaded] = useState(true);
 
   return (
     <Container>
@@ -31,6 +34,21 @@ const Navigation: FC = () => {
         </Section>
         {location.pathname !== "/" && <Searchbar />}
         <Section>
+          <div className="account">
+            <AccountBtn className="accoun-btn">
+              <div className="account-img">
+                {metadata?.img && imageLoadded ? (
+                  <img
+                    src={imagesBucket + metadata?.img}
+                    alt=""
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageLoaded(false)}
+                  />
+                ) : null}
+                <span>{metadata?.name[0]}</span>
+              </div>
+            </AccountBtn>
+          </div>
           <div className="links-list">
             <NavLink to={`/login`}>IN</NavLink>
             <button onClick={() => dispatch(api.user.signOut())}>OUT</button>
@@ -79,6 +97,31 @@ const Section = styled.div`
           color: var(--element-color);
         }
       }
+    }
+  }
+`;
+
+const AccountBtn = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  .account-img {
+    height: 30px;
+    aspect-ratio: 1/1;
+    background: var(--element-background-dark);
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 2;
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    span {
+      z-index: -1;
     }
   }
 `;

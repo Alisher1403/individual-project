@@ -21,6 +21,7 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
   const [disabled, setDisabled] = useState(false);
   const [focus, setFocus] = useState(open);
   const dispatch: AppDispatch = useDispatch();
+  const [imageLoaded, setImageLoaded] = useState(true);
 
   function onInput() {
     if (ref.current && ref.current.textContent) {
@@ -79,11 +80,15 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
         <div className="new-comment">
           <div className="body">
             <div className="img">
-              {userMetadata?.img ? (
-                <img src={imagesBucket + userMetadata?.img} alt="" />
-              ) : (
-                userMetadata?.name[0]
-              )}
+              {userMetadata?.img && imageLoaded ? (
+                <img
+                  src={imagesBucket + userMetadata?.img}
+                  alt=""
+                  onLoad={() => setImageLoaded(true)}
+                  onError={() => setImageLoaded(false)}
+                />
+              ) : null}
+              <span>{userMetadata?.name[0]}</span>
             </div>
             <div className="comment-input-wrapper">
               <div
@@ -159,13 +164,17 @@ const Container = styled.div`
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 25px;
-        line-height: 0;
-        user-select: none;
-        font-family: var(--font-regular);
         margin-right: 15px;
-        text-transform: uppercase;
         overflow: hidden;
+        position: relative;
+        z-index: 2;
+
+        @media screen and (max-width: 700px) {
+          min-width: 30px;
+          width: 30px;
+          font-size: 18px;
+          margin-right: 7px;
+        }
 
         img {
           height: 100%;
@@ -173,11 +182,14 @@ const Container = styled.div`
           object-fit: cover;
         }
 
-        @media screen and (max-width: 700px) {
-          min-width: 30px;
-          width: 30px;
-          font-size: 18px;
-          margin-right: 7px;
+        span {
+          font-size: 25px;
+          line-height: 0;
+          user-select: none;
+          font-family: var(--font-regular);
+          text-transform: uppercase;
+          position: absolute;
+          z-index: -1;
         }
       }
 

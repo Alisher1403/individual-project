@@ -1,8 +1,9 @@
 import { imagesBucket } from "backend";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
+import { setUserLoading } from "store/reducers/user";
 import styled from "styled-components";
 import { Modal } from "ui";
 
@@ -10,9 +11,6 @@ const EditAccount: FC = () => {
   const dispatch = useDispatch() as AppDispatch;
   const account = useSelector((state: RootState) => state.user.metadata);
   const userReducer = useSelector((state: RootState) => state.user);
-  const [form, setForm] = useState({
-    name: account?.name || "",
-  });
 
   const methods = {
     name: {
@@ -31,7 +29,11 @@ const EditAccount: FC = () => {
       if (this.name.ref && this.name.ref.current) {
         this.name.ref.current.disabled = true;
       }
-      dispatch(api.user.metadata.update(form));
+
+      const name = this.name.ref.current?.value;
+      if (name && name.length > 3) {
+        dispatch(api.user.metadata.update({ name }));
+      }
     },
     updateImg(file: File) {
       dispatch(api.user.metadata.updateImg(file));
@@ -39,7 +41,9 @@ const EditAccount: FC = () => {
   };
 
   useEffect(() => {
-    setForm({ name: account?.name || "" });
+    if (methods.name.ref?.current) {
+      methods.name.ref.current.value = account?.name;
+    }
   }, [account]);
 
   if (account)
@@ -59,7 +63,13 @@ const EditAccount: FC = () => {
               <div className="account-img-wrapper">
                 <div className="account-img">
                   {account?.img ? (
-                    <img src={imagesBucket + account.img} alt="account-img" />
+                    <img
+                      src={imagesBucket + account.img}
+                      onLoad={() =>
+                        dispatch(setUserLoading({ key: "img", loading: false }))
+                      }
+                      alt="account-img"
+                    />
                   ) : (
                     <div></div>
                   )}
@@ -79,24 +89,22 @@ const EditAccount: FC = () => {
                   name="img"
                   accept="image/*"
                   ref={methods.img.ref}
+                  style={{ display: "none" }}
                   onChange={(e) => {
                     if (e.target?.files) {
                       methods.updateImg(e.target?.files[0]);
                     }
                   }}
-                  style={{ display: "none" }}
                 />
               </div>
               <div className="account-name">
                 <input
                   type="text"
                   name="name"
-                  value={form.name}
                   minLength={3}
                   disabled
                   ref={methods.name.ref}
                   onBlur={() => methods.update()}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
                 <button
                   type="button"

@@ -151,12 +151,34 @@ const vacancy = createSlice({
       const { key, data, count } = action.payload;
 
       if (data && !state.comments.data[key]) {
-        state.comments.data[key] = data;
-      }
-      if (count && count?.[0].count) {
-        state.comments.count[key] = count?.[0].count;
-      } else {
-        state.comments.count[key] = 0;
+        const returnData = data.map((e: any) => {
+          if (e?.reaction) {
+            const reactionType = e.reaction[0]?.type;
+
+            if (reactionType === "like" && e.likes && e.likes[0]?.count > 0) {
+              return {
+                ...e,
+                likes: [{ count: e.likes[0].count - 1 }],
+              };
+            } else if (
+              reactionType === "dislike" &&
+              e.dislikes &&
+              e.dislikes[0]?.count > 0
+            ) {
+              return {
+                ...e,
+                dislikes: [{ count: e.dislikes[0].count - 1 }],
+              };
+            }
+          }
+          return e;
+        });
+
+        state.comments.data[key] = returnData;
+
+        if (count) {
+          state.comments.count[key] = count[0]?.count || 0;
+        }
       }
     });
 
@@ -165,9 +187,31 @@ const vacancy = createSlice({
         const { key, data } = action.payload;
 
         if (data) {
+          const modifiedComments = data.map((item: any) => {
+            const comment = { ...item };
+            if (comment?.reaction) {
+              const reactionType = comment.reaction[0]?.type;
+
+              if (
+                reactionType === "like" &&
+                comment.likes &&
+                comment.likes[0]?.count > 0
+              ) {
+                comment.likes = [{ count: comment.likes[0].count - 1 }];
+              } else if (
+                reactionType === "dislike" &&
+                comment.dislikes &&
+                comment.dislikes[0]?.count > 0
+              ) {
+                comment.dislikes = [{ count: comment.dislikes[0].count - 1 }];
+              }
+            }
+            return comment;
+          });
+
           const uniqueArray = Array.from(
             new Set(
-              [...state.comments.data[key], data].map((item) =>
+              [...state.comments.data[key], ...modifiedComments].map((item) =>
                 JSON.stringify(item)
               )
             )
@@ -347,7 +391,7 @@ const GetComments = createAsyncThunk(
       query = query.eq("reaction.user_id", user_id);
     }
 
-    const data = await query;
+    const { data } = await query;
 
     dispatch(vacancy.actions.commentsLoading(false));
 

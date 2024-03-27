@@ -17,8 +17,15 @@ const user = createSlice({
         state.requireLogin = action.payload;
       }
     },
-    setLoading(state, action: PayloadAction<keyof typeof state.loading>) {
-      state.loading[action.payload] = true;
+    setUserLoading(
+      state,
+      action: PayloadAction<{
+        key: keyof typeof state.loading;
+        loading: boolean;
+      }>
+    ) {
+      const { key, loading } = action.payload;
+      state.loading[key] = loading;
     },
   },
   extraReducers: (builder) => {
@@ -48,7 +55,6 @@ const user = createSlice({
     builder.addCase(updateImg.fulfilled, (state, action) => {
       if (action.payload) {
         state.metadata = action.payload;
-        state.loading["img"] = false;
       }
     });
   },
@@ -56,7 +62,7 @@ const user = createSlice({
 
 export default user.reducer;
 
-export const { requireLogin } = user.actions;
+export const { requireLogin, setUserLoading } = user.actions;
 
 const authUser = createAsyncThunk("authUser", async (_, { dispatch }) => {
   try {
@@ -71,6 +77,7 @@ const authUser = createAsyncThunk("authUser", async (_, { dispatch }) => {
 
     if (userData) {
       dispatch(getMetadata(userData?.id));
+      dispatch(requireLogin(false));
     }
 
     return userData;
@@ -102,6 +109,9 @@ const signIn = createAsyncThunk(
       }
 
       dispatch(getMetadata(data.user?.id));
+      dispatch(requireLogin(false));
+      window.location.reload();
+      window.location.pathname = "/";
 
       return data.user;
     } catch (error: any) {
@@ -135,6 +145,9 @@ const signUp = createAsyncThunk(
       );
 
       await dispatch(signIn(form));
+      dispatch(requireLogin(false));
+      window.location.reload();
+      window.location.pathname = "/";
 
       return data;
     } catch (error: any) {
@@ -147,6 +160,8 @@ const signUp = createAsyncThunk(
 const signOut = createAsyncThunk("signOut", async () => {
   try {
     await supabase.auth.signOut();
+    window.location.reload();
+    window.location.pathname = "/";
     return false;
   } catch (error: any) {
     console.error("Error fetching user data or refreshing session:", error);
@@ -163,7 +178,7 @@ const updateMetadata = createAsyncThunk(
     try {
       const { data } = await supabase
         .from("user_metadata")
-        .update({ form })
+        .update(form)
         .eq("id", user_id);
 
       return data;
@@ -190,7 +205,9 @@ const updateImg = createAsyncThunk(
           quality: 0.2,
           success: async function (compressedResult) {
             try {
-              dispatch(user.actions.setLoading("img"));
+              dispatch(
+                user.actions.setUserLoading({ key: "img", loading: true })
+              );
               await supabase.storage
                 .from("images")
                 .list(`${user_id}`)
