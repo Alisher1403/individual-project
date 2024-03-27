@@ -1,12 +1,11 @@
 import { FC, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { AppDispatch } from "store";
 import { api } from "store/reducers";
 import styled from "styled-components";
 
 const Login: FC = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch() as AppDispatch;
   const [searchParams, setSearchParams] = useSearchParams();
   const type = searchParams.get("type");
@@ -21,7 +20,6 @@ const Login: FC = () => {
     dispatch(api.user.signIn(form)).then((e) => {
       if (e.payload) {
         setUserExists(false);
-        navigate("/");
       } else {
         setUserExists(true);
       }
@@ -32,7 +30,6 @@ const Login: FC = () => {
     dispatch(api.user.signUp(form)).then((e) => {
       if (e.payload) {
         setUserExists(false);
-        navigate("/profile");
       } else {
         setUserExists(true);
       }
