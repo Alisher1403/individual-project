@@ -293,7 +293,7 @@ const getVacancy = createAsyncThunk(
     const state = getState() as RootState;
     const user_id = state.user.data?.id;
 
-    let selectString = `*, views (count), applicants: applicants(count), 
+    let selectString = `*, user: user_metadata(name, img), views (count), applicants: applicants(count), 
     likes: vacancy_reactions(count), dislikes: vacancy_reactions(count)`;
 
     if (user_id) {

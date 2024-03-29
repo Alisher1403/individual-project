@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { Searchbar } from "layouts";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "chart.js/auto";
+import { UserImage } from "components";
 
 const Home: FC = () => {
   const { data } = backend.home();
@@ -60,7 +61,13 @@ const Home: FC = () => {
                           <div className="swiper-content">
                             <h3 className="title">{item.title}</h3>
                             <div className="user">
-                              <div className="user-img"></div>
+                              <div className="img">
+                                <UserImage
+                                  image={item?.user?.img}
+                                  name={item?.user?.name}
+                                />
+                              </div>
+                              <div className="name">{item.user?.name}</div>
                             </div>
                           </div>
                         </SwiperSlide>
@@ -84,7 +91,7 @@ const Home: FC = () => {
                     (item: any, key: number) => {
                       return (
                         <SwiperSlide key={key}>
-                          <div className="swiper-content">{item.title}</div>
+                          <div className="swiper-content">{item.name}</div>
                         </SwiperSlide>
                       );
                     }
@@ -130,6 +137,33 @@ const SwiperSection = styled.div`
   .swiper-content {
     background-color: var(--element-background);
     border: 1px solid var(--border-color);
-    padding: 20px;
+    padding: 15px;
+
+    .title {
+      font-family: var(--font-semiBold);
+      color: var(--title-color);
+      font-size: 15px;
+      margin-bottom: 0px;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      column-gap: 10px;
+
+      .img {
+        height: 20px;
+
+        .error-text {
+          font-size: 12px;
+        }
+      }
+
+      .name {
+        font-family: var(--font-regular);
+        color: var(--text-color);
+        font-size: 13px;
+      }
+    }
   }
 `;

@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { api } from "store/reducers";
 import { useParams } from "react-router-dom";
 import { requireLogin } from "store/reducers/user";
-import { imagesBucket } from "backend";
+import { UserImage } from ".";
 
 interface Props {
   onCancel?: () => void;
@@ -16,12 +16,11 @@ interface Props {
 const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
   const vacancy_id = useParams()?.id || "";
   const user = useSelector((state: RootState) => state.user.data);
-  const userMetadata = useSelector((state: RootState) => state.user.metadata);
+  const metadata = useSelector((state: RootState) => state.user.metadata);
   const ref = useRef<HTMLDivElement | null>(null);
   const [disabled, setDisabled] = useState(false);
   const [focus, setFocus] = useState(open);
   const dispatch: AppDispatch = useDispatch();
-  const [imageLoaded, setImageLoaded] = useState<boolean | "">("");
 
   function onInput() {
     if (ref.current && ref.current.textContent) {
@@ -80,20 +79,7 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
         <div className="new-comment">
           <div className="body">
             <div className="img">
-              {userMetadata?.img && imageLoaded === "" ? (
-                <img
-                  src={imagesBucket + userMetadata?.img}
-                  alt=""
-                  onLoad={(e: any) => {
-                    if (e.target && e.target?.style) {
-                      e.target.style.background =
-                        "var(--element-background-dark)";
-                    }
-                  }}
-                  onError={() => setImageLoaded(false)}
-                />
-              ) : null}
-              <span>{userMetadata?.name[0]}</span>
+              <UserImage image={metadata?.img} name={metadata?.name} />
             </div>
             <div className="comment-input-wrapper">
               <div
@@ -158,44 +144,8 @@ const Container = styled.div`
       width: 100%;
 
       .img {
-        min-width: 40px;
-        width: 40px;
-        margin-top: 2px;
-        aspect-ratio: 1/1;
-        background-color: var(--element-background-dark);
-        border-radius: 50%;
-        overflow: hidden;
-        color: var(--title-color);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        height: 40px;
         margin-right: 15px;
-        overflow: hidden;
-        position: relative;
-        z-index: 2;
-
-        @media screen and (max-width: 700px) {
-          min-width: 30px;
-          width: 30px;
-          font-size: 18px;
-          margin-right: 7px;
-        }
-
-        img {
-          height: 100%;
-          width: 100px;
-          object-fit: cover;
-        }
-
-        span {
-          font-size: 25px;
-          line-height: 0;
-          user-select: none;
-          font-family: var(--font-regular);
-          text-transform: uppercase;
-          position: absolute;
-          z-index: -1;
-        }
       }
 
       .comment-input-wrapper {

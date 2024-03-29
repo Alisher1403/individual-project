@@ -10,7 +10,7 @@ import parse from "html-react-parser";
 import { useParams } from "react-router-dom";
 import { setCommentReaction } from "store/reducers/vacancy";
 import { requireLogin } from "store/reducers/user";
-import { imagesBucket } from "backend";
+import { UserImage } from ".";
 
 interface Props {
   element: any;
@@ -22,7 +22,7 @@ const Comment: FC<Props> = ({ element }) => {
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.data);
   const [edit, setEdit] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(true);
+
   const timeAgo = useMemo(
     () => formData.timeAgo(element.created_at),
     [element.created_at]
@@ -105,18 +105,7 @@ const Comment: FC<Props> = ({ element }) => {
       ) : (
         <Content>
           <div className="img">
-            {element?.user.img && imageLoaded ? (
-              <img
-                src={imagesBucket + element?.user.img}
-                onLoad={(e: any) => {
-                  if (e.target && e.target?.style) {
-                    e.target.style.background = "var(--element-background-dark)";
-                  }
-                }}
-                onError={() => setImageLoaded(false)}
-              />
-            ) : null}
-            <span>{element?.user.name[0]}</span>
+            <UserImage image={element?.user.img} name={element?.user.name} />
           </div>
           <div className="main-wrapper">
             <div>
@@ -201,44 +190,8 @@ const Content = styled.div`
   border-bottom: 1px solid var(--border-color-light);
 
   .img {
-    min-width: 40px;
-    width: 40px;
-    margin-top: 2px;
-    aspect-ratio: 1/1;
-    background-color: var(--element-background-dark);
-    border-radius: 50%;
-    overflow: hidden;
-    color: var(--title-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 40px;
     margin-right: 15px;
-    overflow: hidden;
-    position: relative;
-    z-index: 2;
-
-    @media screen and (max-width: 700px) {
-      min-width: 30px;
-      width: 30px;
-      font-size: 18px;
-      margin-right: 7px;
-    }
-
-    img {
-      height: 100%;
-      width: 100px;
-      object-fit: cover;
-    }
-
-    span {
-      font-size: 25px;
-      line-height: 0;
-      user-select: none;
-      position: absolute;
-      z-index: -1;
-      font-family: var(--font-regular);
-      text-transform: uppercase;
-    }
   }
 
   .main-wrapper {

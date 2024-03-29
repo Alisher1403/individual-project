@@ -25,7 +25,7 @@ const VacancyPost: FC = () => {
               </div>
               <div className="main">
                 <h3>{data.title}</h3>
-                <Link to={`/profile/${data.user_id}`}>{data.company}</Link>
+                <Link to={`/profile/${data.user_id}`}>{data?.user?.name}</Link>
                 <p>{data.location}</p>
               </div>
               <div className="options">

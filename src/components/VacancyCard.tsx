@@ -19,7 +19,7 @@ const VacancyCard: FC<ComponentProps> = ({ element }) => {
             </div>
             <div className="main">
               <h3>{element.title}</h3>
-              <p>{element.company}</p>
+              <p>{element?.user?.name}</p>
               <p>{element.location}</p>
             </div>
             <div className="options">
@@ -34,7 +34,9 @@ const VacancyCard: FC<ComponentProps> = ({ element }) => {
               <div>{formData.timeAgo(element.created_at)}</div>
               <div>{formData.emp_type.get(element.emp_type)}</div>
               <div>
-                <span className="material-symbols-rounded icon">visibility</span>
+                <span className="material-symbols-rounded icon">
+                  visibility
+                </span>
                 {element.views[0].count}
               </div>
             </div>

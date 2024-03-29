@@ -94,7 +94,7 @@ const vacancies = () => {
       let query = supabase
         .from("vacancies")
         .select(
-          `id, created_at, user_id, title, logo, company, emp_type, location, subtitle, fromSalary, toSalary, currency, experience, views (count)`,
+          `id, created_at, user_id, title, logo, user: user_metadata(name, img), emp_type, location, subtitle, fromSalary, toSalary, currency, experience, views (count)`,
           { count: "exact" }
         );
       // console.log((await query).data);
