@@ -149,7 +149,7 @@ const SwiperSection = styled.div`
     .user {
       display: flex;
       align-items: center;
-      column-gap: 10px;
+      column-gap: 5px;
 
       .img {
         height: 20px;
@@ -163,6 +163,9 @@ const SwiperSection = styled.div`
         font-family: var(--font-regular);
         color: var(--text-color);
         font-size: 13px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
       }
     }
   }
