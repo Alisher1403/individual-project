@@ -542,7 +542,7 @@ const home = () => {
 
   useEffect(() => {
     async function fetch() {
-      dispatch(api.home.categories.getList());
+      dispatch(api.home.vacancies.get());
     }
     fetch();
   }, []);

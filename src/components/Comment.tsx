@@ -108,7 +108,11 @@ const Comment: FC<Props> = ({ element }) => {
             {element?.user.img && imageLoaded ? (
               <img
                 src={imagesBucket + element?.user.img}
-                onLoad={() => setImageLoaded(true)}
+                onLoad={(e: any) => {
+                  if (e.target && e.target?.style) {
+                    e.target.style.background = "var(--element-background-dark)";
+                  }
+                }}
                 onError={() => setImageLoaded(false)}
               />
             ) : null}

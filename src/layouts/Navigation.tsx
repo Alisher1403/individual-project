@@ -12,6 +12,7 @@ const Navigation: FC = () => {
   const location = useLocation();
   const dispatch = useDispatch() as AppDispatch;
   const metadata = useSelector((state: RootState) => state.user.metadata);
+  const user = useSelector((state: RootState) => state.user.data);
   const [imageLoadded, setImageLoaded] = useState(true);
 
   return (
@@ -35,19 +36,21 @@ const Navigation: FC = () => {
         {location.pathname !== "/" && <Searchbar />}
         <Section>
           <div className="account">
-            <AccountBtn className="accoun-btn">
-              <div className="account-img">
-                {metadata?.img && imageLoadded ? (
-                  <img
-                    src={imagesBucket + metadata?.img}
-                    alt=""
-                    onLoad={() => setImageLoaded(true)}
-                    onError={() => setImageLoaded(false)}
-                  />
-                ) : null}
-                <span>{metadata?.name[0]}</span>
-              </div>
-            </AccountBtn>
+            {user?.id ? (
+              <AccountBtn className="accoun-btn">
+                <div className="account-img">
+                  {metadata?.img && imageLoadded ? (
+                    <img
+                      src={imagesBucket + metadata?.img}
+                      alt=""
+                      onLoad={() => setImageLoaded(true)}
+                      onError={() => setImageLoaded(false)}
+                    />
+                  ) : null}
+                  <span>{metadata?.name[0]}</span>
+                </div>
+              </AccountBtn>
+            ) : null}
           </div>
           <div className="links-list">
             <NavLink to={`/login`}>IN</NavLink>
@@ -62,17 +65,7 @@ const Navigation: FC = () => {
 export default Navigation;
 
 const Container = styled.nav`
-  width: 100%;
-  margin: 0 auto;
-  border-bottom: var(--border-style);
-  background: var(--content-background);
-  z-index: 100;
-  max-width: 1350px;
-  width: 100%;
-  height: var(--navigation-height);
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
+  border-bottom: 1px solid var(--border-color);
 `;
 
 const Content = styled.div`
@@ -80,6 +73,12 @@ const Content = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  margin: 0 auto;
+  background: var(--content-background);
+  max-width: 1350px;
+  height: var(--navigation-height);
+  padding: 0 10px;
+  z-index: 100;
 `;
 const Section = styled.div`
   .links-list {
@@ -122,6 +121,7 @@ const AccountBtn = styled.button`
 
     span {
       z-index: -1;
+      text-transform: uppercase;
     }
   }
 `;

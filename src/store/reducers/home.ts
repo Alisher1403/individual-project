@@ -1,34 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { supabase } from "backend";
 
-interface Category {
-  name: string;
-}
-
-interface Company {
-  id: string;
-  name: string;
-  img: string;
-}
-
-interface HomeState {
-  categories: Category[] | null;
-  topCompanies: { name: string; companies: Company[] }[] | null;
-}
-
 const home = createSlice({
   name: "home",
   initialState: {
     categories: null,
-    topCompanies: null,
-  } as HomeState,
+    vacancies: null as null | any,
+  },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getCategories.fulfilled, (state, action) => {
-      state.categories = action.payload;
-    });
-    builder.addCase(getTopCompanies.fulfilled, (state, action) => {
-      state.topCompanies = action.payload;
+    builder.addCase(getAll.fulfilled, (state, action) => {
+      if (action.payload) {
+        state.vacancies = action.payload;
+      }
     });
   },
 });
@@ -36,37 +20,58 @@ const home = createSlice({
 export default home.reducer;
 
 /********************************************************/
-const getCategories = createAsyncThunk<Category[], void>("categories", async () => {
-  const { data } = await supabase.rpc("get_specialization_count");
+const getAll = createAsyncThunk("getAll", async () => {
+  try {
+    const data = {
+      vacanciesOfTheWeek: null as null | any[],
+      latestVacancies: null as null | any[],
+      topCompanies: null as null | any[],
+    };
 
-  return data;
-});
+    const date = new Date();
+    date.setDate(date.getDate() - 7);
 
-const getTopCompanies = createAsyncThunk<{ name: string; companies: Company[] }[], Category[]>(
-  "topCompanies",
-  async (categories) => {
-    if (!categories) return [];
+    await supabase
+      .from("vacancies")
+      .select("*")
+      .gte("created_at", date.toISOString())
+      .limit(12)
+      .then((result) => {
+        if (result.data && result.data.length > 6) {
+          data.vacanciesOfTheWeek = result.data;
+        }
+      });
 
-    const promises = categories.map(async (elem) => {
-      const { data: count } = await supabase.from("vacancies").select("count").eq("specialization", elem.name);
-      const { data: companies } = await supabase.rpc("get_top_companies", { p_specialization: elem.name, p_limit: 4 });
+    await supabase
+      .from("vacancies")
+      .select("*, user: user_metadata(img, name)")
+      .order("created_at", { ascending: false })
+      .limit(12)
+      .then((result) => {
+        if (result.data && result.data.length > 6) {
+          data.latestVacancies = result.data;
+        }
+      });
 
-      return {
-        name: elem.name,
-        count: count ? count[0].count : 0,
-        companies: companies.map((e: any) => {
-          return { id: e.user_id, name: e.user_name, img: e.user_img };
-        }),
-      };
-    });
-
-    const data = await Promise.all(promises);
+    await supabase
+      .from("user_metadata")
+      .select("*, vacancies(*)")
+      .order("created_at", { ascending: false })
+      .limit(12)
+      .then((result) => {
+        if (result.data && result.data.length > 6) {
+          data.topCompanies = result.data;
+        }
+      });
 
     return data;
+  } catch (error: any) {
+    console.error("Error fetching data:", error.message);
   }
-);
+});
 
 export const homeApi = {
-  categories: { getList: getCategories },
-  topCompanies: { getList: getTopCompanies },
+  vacancies: {
+    get: getAll,
+  },
 };

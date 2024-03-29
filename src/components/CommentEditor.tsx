@@ -21,7 +21,7 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
   const [disabled, setDisabled] = useState(false);
   const [focus, setFocus] = useState(open);
   const dispatch: AppDispatch = useDispatch();
-  const [imageLoaded, setImageLoaded] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState<boolean | "">("");
 
   function onInput() {
     if (ref.current && ref.current.textContent) {
@@ -80,11 +80,16 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
         <div className="new-comment">
           <div className="body">
             <div className="img">
-              {userMetadata?.img && imageLoaded ? (
+              {userMetadata?.img && imageLoaded === "" ? (
                 <img
                   src={imagesBucket + userMetadata?.img}
                   alt=""
-                  onLoad={() => setImageLoaded(true)}
+                  onLoad={(e: any) => {
+                    if (e.target && e.target?.style) {
+                      e.target.style.background =
+                        "var(--element-background-dark)";
+                    }
+                  }}
                   onError={() => setImageLoaded(false)}
                 />
               ) : null}

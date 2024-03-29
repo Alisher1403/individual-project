@@ -179,9 +179,10 @@ const updateMetadata = createAsyncThunk(
       const { data } = await supabase
         .from("user_metadata")
         .update(form)
-        .eq("id", user_id);
+        .eq("id", user_id)
+        .select();
 
-      return data;
+      return data?.[0];
     } catch (error: any) {
       console.error("Error fetching user data or refreshing session:", error);
       return { error: error.message };
