@@ -1,13 +1,10 @@
 import { FC } from "react";
-import { Sidebar } from "components";
 import styled from "styled-components";
 
 const SearchPage: FC = () => {
   return (
     <Container>
-      <Content>
-        <Sidebar />
-      </Content>
+      <Content></Content>
     </Container>
   );
 };
