@@ -35,13 +35,15 @@ const getAll = createAsyncThunk("getAll", async () => {
       .from("specializations")
       .select("*, vacancies(count), salary: vacancies!inner(toSalary.max())")
       .eq("salary.currency", "dollar")
-      .then((result) => {
+      .then((result): void => {
         if (result.data && result.data.length > 3) {
           data.specializations = result.data;
 
           data.specializations.sort((a, b) => {
             return b?.vacancies?.[0].count - a?.vacancies?.[0].count;
           });
+
+          data.specializations = data.specializations.slice(0, 8);
         }
       });
 

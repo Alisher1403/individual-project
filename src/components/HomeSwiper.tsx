@@ -1,4 +1,4 @@
-import { FC, useRef } from "react";
+import { FC, useRef, useState } from "react";
 import styled from "styled-components";
 import { Swiper } from "swiper/react";
 import { SwiperOptions } from "swiper/types";
@@ -9,6 +9,7 @@ interface Props {
 }
 
 const HomeSwiper: FC<Props> = ({ children, delay }) => {
+  const [_, setInit] = useState(false);
   const nextBtn = useRef(null);
   const prevBtn = useRef(null);
 
@@ -23,10 +24,6 @@ const HomeSwiper: FC<Props> = ({ children, delay }) => {
       1000: { slidesPerView: 4.5 },
       600: { slidesPerView: 3.5 },
     },
-    navigation: {
-      prevEl: prevBtn.current,
-      nextEl: nextBtn.current,
-    },
   };
 
   return (
@@ -37,7 +34,16 @@ const HomeSwiper: FC<Props> = ({ children, delay }) => {
         </span>
       </button>
 
-      <Swiper {...swiperConfig}>{...children}</Swiper>
+      <Swiper
+        {...swiperConfig}
+        navigation={{
+          prevEl: prevBtn.current,
+          nextEl: nextBtn.current,
+        }}
+        onInit={() => setInit(true)}
+      >
+        {...children}
+      </Swiper>
 
       <button className="swiper-btn next" ref={nextBtn}>
         <span className="material-symbols-rounded icon">
