@@ -103,7 +103,7 @@ const vacancies = () => {
       if (searchText) {
         const removeSpaces = searchText.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
         query = query.or(
-          `title.ilike.%${removeSpaces}%,description.ilike.%${removeSpaces}%,company.ilike.%${removeSpaces}%`
+          `title.ilike.%${removeSpaces}%,description.ilike.%${removeSpaces}%,specialization.ilike.%${removeSpaces}%,subtitle.ilike.%${removeSpaces}%`
         );
       }
 
@@ -141,6 +141,8 @@ const vacancies = () => {
       const { data, error, count } = await query
         .range(fromIndex, toIndex)
         .order("id", { ascending: false });
+
+      console.log(data);
 
       if (error) {
         throw error;

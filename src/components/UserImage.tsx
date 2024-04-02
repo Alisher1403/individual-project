@@ -3,28 +3,30 @@ import { FC, useState } from "react";
 import { styled } from "styled-components";
 
 interface Props {
-  image: string;
-  name: string;
+  src: string;
+  alt: string;
 }
 
-const UserImage: FC<Props> = ({ image, name }) => {
+const UserImage: FC<Props> = ({ src, alt }) => {
   const [imageLoaded, setImageLoaded] = useState(true);
 
-  if (image && name)
+  if (src && alt)
     return (
-      <Container>
-        {image && imageLoaded ? (
+      <Container className={`img-container ${imageLoaded && "img-loaded"}`}>
+        {src && imageLoaded ? (
           <img
-            src={imagesBucket + image}
+            src={imagesBucket + src}
+            className="unloaded"
             onLoad={(e: any) => {
-              if (e.target && e.target?.style) {
-                e.target.style.background = "var(--element-background-dark)";
+              if (e.target && e.target?.className) {
+                e.target.className = "loaded";
+                setImageLoaded(true);
               }
             }}
             onError={() => setImageLoaded(false)}
           />
         ) : null}
-        <span className="error-text">{name[0]}</span>
+        <span className="alt">{alt[0]}</span>
       </Container>
     );
 };
@@ -35,7 +37,6 @@ const Container = styled.div`
   height: 100%;
   aspect-ratio: 1/1;
   background-color: var(--element-background-dark);
-  border-radius: 50%;
   overflow: hidden;
   color: var(--title-color);
   display: flex;
@@ -45,21 +46,18 @@ const Container = styled.div`
   position: relative;
   z-index: 2;
 
-  @media screen and (max-width: 700px) {
-    min-width: 30px;
-    width: 30px;
-    margin-right: 7px;
-  }
-
   img {
     height: 100%;
-    width: 100px;
+    width: 100%;
     object-fit: cover;
+
+    .loaded {
+      background: var(--element-background-dark);
+    }
   }
 
-  .error-text {
+  .alt {
     font-size: 25px;
-    line-height: 0;
     user-select: none;
     position: absolute;
     z-index: -1;

@@ -2,9 +2,13 @@ import backend from "backend";
 import { FC } from "react";
 import styled from "styled-components";
 import { Searchbar } from "layouts";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { SwiperSlide } from "swiper/react";
 import "chart.js/auto";
 import { UserImage } from "components";
+import { formData } from "../constant/formData";
+import { Link } from "react-router-dom";
+import parse from "html-react-parser";
+import { HomeSwiper } from "components";
 
 const Home: FC = () => {
   const { data } = backend.home();
@@ -13,90 +17,154 @@ const Home: FC = () => {
 
   if (data?.vacancies)
     return (
-      <Container className="main-container">
+      <Container>
         <Content>
-          <Section_1>
+          <Header>
             <h1>Find your dream job</h1>
             <Searchbar />
-          </Section_1>
+          </Header>
           <main>
-            {data.vacancies?.vacanciesOfTheWeek ? (
+            {data.vacancies?.specializations ? (
               <SwiperSection>
-                <h2 className="title">Top hiring companies</h2>
-                <Swiper
-                  spaceBetween={5}
-                  speed={300}
-                  autoplay={{ delay: 4000 }}
-                  slidesPerView={5.5}
-                  className="swiper"
-                >
-                  {data.vacancies?.vacanciesOfTheWeek?.map(
-                    (item: any, key: number) => {
+                <div className="specialization-list">
+                  {data.vacancies?.specializations?.map(
+                    (item: any, index: number) => {
                       return (
-                        <SwiperSlide key={key}>
-                          <div className="swiper-content">
-                            <h3 className="title">{item.title}</h3>
+                        <Link
+                          key={index}
+                          className="specialization"
+                          to={{
+                            pathname: "/search/vacancy",
+                            search: `text=${item.name ?? ""}&page=1`,
+                          }}
+                        >
+                          <div
+                            className="specialization-content"
+                            style={{ animationDelay: index * 0.1 + "s" }}
+                          >
+                            <div className="body">
+                              <h3 className="title">
+                                <span className="title-text">
+                                  {item.name ?? "Others"}
+                                </span>
+                                <span className="material-symbols-rounded icon">
+                                  search
+                                </span>
+                              </h3>
+                              {item?.vacancies?.[0]?.count > 0 ? (
+                                <p className="text">
+                                  More than {item?.vacancies?.[0]?.count}{" "}
+                                  vacancies
+                                </p>
+                              ) : null}
+                              {item?.salary?.[0]?.max > 0 ? (
+                                <p className="text">
+                                  Up to {item?.salary?.[0]?.max}$
+                                </p>
+                              ) : null}
+                              {!item.name ? (
+                                <p className="text">See other vacancies</p>
+                              ) : null}
+                            </div>
                           </div>
-                        </SwiperSlide>
+                        </Link>
                       );
                     }
                   )}
-                </Swiper>
+                </div>
               </SwiperSection>
             ) : null}
             {data.vacancies?.latestVacancies ? (
               <SwiperSection>
-                <h2 className="title">Top hiring companies</h2>
-                <Swiper
-                  spaceBetween={5}
-                  speed={300}
-                  autoplay={{ delay: 4000 }}
-                  slidesPerView={5.5}
-                  className="swiper"
-                >
+                <h2 className="title">Most recent jobs</h2>
+                <HomeSwiper delay={5500}>
                   {data.vacancies?.latestVacancies?.map(
                     (item: any, key: number) => {
                       return (
                         <SwiperSlide key={key}>
-                          <div className="swiper-content">
-                            <h3 className="title">{item.title}</h3>
-                            <div className="user">
-                              <div className="img">
-                                <UserImage
-                                  image={item?.user?.img}
-                                  name={item?.user?.name}
-                                />
+                          <Link to={`vacancy/${item.id}`}>
+                            <div className="swiper-content">
+                              <div className="body">
+                                <h3 className="title">{item.title}</h3>
+                                <div className="user">
+                                  <div className="img">
+                                    <UserImage
+                                      src={item?.user?.img}
+                                      alt={item?.user?.name}
+                                    />
+                                  </div>
+                                  <p className="name">{item.user?.name}</p>
+                                </div>
+                                <div className="info-list">
+                                  <div className="info">
+                                    <span className="material-symbols-rounded icon">
+                                      location_on
+                                    </span>
+                                    {item?.location}
+                                  </div>
+                                  {formData.emp_type.get(item?.emp_type) ? (
+                                    <>
+                                      <div className="break"></div>
+                                      <div className="info">
+                                        <span className="material-symbols-rounded icon">
+                                          work
+                                        </span>
+                                        {formData.emp_type.get(item.emp_type)}
+                                      </div>
+                                    </>
+                                  ) : null}
+                                </div>
+                                <div className="time-ago">
+                                  {formData.timeAgo(item.created_at)}
+                                </div>
                               </div>
-                              <div className="name">{item.user?.name}</div>
+                              <div className="salary">
+                                {formData.salary.get({
+                                  fromSalary: item?.fromSalary,
+                                  toSalary: item?.toSalary,
+                                  currency: item?.currency,
+                                })}
+                              </div>
                             </div>
-                          </div>
+                          </Link>
                         </SwiperSlide>
                       );
                     }
                   )}
-                </Swiper>
+                </HomeSwiper>
               </SwiperSection>
             ) : null}
             {data.vacancies?.topCompanies ? (
               <SwiperSection>
                 <h2 className="title">Top hiring companies</h2>
-                <Swiper
-                  spaceBetween={5}
-                  speed={300}
-                  autoplay={{ delay: 4000 }}
-                  slidesPerView={5.5}
-                  className="swiper"
-                >
+                <HomeSwiper delay={5000}>
                   {data.vacancies?.topCompanies?.map(
                     (item: any, key: number) => {
                       return (
-                        <SwiperSlide key={key}>
-                          <div className="swiper-content">{item.name}</div>
+                        <SwiperSlide key={key} style={{ height: "auto" }}>
+                          <Link to={`profile/${item.id}`}>
+                            <div className="swiper-content centered">
+                              <div className="body">
+                                <div className="logo">
+                                  <UserImage src={item?.img} alt={item?.name} />
+                                </div>
+                                <h3 className="title">{item.name}</h3>
+                                {item?.description ? (
+                                  <div className="description">
+                                    <div className="description-content">
+                                      {parse(item?.description)}
+                                    </div>
+                                  </div>
+                                ) : null}
+                                <button className="button">View jobs</button>
+                              </div>
+                            </div>
+                          </Link>
                         </SwiperSlide>
                       );
                     }
                   )}
-                </Swiper>
+                </HomeSwiper>
               </SwiperSection>
             ) : null}
           </main>
@@ -107,24 +175,30 @@ const Home: FC = () => {
 
 export default Home;
 
-const Container = styled.div``;
+const Container = styled.div`
+  max-width: 1420px;
+  margin: 0 auto;
+  padding: 0 10px;
+`;
 
 const Content = styled.div`
   padding: 30px 0;
 `;
 
-const Section_1 = styled.div`
+const Header = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 20px;
 
   h1 {
-    margin-bottom: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
   }
 `;
 
 const SwiperSection = styled.div`
-  padding: 20px 0;
+  padding: 15px 0;
 
   .title {
     font-size: 18px;
@@ -132,40 +206,80 @@ const SwiperSection = styled.div`
     font-family: var(--font-semiBold);
     font-weight: normal;
     margin-bottom: 10px;
+    padding: 0 30px;
   }
 
-  .swiper-content {
-    background-color: var(--element-background);
-    border: 1px solid var(--border-color);
-    padding: 15px;
+  .specialization-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 950px;
+    padding: 0 30px;
+    margin: 0 auto;
+    gap: 2px;
 
-    .title {
-      font-family: var(--font-semiBold);
-      color: var(--title-color);
-      font-size: 15px;
-      margin-bottom: 0px;
+    @media screen and (max-width: 800px) {
+      grid-template-columns: repeat(3, 1fr);
+      padding: 0;
+    }
+    @media screen and (max-width: 470px) {
+      grid-template-columns: repeat(2, 1fr);
+      padding: 0;
     }
 
-    .user {
-      display: flex;
-      align-items: center;
-      column-gap: 5px;
+    .specialization {
+      display: block;
 
-      .img {
-        height: 20px;
-
-        .error-text {
-          font-size: 12px;
-        }
-      }
-
-      .name {
-        font-family: var(--font-regular);
-        color: var(--text-color);
-        font-size: 13px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      .specialization-content {
+        height: 100%;
         width: 100%;
+        background: var(--element-background);
+        padding: 15px;
+        transition: 0.1s;
+        opacity: 0;
+        animation: specialization 0.2s forwards;
+
+        @keyframes specialization {
+          100% {
+            opacity: 1;
+          }
+        }
+
+        &:hover {
+          background: var(--element-background-hover);
+        }
+
+        * {
+          color: var(--text-color);
+        }
+
+        .title {
+          margin-bottom: 0;
+          padding: 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          column-gap: 10px;
+
+          .title-text {
+            color: var(--title-color);
+            font-size: 15px;
+            font-family: var(--font-semiBold);
+            font-weight: normal;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            width: 100%;
+          }
+
+          .icon {
+            font-size: 15px;
+            color: var(--text-color);
+          }
+        }
+
+        .text {
+          font-family: var(--font-regular);
+          font-size: 13px;
+        }
       }
     }
   }

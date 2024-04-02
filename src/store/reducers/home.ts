@@ -23,7 +23,7 @@ export default home.reducer;
 const getAll = createAsyncThunk("getAll", async () => {
   try {
     const data = {
-      vacanciesOfTheWeek: null as null | any[],
+      specializations: null as null | any[],
       latestVacancies: null as null | any[],
       topCompanies: null as null | any[],
     };
@@ -32,34 +32,38 @@ const getAll = createAsyncThunk("getAll", async () => {
     date.setDate(date.getDate() - 7);
 
     await supabase
-      .from("vacancies")
-      .select("*")
-      .gte("created_at", date.toISOString())
-      .limit(12)
+      .from("specializations")
+      .select("*, vacancies(count), salary: vacancies!inner(toSalary.max())")
+      .eq("salary.currency", "dollar")
       .then((result) => {
-        if (result.data && result.data.length > 6) {
-          data.vacanciesOfTheWeek = result.data;
+        if (result.data && result.data.length > 3) {
+          data.specializations = result.data;
+
+          data.specializations.sort((a, b) => {
+            return b?.vacancies?.[0].count - a?.vacancies?.[0].count;
+          });
         }
       });
 
     await supabase
       .from("vacancies")
-      .select("*, user: user_metadata(img, name)")
+      .select("*, user: user_metadata!inner(img, name)")
+      .eq("user.userType", "employer")
       .order("created_at", { ascending: false })
-      .limit(12)
+      .limit(8)
       .then((result) => {
-        if (result.data && result.data.length > 6) {
+        if (result.data && result.data.length > 4) {
           data.latestVacancies = result.data;
         }
       });
 
     await supabase
       .from("user_metadata")
-      .select("*, vacancies(*)")
-      .order("created_at", { ascending: false })
+      .select("*")
+      .eq("userType", "employer")
       .limit(12)
       .then((result) => {
-        if (result.data && result.data.length > 6) {
+        if (result.data && result.data.length > 4) {
           data.topCompanies = result.data;
         }
       });

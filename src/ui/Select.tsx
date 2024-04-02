@@ -1,7 +1,5 @@
-import { icons } from "icons";
 import React, { FC, useContext, useState } from "react";
 import styled from "styled-components";
-import parse from "html-react-parser";
 import { UIContext } from "ui";
 
 interface Props {
@@ -12,7 +10,13 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-const Select: FC<Props> = ({ value, options, onChange, width = "auto", style }) => {
+const Select: FC<Props> = ({
+  value,
+  options,
+  onChange,
+  width = "auto",
+  style,
+}) => {
   const { id, setId } = useContext(UIContext);
   const [uid] = useState(Math.random() * 1000000 + Math.random() * 50000);
   const open = uid === id;
@@ -39,7 +43,11 @@ const Select: FC<Props> = ({ value, options, onChange, width = "auto", style }) 
       <Content $width={width}>
         <Selected onClick={componentClick} className={open ? "opened" : ""}>
           <p>{label}</p>
-          <Icon className={open ? "opened" : ""}>{parse(icons["arrowBottom"])}</Icon>
+          <Icon className={open ? "opened" : ""}>
+            <span className="material-symbols-rounded">
+              keyboard_arrow_down
+            </span>
+          </Icon>
         </Selected>
         <OptionsWrapper className={open ? "opened" : ""}>
           <List>
@@ -71,7 +79,6 @@ const Container = styled.div`
   margin: var(--input-margin);
 
   * {
-    font-family: var(--text-font);
     font-size: var(--input-font-size);
   }
 `;
@@ -84,41 +91,47 @@ const Content = styled.div<{ $width: string }>`
 `;
 
 const Selected = styled.button`
+  width: 100%;
   display: flex;
   background: none;
-  column-gap: 5px;
   justify-content: space-between;
   cursor: pointer;
   align-items: center;
-  border: var(--input-border);
+  border: 1px solid var(--border-color-dark);
   width: 100%;
-  border-radius: var(--input-border-radius);
-  padding: var(--input-padding);
+  border-radius: 5px;
+  padding: 5px 10px;
+  padding-right: 6px;
   height: var(--input-height);
-  background: var(--input-bg);
-  transition: var(--input-transition);
-  color: var(--input-color);
+  background: none;
+  transition: 0.2s;
+  color: var(--text-color);
+  font-family: var(--text-font);
 
   &.opened {
-    border-color: var(--border-focus-bg);
-    box-shadow: 0 0 5px var(--border-focus-bg);
+    border-color: var(--element-color);
+    box-shadow: 0 0 5px var(--element-color);
   }
 `;
 
 const Icon = styled.div`
-  height: 20px;
+  height: 100%;
   transition: var(--input-transition);
   transform: rotate(0);
+  display: flex;
+  align-items: center;
 
-  * {
-    fill: var(--input-icon-color);
+  span {
+    color: var(--icon-color);
+    font-size: 22px;
+    line-height: 0;
   }
 `;
 
 const OptionsWrapper = styled.div`
   border: var(--input-border);
-  border-radius: var(--input-border-radius);
-  padding: var(--option-wrapper-padding);
+  border-radius: 5px;
+  padding: 2px;
   width: 100%;
   top: calc(100% + 3px);
   position: absolute;
@@ -126,9 +139,37 @@ const OptionsWrapper = styled.div`
   background: var(--input-bg);
   z-index: 5;
   background: var(--input-bg);
+  max-height: 150px;
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    display: none;
+  }
+
+  &:-webkit-scrollbar-track {
+    display: none;
+  }
 
   &.opened {
     display: block;
+    animation: open-select 0.15s forwards;
+
+    @keyframes open-select {
+      0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-20%);
+        height: 0;
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        height: auto;
+      }
+    }
   }
 `;
 
@@ -144,19 +185,20 @@ const Option = styled.button`
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: var(--option-padding);
   transition: var(--input-transition);
-  border-radius: var(--option-border-radius);
-  color: var(--input-color);
+  border-radius: 3px;
+  color: var(--text-color);
+  font-family: var(--text-font);
 
   &.selected {
-    background: var(--option-selected-bg);
-  }
+    background: var(--element-color-light);
 
-  display: flex;
-  align-items: center;
-  width: 100%;
-  justify-content: space-between;
+    * {
+      color: white;
+    }
+  }
 `;
 
 const Label = styled.p`

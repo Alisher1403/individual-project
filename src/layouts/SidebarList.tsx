@@ -18,7 +18,7 @@ const SidebarList: FC = () => {
               <NavLink to={`/vacancy/${elem.id}`}>
                 <div>
                   <h3>{elem.title}</h3>
-                  <p>{elem.company}</p>
+                  <p>{elem?.user?.name}</p>
                   <p>{formData.salary.get(elem)}</p>
                 </div>
               </NavLink>

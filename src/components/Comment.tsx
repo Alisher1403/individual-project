@@ -105,7 +105,7 @@ const Comment: FC<Props> = ({ element }) => {
       ) : (
         <Content>
           <div className="img">
-            <UserImage image={element?.user.img} name={element?.user.name} />
+            <UserImage src={element?.user.img} alt={element?.user.name} />
           </div>
           <div className="main-wrapper">
             <div>
@@ -191,7 +191,10 @@ const Content = styled.div`
 
   .img {
     height: 40px;
+    min-width: 40px;
     margin-right: 15px;
+    border-radius: 50%;
+    overflow: hidden;
   }
 
   .main-wrapper {

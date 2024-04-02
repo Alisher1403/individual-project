@@ -2,6 +2,7 @@ import { FC } from "react";
 import styled from "styled-components";
 import { formData } from "../constant/formData";
 import { Link } from "react-router-dom";
+import { UserImage } from ".";
 
 interface ComponentProps {
   element: any;
@@ -15,7 +16,7 @@ const VacancyCard: FC<ComponentProps> = ({ element }) => {
         <Content>
           <div className="s1">
             <div className="logo">
-              <img src={element.logo} alt="" />
+              <UserImage src={element?.user?.img} alt={element?.user?.name} />
             </div>
             <div className="main">
               <h3>{element.title}</h3>
@@ -75,8 +76,26 @@ const Content = styled.div`
 
     .logo {
       aspect-ratio: 1/1;
-      background: var(--element-color);
       border-radius: 7px;
+      overflow: hidden;
+
+      .img-container {
+        background: var(--element-color);
+
+        img {
+          padding: 5px;
+
+          &.loaded {
+            background: var(--element-background);
+          }
+        }
+
+        .alt {
+          font-size: 30px;
+          text-transform: uppercase;
+          color: white;
+        }
+      }
     }
 
     .main {

@@ -11,10 +11,10 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 import SwiperCore from "swiper";
-import { Autoplay } from "swiper/modules";
+import { Autoplay, Navigation } from "swiper/modules";
 import backend from "backend";
 
-SwiperCore.use([Autoplay]);
+SwiperCore.use([Autoplay, Navigation]);
 
 function App() {
   const { startApp } = backend.app();

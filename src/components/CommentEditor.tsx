@@ -79,7 +79,7 @@ const CommentEditor: FC<Props> = ({ onCancel, open = false, element }) => {
         <div className="new-comment">
           <div className="body">
             <div className="img">
-              <UserImage image={metadata?.img} name={metadata?.name} />
+              <UserImage src={metadata?.img} alt={metadata?.name} />
             </div>
             <div className="comment-input-wrapper">
               <div
@@ -145,7 +145,10 @@ const Container = styled.div`
 
       .img {
         height: 40px;
+        min-width: 40px;
         margin-right: 15px;
+        border-radius: 50%;
+        overflow: hidden;
       }
 
       .comment-input-wrapper {
