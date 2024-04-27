@@ -2,23 +2,18 @@ import { FC } from "react";
 import {
   Create,
   Home,
-  Login,
-  Profile,
   TopCompanies,
   VacancyList,
   VacancyPost,
   Chat,
-  EditAccount,
+  Profile,
 } from "pages";
 import styled from "styled-components";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { Navigation } from "layouts";
 import { RequireLogin } from "components";
 
 const MainLayout: FC = () => {
-  const location = useLocation();
-  if (location.pathname === "/login") return <Login />;
-
   return (
     <Container>
       <RequireLogin />
@@ -29,12 +24,10 @@ const MainLayout: FC = () => {
             <Route path="/" element={<Home />}></Route>
             <Route path="/search/vacancy" element={<VacancyList />}></Route>
             <Route path="/vacancy/:id" element={<VacancyPost />}></Route>
-            <Route path="/profile/:id" element={<Profile />}></Route>
             <Route path="/create" element={<Create />}></Route>
-            <Route path="/login" element={<Login />}></Route>
             <Route path="/top-companies" element={<TopCompanies />}></Route>
             <Route path="/chat/:id" element={<Chat />}></Route>
-            <Route path="/profile" element={<EditAccount />}></Route>
+            <Route path="/profile/:id" element={<Profile />}></Route>
           </Routes>
         </MainContent>
       </Content>

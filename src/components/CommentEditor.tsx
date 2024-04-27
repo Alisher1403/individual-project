@@ -149,6 +149,10 @@ const Container = styled.div`
         margin-right: 15px;
         border-radius: 50%;
         overflow: hidden;
+
+        .alt {
+          font-size: 20px;
+        }
       }
 
       .comment-input-wrapper {

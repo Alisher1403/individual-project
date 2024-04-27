@@ -5,18 +5,19 @@ import { AppDispatch } from "store";
 import { api } from "store/reducers";
 import styled from "styled-components";
 
-const Login: FC = () => {
+const SignUpApplicant: FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch() as AppDispatch;
   const [passwordType, setPasswordType] = useState("password");
   const [userExists, setUserExists] = useState(false);
   const [form, setForm] = useState({
+    type: "applicant",
     email: "",
     password: "",
   });
 
-  async function signIn() {
-    dispatch(api.user.signIn(form)).then((e) => {
+  async function signUp() {
+    dispatch(api.user.signUp(form)).then((e) => {
       if (e.payload) {
         setUserExists(false);
       } else {
@@ -28,14 +29,15 @@ const Login: FC = () => {
   return (
     <Container>
       <Content>
-        <h1 className="title">Log In</h1>
+        <h1 className="title">Sign Up</h1>
         <h2 className="subtitle">
-          Enter your email and password to access your account
+          Enter your email and password to create a new <b>applicant</b> account
         </h2>
         <form
+          autoComplete="off"
           onSubmit={(e) => {
             e.preventDefault();
-            signIn();
+            signUp();
           }}
         >
           <div className="form-content">
@@ -45,6 +47,7 @@ const Login: FC = () => {
                 <input
                   type="email"
                   name="email"
+                  autoComplete="off"
                   required
                   onChange={(e) => {
                     setUserExists(false);
@@ -60,12 +63,13 @@ const Login: FC = () => {
                 <input
                   type={passwordType}
                   name="password"
+                  autoComplete="off"
                   required
                   onChange={(e) =>
                     setForm({ ...form, password: e.target.value })
                   }
                 />
-                <div
+                <button
                   onClick={(e) => {
                     e.preventDefault();
                     if (passwordType === "password") {
@@ -78,26 +82,26 @@ const Login: FC = () => {
                   <span className="material-symbols-rounded icon">
                     visibility
                   </span>
-                </div>
+                </button>
               </div>
             </div>
 
             <button type="submit" className="submit-button">
-              Sign In
+              Sign Up
             </button>
           </div>
         </form>
 
         <h2 className="subtitle">
-          Don't have an account?{" "}
-          <button onClick={() => navigate("/signupas")}>Sign Up</button>
+          Already have an account?{" "}
+          <button onClick={() => navigate("/login")}>Log In</button>
         </h2>
       </Content>
     </Container>
   );
 };
 
-export default Login;
+export default SignUpApplicant;
 
 const Container = styled.div`
   width: 100%;

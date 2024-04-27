@@ -20,7 +20,11 @@ const useSearchParams = () => {
     const allParams: any = {};
     for (const [key, value] of searchParams.entries()) {
       if (value !== "undefined") {
-        allParams[key] = isArrayParam(value) ? value.split(",") : value;
+        if (isArrayParam(value)) {
+          allParams[key] = value.split(",");
+        } else {
+          allParams[key] = value;
+        }
       }
     }
     return allParams;
@@ -28,11 +32,14 @@ const useSearchParams = () => {
 
   function set(newParams: object) {
     const existingParams = Object.fromEntries(searchParams.entries());
-    const updatedParams = { ...existingParams, ...newParams };
+    const updatedParams: any = { ...existingParams, ...newParams };
 
     for (const key in updatedParams) {
       if (updatedParams[key] === undefined || updatedParams[key] === null) {
         delete updatedParams[key];
+      }
+      if (Array.isArray(updatedParams[key])) {
+        updatedParams[key] = updatedParams[key]?.join(",");
       }
     }
 

@@ -8,6 +8,7 @@ import InputStateful from "./InputStateful";
 import Grid from "./Grid";
 import Options from "./Options";
 import Modal from "./Modal";
+import MultiSelect from "./MultiSelect";
 
 export {
   Input,
@@ -18,6 +19,7 @@ export {
   Grid,
   Options,
   Modal,
+  MultiSelect,
 };
 
 const UIContext = createContext(

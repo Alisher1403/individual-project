@@ -64,27 +64,29 @@ const Container = styled.div`
 `;
 
 const Wrapper = styled.div`
-  border: var(--border-style);
-  border-radius: 7px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
   overflow: hidden;
   transition: 0.2s;
   padding: var(--input-padding);
   height: var(--input-height);
+  background: var(--element-background);
+  display: flex;
+  align-items: center;
 
   &.focused {
-    border-color: var(--border-focus-bg);
-    box-shadow: 0 0 5px var(--border-focus-bg);
+    border-color: var(--element-color);
+    box-shadow: 0 0 5px var(--element-color);
   }
 
   input {
     outline: none;
     width: 100%;
-    padding: 7px 10px;
     font-size: 14px;
-    font-family: var(--text-font);
+    font-family: var(--font-regular);
     border: none;
     background: none;
-    color: var(--text-font);
+    color: var(--text-color);
 
     &::placeholder {
       color: var(--text-color);

@@ -44,7 +44,7 @@ const user = createSlice({
     });
     builder.addCase(updateMetadata.fulfilled, (state, action) => {
       if (action.payload) {
-        state.metadata = action.payload;
+        state.metadata = action.payload.data;
       }
     });
     builder.addCase(getMetadata.fulfilled, (state, action) => {
@@ -55,6 +55,11 @@ const user = createSlice({
     builder.addCase(updateImg.fulfilled, (state, action) => {
       if (action.payload) {
         state.metadata = action.payload;
+      }
+    });
+    builder.addCase(deleteImg.fulfilled, (state) => {
+      if (state.metadata && state.metadata?.img) {
+        state.metadata.img = null;
       }
     });
   },
@@ -123,7 +128,10 @@ const signIn = createAsyncThunk(
 
 const signUp = createAsyncThunk(
   "signUp",
-  async (form: { email: string; password: string }, { dispatch }) => {
+  async (
+    form: { type: string; email: string; password: string },
+    { dispatch }
+  ) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email: form.email,
@@ -134,20 +142,24 @@ const signUp = createAsyncThunk(
         throw error;
       }
 
-      await supabase.from("user_metadata").upsert(
-        {
-          id: data.user?.id,
-          name: data.user?.email,
-          email: data.user?.email,
-          img: `${Date.now()}.png`,
-        },
-        { onConflict: "id" }
-      );
+      supabase
+        .from("user_metadata")
+        .upsert(
+          {
+            id: data.user?.id,
+            name: data.user?.email,
+            email: data.user?.email,
+            img: null,
+            userType: form.type,
+          },
+          { onConflict: "id" }
+        )
+        .then(() => {
+          window.location.reload();
+        });
 
       await dispatch(signIn(form));
       dispatch(requireLogin(false));
-      window.location.reload();
-      window.location.pathname = "/profile";
 
       return data;
     } catch (error: any) {
@@ -171,7 +183,7 @@ const signOut = createAsyncThunk("signOut", async () => {
 
 const updateMetadata = createAsyncThunk(
   "updateMetadata",
-  async (form: { name: string }, { getState }) => {
+  async (form: { name: string; email: string }, { getState }) => {
     const state = getState() as RootState;
     const user_id = state.user.data?.id;
 
@@ -182,7 +194,7 @@ const updateMetadata = createAsyncThunk(
         .eq("id", user_id)
         .select();
 
-      return data?.[0];
+      return { key: user_id, data: data?.[0] };
     } catch (error: any) {
       console.error("Error fetching user data or refreshing session:", error);
       return { error: error.message };
@@ -254,6 +266,18 @@ const updateImg = createAsyncThunk(
   }
 );
 
+const deleteImg = createAsyncThunk("deleteImg", async (_, { getState }) => {
+  const state = getState() as RootState;
+  const user_id = state.user.data?.id;
+  const img = state.user.metadata?.img;
+
+  if (!user_id && img) return;
+  await supabase.from("user_metadata").update({ img: null }).eq("id", user_id);
+  await supabase.storage.from("images").remove([`${user_id}/${img}.png`]);
+
+  return { key: user_id };
+});
+
 export const userApi = {
   auth: authUser,
   signOut,
@@ -262,5 +286,6 @@ export const userApi = {
   metadata: {
     update: updateMetadata,
     updateImg,
+    deleteImg,
   },
 };

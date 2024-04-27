@@ -13,8 +13,6 @@ import { HomeSwiper } from "components";
 const Home: FC = () => {
   const { data } = backend.home();
 
-  console.log(data.vacancies);
-
   if (data?.vacancies)
     return (
       <Container>

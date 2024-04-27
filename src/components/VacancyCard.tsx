@@ -38,7 +38,7 @@ const VacancyCard: FC<ComponentProps> = ({ element }) => {
                 <span className="material-symbols-rounded icon">
                   visibility
                 </span>
-                {element.views[0].count}
+                {element?.views?.[0]?.count}
               </div>
             </div>
           </div>
@@ -64,6 +64,7 @@ const Content = styled.div`
   border: 1px solid var(--border-color);
   margin: 10px 0;
   cursor: pointer;
+  transition: 0.2s;
 
   &:hover {
     background: var(--element-background-hover);
@@ -83,8 +84,6 @@ const Content = styled.div`
         background: var(--element-color);
 
         img {
-          padding: 5px;
-
           &.loaded {
             background: var(--element-background);
           }

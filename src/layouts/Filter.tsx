@@ -8,12 +8,14 @@ interface FilterProps {}
 
 const Filter: FC<FilterProps> = () => {
   const searchParams = useSearchParams();
-  const { experience, emp_type, education, salary, currency } = searchParams.getAll();
+  const { experience, emp_type, education, salary, currency } =
+    searchParams.getAll();
 
   return (
     <Container>
       <form>
         <Content>
+          <h2 className="title">Apply Filters</h2>
           <Section>
             <p className="section-title">{formData.experience.title}</p>
             <RadioSelect
@@ -69,6 +71,9 @@ const Container = styled.div`
   overflow-y: scroll;
   height: 100%;
   top: 0;
+  background: var(--element-background);
+  padding: 15px;
+  border: 1px solid var(--border-color);
 
   &::-webkit-scrollbar {
     display: none;
@@ -83,14 +88,19 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
-  border-right: 0.5px solid var(--border-color);
-  border-bottom: 0.5px solid var(--border-color);
+  .title {
+    font-size: 17px;
+    font-family: var(--font-semiBold);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    color: var(--element-color);
+  }
 `;
 
 const Section = styled.div`
-  padding: 15px;
-  border-top: 0.5px solid var(--border-color);
+  padding: 15px 0;
   position: relative;
+  border-bottom: 1px solid var(--border-color);
 
   .section-title {
     font-family: var(--font-semiBold);

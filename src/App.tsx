@@ -1,9 +1,9 @@
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { GlobalStyle, Theme } from "./style";
 import { ThemeProvider } from "styled-components";
 import { UIProvider } from "ui";
 import "./index.css";
-import "./App.css";
+import "./App.scss";
 import { MainLayout } from "layouts";
 import "swiper/css";
 import "swiper/css/autoplay";
@@ -13,6 +13,8 @@ import "swiper/css/effect-fade";
 import SwiperCore from "swiper";
 import { Autoplay, Navigation } from "swiper/modules";
 import backend from "backend";
+import Login from "./pages/Login";
+import { SignUpApplicant, SignUpAs, SignUpEmployer } from "pages";
 
 SwiperCore.use([Autoplay, Navigation]);
 
@@ -25,7 +27,13 @@ function App() {
         <ThemeProvider theme={Theme}>
           <UIProvider>
             <GlobalStyle />
-            <MainLayout />
+            <Routes>
+              <Route path="*" element={<MainLayout />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signupas" element={<SignUpAs />} />
+              <Route path="/signup-employer" element={<SignUpEmployer />} />
+              <Route path="/signup-applicant" element={<SignUpApplicant />} />
+            </Routes>
           </UIProvider>
         </ThemeProvider>
       </BrowserRouter>

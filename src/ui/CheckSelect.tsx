@@ -62,7 +62,9 @@ const CheckSelect: FC<Props> = ({ value, options, onChange }) => {
               <div>
                 <Button data-selected={activeElements(elem.value)}>
                   <span className="material-symbols-rounded filled icon">
-                    {activeElements(elem.value) ? "check_box" : "check_box_outline_blank"}
+                    {activeElements(elem.value)
+                      ? "check_box"
+                      : "check_box_outline_blank"}
                   </span>
                 </Button>
                 <Label>{elem.label}</Label>

@@ -10,7 +10,7 @@ interface Props {
 const UserImage: FC<Props> = ({ src, alt }) => {
   const [imageLoaded, setImageLoaded] = useState(true);
 
-  if (src && alt)
+  if (alt)
     return (
       <Container className={`img-container ${imageLoaded && "img-loaded"}`}>
         {src && imageLoaded ? (

@@ -12,6 +12,10 @@ interface Props {
 const Modal: FC<Props> = ({ open, children, onClose, custom, style }) => {
   const [show, setShow] = useState(open);
 
+  useEffect(() => {
+    setShow(open);
+  }, [open]);
+
   function close() {
     setShow(false);
     if (onClose) {

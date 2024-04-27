@@ -89,10 +89,12 @@ const Container = styled.div`
       display: none;
     }
 
-    &:hover {
-      .icon {
-        color: var(--element-color);
-        transform: scale(1.2);
+    @media (hover: hover) {
+      &:hover {
+        .icon {
+          color: var(--element-color);
+          transform: scale(1.2);
+        }
       }
     }
 
@@ -117,8 +119,10 @@ const Container = styled.div`
     padding: 15px 15px 10px;
     transition: 0.1s;
 
-    &:hover {
-      background: var(--element-background-hover);
+    @media (hover: hover) {
+      &:hover {
+        background: var(--element-background-hover);
+      }
     }
 
     .body {
@@ -147,10 +151,6 @@ const Container = styled.div`
           min-width: 20px;
           border-radius: 50%;
           overflow: hidden;
-
-          img {
-            padding: 2px;
-          }
 
           .alt {
             font-size: 12px;
@@ -291,10 +291,6 @@ const Container = styled.div`
         margin-bottom: 10px;
         border-radius: 50%;
         overflow: hidden;
-
-        img {
-          padding: 4px;
-        }
 
         .alt {
           font-size: 25px;

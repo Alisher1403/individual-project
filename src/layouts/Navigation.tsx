@@ -1,19 +1,20 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import styled from "styled-components";
 import { Searchbar } from "layouts";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 import { api } from "store/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store";
-import { imagesBucket } from "backend";
+import UserImage from "../components/UserImage";
+import Options from "../ui/Options";
 
 const Navigation: FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch() as AppDispatch;
   const metadata = useSelector((state: RootState) => state.user.metadata);
   const user = useSelector((state: RootState) => state.user.data);
-  const [imageLoadded, setImageLoaded] = useState(true);
 
   return (
     <Container>
@@ -38,23 +39,43 @@ const Navigation: FC = () => {
           <div className="account">
             {user?.id ? (
               <AccountBtn className="accoun-btn">
-                <div className="account-img">
-                  {metadata?.img && imageLoadded ? (
-                    <img
-                      src={imagesBucket + metadata?.img}
-                      alt=""
-                      onLoad={() => setImageLoaded(true)}
-                      onError={() => setImageLoaded(false)}
-                    />
-                  ) : null}
-                  <span>{metadata?.name[0]}</span>
-                </div>
+                <Options
+                  parent={
+                    <div className="account">
+                      <div className="account-img">
+                        <UserImage src={metadata?.img} alt={metadata?.name} />
+                      </div>
+                      <div className="account-name">{metadata?.name}</div>
+                    </div>
+                  }
+                  options={[
+                    {
+                      label: "Profile",
+                      icon: "person",
+                      onClick: () => {
+                        navigate(`/profile/${user?.id}`);
+                      },
+                    },
+                    {
+                      label: "Log Out",
+                      icon: "logout",
+                      onClick: () => {
+                        dispatch(api.user.signOut());
+                      },
+                    },
+                  ]}
+                />
               </AccountBtn>
-            ) : null}
-          </div>
-          <div className="links-list">
-            <NavLink to={`/login`}>IN</NavLink>
-            <button onClick={() => dispatch(api.user.signOut())}>OUT</button>
+            ) : (
+              <div className="btn-list">
+                <NavLink to={`/login`} className={"custom-btn"}>
+                  Log In
+                </NavLink>
+                <NavLink to={`/signupas`} className={"custom-btn"}>
+                  Sign Up
+                </NavLink>
+              </div>
+            )}
           </div>
         </Section>
       </Content>
@@ -86,42 +107,88 @@ const Section = styled.div`
     column-gap: 15px;
     align-items: center;
 
-    li {
-      a {
-        color: var(--title-color);
-        font-family: var(--font-regular);
-        font-size: 16px;
+    a {
+      color: var(--title-color);
+      font-family: var(--font-regular);
+      font-size: 16px;
+      white-space: nowrap;
 
-        &.active {
-          color: var(--element-color);
-        }
+      &.custom-btn {
+        color: white;
       }
+
+      &.active {
+        color: var(--element-color);
+      }
+    }
+  }
+
+  .btn-list {
+    display: flex;
+    column-gap: 5px;
+    align-items: center;
+
+    .custom-btn {
+      height: 35px;
+      color: var(--title-color);
+      font-family: var(--font-regular);
+      font-size: 15px;
+      white-space: nowrap;
+      color: white;
     }
   }
 `;
 
-const AccountBtn = styled.button`
+const AccountBtn = styled.div`
   background: none;
   border: none;
   cursor: pointer;
+  position: relative;
+  z-index: 1000;
 
-  .account-img {
-    height: 30px;
-    aspect-ratio: 1/1;
-    background: var(--element-background-dark);
-    border-radius: 50%;
-    overflow: hidden;
-    z-index: 2;
+  .account {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    column-gap: 10px;
+    padding: 3px;
+    padding-right: 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border-color);
 
-    img {
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
+    &:hover {
+      background: var(--element-background-hover);
     }
 
-    span {
-      z-index: -1;
-      text-transform: uppercase;
+    .account-img {
+      height: 30px;
+      min-width: 30px;
+      aspect-ratio: 1/1;
+      background: var(--element-background-dark);
+      border-radius: 50%;
+      overflow: hidden;
+
+      .alt {
+        text-transform: uppercase;
+        font-size: 14px;
+      }
     }
+
+    .account-name {
+      white-space: nowrap;
+      font-size: 14px;
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .options-header {
+    border-radius: 100px !important;
+  }
+
+  .options-body {
+    width: 150px;
+    top: calc(100% + 3px);
   }
 `;

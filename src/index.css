@@ -4,6 +4,7 @@
   /* Main */
   --main-bg: #f7f7f7;
   --navigation-height: 80px;
+  --red-color: rgb(255, 56, 56);
 
   /* common */
   --element-color: #7487eb;
@@ -11,7 +12,7 @@
   --element-color-hover: #3a53cf;
   --element-background: white;
   --element-background-dark: rgb(215, 222, 225);
-  --element-background-hover: #ededef;
+  --element-background-hover: rgb(232, 237, 239);
   --content-background: var(--main-bg);
 
   /* fonts */
@@ -70,4 +71,6 @@
 
   /* placeholder */
   --placeholder-color: #a8aabc;
+
+  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
 }

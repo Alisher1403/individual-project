@@ -5,7 +5,7 @@ import { UIContext } from "ui";
 interface Props {
   value: string;
   options: { value: string | undefined; label: string }[];
-  onChange: (value: string | undefined) => void;
+  onChange?: (value: string | undefined) => void;
   width?: string | undefined;
   style?: React.CSSProperties;
 }
@@ -29,7 +29,9 @@ const Select: FC<Props> = ({
   }
 
   function handleClick(params: { value: string | undefined; label: string }) {
-    onChange(params.value);
+    if (onChange) {
+      onChange(params.value);
+    }
     setLabel(params.label);
   }
 
@@ -93,7 +95,7 @@ const Content = styled.div<{ $width: string }>`
 const Selected = styled.button`
   width: 100%;
   display: flex;
-  background: none;
+  background: var(--element-background);
   justify-content: space-between;
   cursor: pointer;
   align-items: center;
@@ -103,7 +105,6 @@ const Selected = styled.button`
   padding: 5px 10px;
   padding-right: 6px;
   height: var(--input-height);
-  background: none;
   transition: 0.2s;
   color: var(--text-color);
   font-family: var(--text-font);
@@ -136,11 +137,10 @@ const OptionsWrapper = styled.div`
   top: calc(100% + 3px);
   position: absolute;
   display: none;
-  background: var(--input-bg);
   z-index: 5;
-  background: var(--input-bg);
-  max-height: 150px;
+  max-height: 250px;
   overflow-y: scroll;
+  background: var(--element-background);
 
   &::-webkit-scrollbar {
     display: none;
