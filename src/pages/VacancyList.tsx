@@ -3,21 +3,59 @@ import { VacancyCard } from "components";
 import backend from "backend";
 import styled from "styled-components";
 import Filter from "../layouts/Filter";
+import Searchbar from "../layouts/Searchbar";
+import useSearchParams from "../hooks/useSearchParams";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const VacancyList: FC = () => {
-  const { data, count, loading, error, pagination } = backend.vacancies();
+  const searchParams = useSearchParams();
+  const { data, count, loading, error, pagination, searchList } =
+    backend.vacancies();
 
   return (
     <Container className="main-container">
+      <div className="searchbar-wrapper">
+        <Searchbar />
+      </div>
+      <div className="top-content">
+        <div className="count">
+          <span className="material-symbols-rounded icon">search</span>{" "}
+          {count ?? 0} vacancies found
+        </div>
+        <div className="search-list">
+          <Swiper slidesPerView={"auto"} freeMode spaceBetween={7}>
+            {searchList.similar.map((e, idx) => {
+              return (
+                <SwiperSlide key={idx}>
+                  <button
+                    className="search custom-btn secondary"
+                    onClick={() => searchParams.set({ text: e.name })}
+                  >
+                    {e.name}
+                  </button>
+                </SwiperSlide>
+              );
+            })}
+            {searchList.others.map((e, idx) => {
+              return (
+                <SwiperSlide key={idx}>
+                  <button
+                    className="search custom-btn secondary"
+                    onClick={() => searchParams.set({ text: e.name })}
+                  >
+                    {e.name}
+                  </button>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+        </div>
+      </div>
       <Content>
         <Aside>
-          <h3>Filters</h3>
           <Filter />
         </Aside>
         <Main>
-          <div className="top-content">
-            <div className="count">{count} items found</div>
-          </div>
           <div>
             <Data>
               <ul>
@@ -41,7 +79,9 @@ const VacancyList: FC = () => {
                   {pagination.first && (
                     <li>
                       <button data-primary onClick={() => pagination.prev()}>
-                        <span className="material-symbols-rounded">chevron_left</span>
+                        <span className="material-symbols-rounded">
+                          chevron_left
+                        </span>
                       </button>
                     </li>
                   )}
@@ -61,7 +101,9 @@ const VacancyList: FC = () => {
                   {pagination.last && (
                     <li>
                       <button data-primary onClick={() => pagination.next()}>
-                        <span className="material-symbols-rounded">chevron_right</span>
+                        <span className="material-symbols-rounded">
+                          chevron_right
+                        </span>
                       </button>
                     </li>
                   )}
@@ -81,6 +123,51 @@ const Container = styled.div`
   background-color: var(--content-background);
   width: 100%;
   padding-bottom: 80px;
+
+  .searchbar-wrapper {
+    margin: 0 auto;
+    max-width: 600px;
+    margin-top: 30px;
+
+    .searchbar {
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      background: var(--element-background);
+    }
+  }
+
+  .top-content {
+    margin-bottom: 20px;
+
+    .search-list {
+      .swiper-slide {
+        width: auto;
+      }
+
+      .custom-btn {
+        white-space: nowrap;
+        height: 35px;
+      }
+    }
+
+    .count {
+      font-family: var(--font-regular);
+      color: var(--text-color-dark);
+      font-size: 14px;
+      display: inline-flex;
+      margin-bottom: 10px;
+      background: var(--border-color);
+      padding: 2px 7px;
+      border-radius: 100px;
+      align-items: center;
+      column-gap: 2px;
+
+      .icon {
+        font-size: 18px;
+        line-height: 0;
+      }
+    }
+  }
 `;
 
 const Data = styled.div`
@@ -125,40 +212,6 @@ const Aside = styled.aside`
 const Main = styled.div`
   width: 100%;
   height: 100%;
-
-  .top-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0 7px;
-
-    .count {
-      font-family: var(--font-regular);
-      color: var(--text-color-dark);
-      font-size: 15px;
-    }
-
-    .btn-group {
-      display: flex;
-      border-radius: 5px;
-      overflow: hidden;
-      border: 1px solid var(--element-color);
-
-      button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: none;
-        background: none;
-        padding: 0 10px;
-        cursor: pointer;
-
-        &[data-active="true"] {
-          background: var(--element-color);
-        }
-      }
-    }
-  }
 `;
 
 const Pagination = styled.div`

@@ -32,19 +32,6 @@ const profile = createSlice({
         }
       }
     });
-    builder.addCase(userApi.metadata.update.fulfilled, (state, action) => {
-      if (action.payload) {
-        const { key, data } = action.payload;
-        state.data[key].metadata = data;
-
-        if (state.data[key]?.posts) {
-          const returnPosts = state.data[key].posts.map((e: any) => {
-            e.user = data;
-          });
-          state.data[key].posts = returnPosts;
-        }
-      }
-    });
   },
 });
 

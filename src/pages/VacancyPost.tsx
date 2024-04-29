@@ -6,10 +6,13 @@ import parse from "html-react-parser";
 import { skills } from "icons";
 import { appData } from "constant";
 import { Link } from "react-router-dom";
-import { Comment, CommentEditor } from "components";
+import { Comment, CommentEditor, UserImage } from "components";
 import SidebarList from "../layouts/SidebarList";
+import { useSelector } from "react-redux";
+import { RootState } from "store";
 
 const VacancyPost: FC = () => {
+  const metadata = useSelector((state: RootState) => state.user.metadata);
   const { data, error, comments, id, methods, user } = backend.vacancy();
 
   if (!data || error) return;
@@ -21,7 +24,7 @@ const VacancyPost: FC = () => {
           <Section_1>
             <div className="p-1">
               <div className="logo">
-                <img src={data.logo} alt="" />
+                <UserImage src={data?.user?.img} alt={data?.user?.name} />
               </div>
               <div className="main">
                 <h3>{data.title}</h3>
@@ -49,23 +52,25 @@ const VacancyPost: FC = () => {
                 </div>
               </div>
               <div className="right">
-                <button
-                  className="apply-btn"
-                  data-applied={!!data?.applied?.[0]}
-                  disabled={!!data?.applied?.[0]}
-                  onClick={methods.apply}
-                >
-                  {data?.applied?.[0] && user?.id ? (
-                    <div className="apply-btn-content">
-                      <span className="material-symbols-rounded icon">
-                        done
-                      </span>{" "}
-                      Applied
-                    </div>
-                  ) : (
-                    <div className="apply-btn-content">Apply</div>
-                  )}
-                </button>
+                {metadata?.userType === "applicant" ? (
+                  <button
+                    className="apply-btn"
+                    data-applied={!!data?.applied?.[0]}
+                    disabled={!!data?.applied?.[0]}
+                    onClick={methods.apply}
+                  >
+                    {data?.applied?.[0] && user?.id ? (
+                      <div className="apply-btn-content">
+                        <span className="material-symbols-rounded icon">
+                          done
+                        </span>{" "}
+                        Applied
+                      </div>
+                    ) : (
+                      <div className="apply-btn-content">Apply</div>
+                    )}
+                  </button>
+                ) : null}
               </div>
             </div>
           </Section_1>
@@ -364,13 +369,14 @@ const Section_2 = styled.div`
   .description {
     font-family: var(--font-regular);
     color: var(--text-color);
+    margin-top: 15px;
 
     h2 {
       font-size: 16px;
       color: var(--title-color);
       font-family: var(--font-bold);
       font-weight: normal;
-      margin-top: 20px;
+      margin-top: 10px;
       margin-bottom: 3px;
     }
 

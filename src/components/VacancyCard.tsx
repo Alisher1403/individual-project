@@ -62,7 +62,7 @@ const Content = styled.div`
   padding: 20px;
   background: var(--element-background);
   border: 1px solid var(--border-color);
-  margin: 10px 0;
+  margin-bottom: 10px;
   cursor: pointer;
   transition: 0.2s;
 

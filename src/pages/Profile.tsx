@@ -1,7 +1,7 @@
 // import { imagesBucket } from "backend";
 import { FC, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
 // import { setUserLoading } from "store/reducers/user";
@@ -13,6 +13,7 @@ import VacancyCard from "../components/VacancyCard";
 const Profile: FC = () => {
   const dispatch = useDispatch() as AppDispatch;
   const id = useParams()?.id;
+  const location = useLocation();
   const user = useSelector((state: RootState) => state.user.data);
   const [editModal, setEditModal] = useState(false);
   const [editData, setEditData] = useState({ name: "", email: "" });
@@ -31,7 +32,7 @@ const Profile: FC = () => {
     if (id) {
       dispatch(api.profile.get(id));
     }
-  }, []);
+  }, [location.pathname]);
 
   const methods = {
     img: {
@@ -159,6 +160,7 @@ const Profile: FC = () => {
             </div>
             <div className="user-info">
               <h1 className="user-name">{metadata?.name}</h1>
+              <p className="user-type">{metadata?.userType}</p>
               <div className="btn-group"></div>
             </div>
           </div>
@@ -166,22 +168,25 @@ const Profile: FC = () => {
           <div className="posts">
             <div className="btn-group">
               {isHost ? (
-                <button
-                  className="custom-btn secondary"
-                  onClick={() => setEditModal(true)}
-                >
-                  <span className="material-symbols-rounded icon custom-btn-icon">
-                    person
-                  </span>
-                  Edit profile
-                </button>
+                <>
+                  <button
+                    className="custom-btn secondary"
+                    onClick={() => setEditModal(true)}
+                  >
+                    <span className="material-symbols-rounded icon custom-btn-icon">
+                      person
+                    </span>
+                    Edit profile
+                  </button>
+
+                  <Link to={`/create`} className="custom-btn secondary">
+                    <span className="material-symbols-rounded">add</span>
+                    Add New Post
+                  </Link>
+                </>
               ) : null}
-              <Link to={`/create`} className="custom-btn secondary">
-                <span className="material-symbols-rounded">add</span>
-                Add New Post
-              </Link>
             </div>
-            <h2 className="title">Latest Posts</h2>
+            <h2 className="title">Posts</h2>
             {posts?.map((item: any, index: number) => {
               return (
                 <div key={index}>
@@ -240,6 +245,15 @@ const Content = styled.div`
     .user-info {
       .user-name {
         font-size: 24px;
+        font-family: var(--font-bold);
+        color: var(--text-color);
+      }
+
+      .user-type {
+        font-size: 16px;
+        text-transform: capitalize;
+        font-family: var(--font-regular);
+        color: var(--text-color);
       }
 
       .edit-btn {

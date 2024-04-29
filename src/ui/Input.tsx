@@ -32,10 +32,11 @@ const Input: FC<Props> = ({ value, type, placeholder, title, onChange }) => {
   }
 
   return (
-    <Container>
+    <Container className="input-container">
       {title ? <span>{title}</span> : null}
-      <Wrapper className={focus}>
+      <Wrapper className={`input-wrapper ${focus}`}>
         <input
+          className="input-input"
           type={defineType}
           placeholder={placeholder}
           value={value}
@@ -54,6 +55,8 @@ export default Input;
 
 const Container = styled.div`
   margin: var(--input-margin);
+  width: 100%;
+  height: 100%;
 
   span {
     font-size: 13px;
@@ -64,7 +67,7 @@ const Container = styled.div`
 `;
 
 const Wrapper = styled.div`
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-color-dark);
   border-radius: 5px;
   overflow: hidden;
   transition: 0.2s;

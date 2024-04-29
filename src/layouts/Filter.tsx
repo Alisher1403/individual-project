@@ -1,6 +1,6 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import styled from "styled-components";
-import { CheckSelect, RadioSelect, InputStateful, Select, Grid } from "ui";
+import { CheckSelect, RadioSelect, Select, Input } from "ui";
 import { formData } from "constant";
 import { useSearchParams } from "hooks";
 
@@ -10,6 +10,8 @@ const Filter: FC<FilterProps> = () => {
   const searchParams = useSearchParams();
   const { experience, emp_type, education, salary, currency } =
     searchParams.getAll();
+
+  const [salaryValue, setSalaryValue] = useState(salary);
 
   return (
     <Container>
@@ -43,19 +45,31 @@ const Filter: FC<FilterProps> = () => {
           <Section>
             <p className="section-title">{formData.salary.title}</p>
 
-            <Grid gap="20px">
-              <InputStateful
+            <div className="salary grid">
+              <Input
                 type="number"
-                value={salary}
-                onPressEnter={(value) => searchParams.set({ salary: value })}
-                onBlur={(value) => searchParams.set({ salary: value })}
+                value={salaryValue}
+                placeholder="type only numbers"
+                onChange={(value) => setSalaryValue(value)}
               />
               <Select
                 value={currency}
                 options={formData.currency.data}
+                width="60px"
                 onChange={(value) => searchParams.set({ currency: value })}
               />
-            </Grid>
+            </div>
+            <div className="end">
+              <button
+                className="custom-btn secondary w-full"
+                onClick={(e) => {
+                  e.preventDefault();
+                  searchParams.set({ salary: salaryValue });
+                }}
+              >
+                Apply salary
+              </button>
+            </div>
           </Section>
         </Content>
       </form>
@@ -106,5 +120,31 @@ const Section = styled.div`
     font-family: var(--font-semiBold);
     font-size: 15px;
     margin-bottom: 10px;
+  }
+
+  .grid {
+    display: flex;
+    column-gap: 5px;
+  }
+
+  .end {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .custom-btn {
+    border-radius: 5px;
+    height: 35px;
+
+    &.w-full {
+      width: 100%;
+    }
+  }
+
+  .salary {
+    .select-header {
+      width: 100%;
+      height: 35px;
+    }
   }
 `;

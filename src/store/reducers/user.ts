@@ -42,11 +42,6 @@ const user = createSlice({
     builder.addCase(signOut.fulfilled, (state) => {
       state.data = null;
     });
-    builder.addCase(updateMetadata.fulfilled, (state, action) => {
-      if (action.payload) {
-        state.metadata = action.payload.data;
-      }
-    });
     builder.addCase(getMetadata.fulfilled, (state, action) => {
       if (action.payload) {
         state.metadata = action.payload;
@@ -188,13 +183,13 @@ const updateMetadata = createAsyncThunk(
     const user_id = state.user.data?.id;
 
     try {
-      const { data } = await supabase
+      await supabase
         .from("user_metadata")
         .update(form)
         .eq("id", user_id)
-        .select();
-
-      return { key: user_id, data: data?.[0] };
+        .then(() => {
+          window.location.reload();
+        });
     } catch (error: any) {
       console.error("Error fetching user data or refreshing session:", error);
       return { error: error.message };

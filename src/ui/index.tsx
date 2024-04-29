@@ -4,7 +4,6 @@ import Input from "./Input";
 import RadioSelect from "./RadioSelect";
 import CheckSelect from "./CheckSelect";
 import Select from "./Select";
-import InputStateful from "./InputStateful";
 import Grid from "./Grid";
 import Options from "./Options";
 import Modal from "./Modal";
@@ -15,7 +14,6 @@ export {
   RadioSelect,
   CheckSelect,
   Select,
-  InputStateful,
   Grid,
   Options,
   Modal,

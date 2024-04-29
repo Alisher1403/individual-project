@@ -20,7 +20,7 @@ import {
 import { supabase } from "backend";
 import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
 import { requireLogin } from "store/reducers/user";
 
@@ -61,6 +61,36 @@ const vacancies = () => {
   const dataKey = JSON.stringify(allSearchParams);
   const page = searchParams.get("page") || "1";
   const searchText = searchParams.get("text") || "";
+
+  const [searchList, setSearchList] = useState({
+    similar: [] as any[],
+    others: [] as any[],
+  });
+
+  useEffect(() => {
+    async function fetch() {
+      const { data: similar } = await supabase
+        .from("search")
+        .select("name")
+        .ilike("name", `%${searchText}%`)
+        .gte("count", 20)
+        .neq("name", searchText)
+        .order("count", { ascending: false })
+        .limit(7);
+
+      const { data: others } = await supabase
+        .from("search")
+        .select("name")
+        .neq("name", searchText)
+        .gte("count", 20)
+        .limit(7);
+
+      if (similar && others) {
+        setSearchList({ similar, others });
+      }
+    }
+    fetch();
+  }, [searchText]);
 
   // Data for the current page
   const mainData = pageData?.[dataKey];
@@ -142,8 +172,6 @@ const vacancies = () => {
         .range(fromIndex, toIndex)
         .order("id", { ascending: false });
 
-      console.log(data);
-
       if (error) {
         throw error;
       } else {
@@ -180,12 +208,20 @@ const vacancies = () => {
   };
 
   // Return relevant variables and functions
-  return { loading, error, data: mainData, count: mainDataCount, pagination };
+  return {
+    loading,
+    error,
+    data: mainData,
+    count: mainDataCount,
+    pagination,
+    searchList,
+  };
 };
 
 const vacancy = () => {
   const params = useParams();
   const dispatch: AppDispatch = useDispatch();
+  const location = useLocation();
   const id = params?.id || "";
 
   const element = useSelector(
@@ -211,7 +247,7 @@ const vacancy = () => {
     if (InCommentsObserver) {
       comments.get();
     }
-  }, [InCommentsObserver]);
+  }, [InCommentsObserver, location.pathname]);
 
   const data = useMemo(() => element, [element]);
   const { error } = useSelector((state: RootState) => state.vacancy.element);
@@ -220,7 +256,7 @@ const vacancy = () => {
     if (id && !data) {
       dispatch(api.vacancy.get(id));
     }
-  }, [id]);
+  }, [id, location.pathname]);
 
   const methods = {
     apply() {
@@ -382,7 +418,7 @@ const searchbar = () => {
       await supabase
         .from("search")
         .select("count")
-        .eq("name", name)
+        .eq("name", name?.toLowerCase())
         .then(async (record) => {
           const currentTimestamp = new Date().toISOString();
           if (record && record.data && record.data[0]) {
@@ -457,11 +493,13 @@ const searchbar = () => {
         // Check if the search input has a non-empty trimmed value
         async function fetchSearches() {
           try {
-            const regexValue = value.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
+            const regexValue = value
+              .replace(/^\s+|\s+$|\s+(?=\s)/g, "")
+              .toLowerCase();
             const { data, error } = await supabase
               .from("search")
               .select("name")
-              .ilike("name", `${regexValue}%`)
+              .ilike("name", `%${regexValue}%`)
               .gte("count", "10");
 
             // Map the retrieved data to a list format with specific properties
@@ -496,7 +534,7 @@ const searchbar = () => {
   useEffect(() => {
     if (searched && Array.isArray(searched)) {
       const arr = searched.filter((elem) => {
-        if (elem.startsWith(value)) {
+        if (elem.includes(value.toLowerCase())) {
           return elem;
         }
       });
@@ -508,7 +546,7 @@ const searchbar = () => {
   useEffect(() => {
     if (searchListData && Array.isArray(searchListData)) {
       const arr = searchListData.filter((elem) => {
-        if (elem.startsWith(value)) {
+        if (elem.includes(value.toLowerCase())) {
           return elem;
         }
       });

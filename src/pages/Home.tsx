@@ -19,7 +19,9 @@ const Home: FC = () => {
         <Content>
           <Header>
             <h1>Find your dream job</h1>
-            <Searchbar />
+            <div className="searchbar-wrapper">
+              <Searchbar />
+            </div>
           </Header>
           <main>
             {data.vacancies?.specializations ? (
@@ -192,6 +194,22 @@ const Header = styled.div`
   h1 {
     margin-top: 30px;
     margin-bottom: 30px;
+  }
+
+  .searchbar-wrapper {
+    margin: 0 auto;
+    max-width: 600px;
+    width: 100%;
+
+    .searchbar {
+      border: 1px solid var(--border-color);
+      background: var(--element-background);
+      border-radius: 5px;
+
+      .searchbar-input {
+        font-size: 16px;
+      }
+    }
   }
 `;
 

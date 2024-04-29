@@ -21,9 +21,9 @@ const Searchbar: FC = () => {
   const listLength = 10;
 
   return (
-    <Container className="container">
+    <Container>
       <SearchInputWrapper>
-        <SearchInput data-focused={focus} data-bg={location.pathname === "/"}>
+        <SearchInput data-focused={focus} className="searchbar">
           <FocusBg data-focus={focus} onClick={() => setFocus(false)} />
           <Top>
             <form onSubmit={(e) => search(value, e)}>
@@ -32,18 +32,27 @@ const Searchbar: FC = () => {
                 type="text"
                 value={value}
                 ref={inputRef}
+                className="searchbar-input"
                 onFocus={() => setFocus(true)}
                 onChange={(e) => setValue(e.target.value)}
                 placeholder="Search for items..."
               />
-              <div className="icon" data-visible={value.length !== 0} onClick={(e) => clearInput(e)}>
+              <div
+                className="icon"
+                data-visible={value.length !== 0}
+                onClick={(e) => clearInput(e)}
+              >
                 <span className="material-symbols-rounded">close</span>
               </div>
             </form>
           </Top>
           {searchedItems && Array.isArray(searchedItems) ? (
             <SearchList data-focus={focus} $height={searchListHeight}>
-              <Line data-focus={searchedItems && Array.isArray(searchedItems) && focus} />
+              <Line
+                data-focus={
+                  searchedItems && Array.isArray(searchedItems) && focus
+                }
+              />
               <ul ref={listRef}>
                 {searchedItems.slice(0, listLength)?.map((elem, idx) => {
                   return (
@@ -52,17 +61,24 @@ const Searchbar: FC = () => {
                         <div className="content">
                           <div className="left">
                             <div className="icon">
-                              <span className="material-symbols-rounded">history</span>
+                              <span className="material-symbols-rounded">
+                                history
+                              </span>
                             </div>
                             <p>
                               <b>{elem.slice(0, value.length)}</b>
                               {elem.slice(value.length)}
                             </p>
                           </div>
-                          <div className="right" onClick={(e) => searchHistory.delete(elem, e)}>
+                          <div
+                            className="right"
+                            onClick={(e) => searchHistory.delete(elem, e)}
+                          >
                             {elem ? (
                               <div className="icon">
-                                <span className="material-symbols-rounded">close</span>
+                                <span className="material-symbols-rounded">
+                                  close
+                                </span>
                               </div>
                             ) : null}
                           </div>
@@ -72,27 +88,31 @@ const Searchbar: FC = () => {
                   );
                 })}
                 {value.length > 0 &&
-                  searchList?.slice(0, listLength - searchedItems.length)?.map((elem, idx) => {
-                    if (!searchedItems.includes(elem)) {
-                      return (
-                        <li key={idx}>
-                          <SearchItems onClick={() => search(elem)}>
-                            <div className="content">
-                              <div className="left">
-                                <div className="icon">
-                                  <span className="material-symbols-rounded">search</span>
+                  searchList
+                    ?.slice(0, listLength - searchedItems.length)
+                    ?.map((elem, idx) => {
+                      if (!searchedItems.includes(elem.toLowerCase())) {
+                        return (
+                          <li key={idx}>
+                            <SearchItems onClick={() => search(elem)}>
+                              <div className="content">
+                                <div className="left">
+                                  <div className="icon">
+                                    <span className="material-symbols-rounded">
+                                      search
+                                    </span>
+                                  </div>
+                                  <p>
+                                    <b>{elem.slice(0, value.length)}</b>
+                                    {elem.slice(value.length)}
+                                  </p>
                                 </div>
-                                <p>
-                                  <b>{elem.slice(0, value.length)}</b>
-                                  {elem.slice(value.length)}
-                                </p>
                               </div>
-                            </div>
-                          </SearchItems>
-                        </li>
-                      );
-                    }
-                  })}
+                            </SearchItems>
+                          </li>
+                        );
+                      }
+                    })}
               </ul>
             </SearchList>
           ) : null}
@@ -108,34 +128,23 @@ const Container = styled.div``;
 
 const SearchInputWrapper = styled.div`
   z-index: 100;
-  max-width: 600px;
   height: 40px;
+  width: 100%;
   position: relative;
-  margin: 0 auto;
 `;
 
 const SearchInput = styled.div`
-  border-radius: 8px;
   overflow: hidden;
   background: var(--content-background);
-  border: var(--border-style);
+  border-bottom: 1px solid var(--border-color);
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-
-  &[data-bg="true"] {
-    background: var(--element-background);
-  }
-
-  &[data-focused="true"] {
-    border-color: var(--border-color-dark);
-    background: var(--element-background);
-  }
 `;
 
 const Top = styled.div`
-  padding-left: 15px;
+  padding-left: 5px;
   padding-right: 10px;
 
   form {
@@ -149,7 +158,7 @@ const Top = styled.div`
       font-family: var(--font-regular);
       color: var(--text-color);
       font-size: 16px;
-      padding: 6px 0;
+      padding: 6px 6px;
       border: none;
       outline: none;
       width: 100%;
@@ -183,7 +192,7 @@ const Top = styled.div`
 const FocusBg = styled.div`
   position: fixed;
   z-index: -1;
-  background-color: #0000001e;
+  background-color: #0000001f;
   transition: 0.2s;
   top: 0;
   left: 0;

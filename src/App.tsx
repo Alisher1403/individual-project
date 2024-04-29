@@ -9,14 +9,14 @@ import "swiper/css";
 import "swiper/css/autoplay";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import "swiper/css/effect-fade";
+import "swiper/css/free-mode";
 import SwiperCore from "swiper";
-import { Autoplay, Navigation } from "swiper/modules";
+import { Autoplay, FreeMode, Navigation, Pagination } from "swiper/modules";
 import backend from "backend";
 import Login from "./pages/Login";
 import { SignUpApplicant, SignUpAs, SignUpEmployer } from "pages";
 
-SwiperCore.use([Autoplay, Navigation]);
+SwiperCore.use([Autoplay, Navigation, Pagination, FreeMode]);
 
 function App() {
   const { startApp } = backend.app();

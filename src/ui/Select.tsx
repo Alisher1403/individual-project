@@ -43,15 +43,18 @@ const Select: FC<Props> = ({
   return (
     <Container style={style}>
       <Content $width={width}>
-        <Selected onClick={componentClick} className={open ? "opened" : ""}>
+        <Selected
+          onClick={componentClick}
+          className={`select-header ${open ? "opened" : ""}`}
+        >
           <p>{label}</p>
           <Icon className={open ? "opened" : ""}>
-            <span className="material-symbols-rounded">
+            <span className="material-symbols-rounded select-icon">
               keyboard_arrow_down
             </span>
           </Icon>
         </Selected>
-        <OptionsWrapper className={open ? "opened" : ""}>
+        <OptionsWrapper className={`select-body ${open ? "opened" : ""}`}>
           <List>
             {options.map((elem, idx) => {
               return (
@@ -108,6 +111,7 @@ const Selected = styled.button`
   transition: 0.2s;
   color: var(--text-color);
   font-family: var(--text-font);
+  height: 100%;
 
   &.opened {
     border-color: var(--element-color);
