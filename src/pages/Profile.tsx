@@ -193,7 +193,7 @@ const Profile: FC = () => {
             {posts?.map((item: any, index: number) => {
               return (
                 <div key={index}>
-                  <VacancyCard index={index} element={item} />
+                  <VacancyCard element={item} link={true} />
                 </div>
               );
             })}
