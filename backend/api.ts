@@ -1,12 +1,6 @@
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "hooks";
-import {
-  setVacancyCount,
-  setVacancyReaction,
-  setVacancyListData,
-  vacancyListError,
-  vacancyListLoading,
-} from "store/reducers/vacancy";
+import { setVacancyReaction, vacancyListLoading } from "store/reducers/vacancy";
 import { useSelector } from "react-redux";
 import {
   FormEvent,
@@ -44,7 +38,7 @@ const app = () => {
 
 const vacancies = () => {
   // Redux
-  const dispatch = useDispatch();
+  const dispatch = useDispatch() as AppDispatch;
   const vacancyState = useSelector((state: RootState) => state.vacancy.list);
 
   // Memoize the result of the useSelector
@@ -118,73 +112,16 @@ const vacancies = () => {
     const fromIndex = (+page - 1) * range;
     const toIndex = fromIndex + range - 1;
 
+    dispatch(
+      api.vacancy.list.get({
+        fromIndex,
+        toIndex,
+        searchParams: allSearchParams,
+        searchText,
+        dataKey,
+      })
+    );
     dispatch(vacancyListLoading(true));
-
-    try {
-      let query = supabase
-        .from("vacancies")
-        .select(
-          `id, created_at, user_id, title, logo, user: user_metadata(name, img), emp_type, location, subtitle, fromSalary, toSalary, currency, experience, views (count)`,
-          { count: "exact" }
-        );
-      // console.log((await query).data);
-
-      // Apply search text filter
-      if (searchText) {
-        const removeSpaces = searchText.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
-        query = query.or(
-          `title.ilike.%${removeSpaces}%,description.ilike.%${removeSpaces}%,specialization.ilike.%${removeSpaces}%,subtitle.ilike.%${removeSpaces}%`
-        );
-      }
-
-      // Utility functions for applying filters
-      const useFilter = {
-        like(params: { value: string; column: string }) {
-          if (params.value) {
-            query = query.filter(params.column, "like", params.value);
-          }
-        },
-        or(params: { value: string[]; column: string }) {
-          if (params.value && params.value.length > 0) {
-            let matchQuery;
-            if (Array.isArray(params.value)) {
-              matchQuery = params.value
-                .map((e) => `${params.column}.ilike.${e}`)
-                .join(",");
-              query = query.or(matchQuery);
-            } else {
-              query = query.or(`${params.column}.ilike.${params.value}`);
-            }
-          }
-        },
-      };
-
-      // Apply additional filters from search parameters
-      useFilter.like({
-        value: allSearchParams.experience,
-        column: "experience",
-      });
-      useFilter.or({ value: allSearchParams.emp_type, column: "emp_type" });
-      useFilter.or({ value: allSearchParams.education, column: "education" });
-
-      // Fetch data from the API
-      const { data, error, count } = await query
-        .range(fromIndex, toIndex)
-        .order("id", { ascending: false });
-
-      if (error) {
-        throw error;
-      } else {
-        dispatch(vacancyListLoading(false));
-        dispatch(setVacancyListData({ key: dataKey, data }));
-
-        if (count) {
-          dispatch(setVacancyCount({ key: dataKey, value: count }));
-        }
-      }
-    } catch (error) {
-      dispatch(vacancyListError(true));
-    }
   }, [dispatch, allSearchParams, page, range, searchParams]);
 
   useEffect(() => {
@@ -591,11 +528,13 @@ const home = () => {
 };
 
 const chats = () => {
-  const params = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch() as AppDispatch;
-  const vacancy_id = params?.id;
   const user_id = useSelector((state: RootState) => state.user.data?.id);
+
+  const currentChat = useSelector(
+    (state: RootState) => state.chats.currentChat
+  );
 
   useEffect(() => {
     if (!user_id) {
@@ -604,7 +543,7 @@ const chats = () => {
   }, []);
 
   const messagesRef = useRef<HTMLDivElement>(null);
-  const key = `${vacancy_id}${user_id}`;
+  const key = `${currentChat}/${user_id}`;
   const messagesList = useSelector(
     (state: RootState) => state.chats.messages[key]
   );
@@ -627,17 +566,13 @@ const chats = () => {
     list: messagesList,
   };
 
-  if (messages.inObserver) {
-    // console.log(true);
-  }
-
   useLayoutEffect(() => {
     scrollToBottom();
   }, []);
 
   useEffect(() => {
-    if (vacancy_id) {
-      dispatch(api.chats.messages.get({ vacancy_id }));
+    if (currentChat) {
+      dispatch(api.chats.messages.get({ vacancy_id: currentChat }));
     }
   }, []);
 

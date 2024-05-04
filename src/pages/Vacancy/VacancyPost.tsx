@@ -1,19 +1,18 @@
 import backend from "backend";
 import { FC } from "react";
 import styled from "styled-components";
-import { formData } from "../constant/formData";
+import { formData } from "../../constant/formData";
 import parse from "html-react-parser";
 import { skills } from "icons";
-import { appData } from "constant";
 import { Link } from "react-router-dom";
-import { Comment, CommentEditor, UserImage } from "components";
-import SidebarList from "../layouts/SidebarList";
-import { useSelector } from "react-redux";
-import { RootState } from "store";
+import { Comment, CommentEditor, VacancyCard } from "components";
+import SidebarList from "../../layouts/SidebarList";
+import { useDispatch } from "react-redux";
+import { setChat } from "store/reducers/chats";
 
 const VacancyPost: FC = () => {
-  const metadata = useSelector((state: RootState) => state.user.metadata);
   const { data, error, comments, id, methods, user } = backend.vacancy();
+  const dispatch = useDispatch();
 
   if (!data || error) return;
 
@@ -21,61 +20,9 @@ const VacancyPost: FC = () => {
     <Container className="main-container">
       <Content>
         <Main>
-          <Section_1>
-            <div className="p-1">
-              <div className="logo">
-                <UserImage src={data?.user?.img} alt={data?.user?.name} />
-              </div>
-              <div className="main">
-                <h3>{data.title}</h3>
-                <Link to={`/profile/${data.user_id}`}>{data?.user?.name}</Link>
-                <p>{data.location}</p>
-              </div>
-              <div className="options">
-                <button>
-                  <span className="material-symbols-rounded icon">
-                    bookmark
-                  </span>
-                </button>
-              </div>
-            </div>
-            <div className="p-2">{data.subtitle}</div>
-            <div className="p-3">
-              <div className="left">
-                <div>{formData.timeAgo(data.created_at)}</div>
-                <div>{formData.emp_type.get(data.emp_type)}</div>
-                <div>
-                  <span className="material-symbols-rounded icon">
-                    visibility
-                  </span>
-                  {data.views[0].count}
-                </div>
-              </div>
-              <div className="right">
-                {metadata?.userType === "applicant" ? (
-                  <button
-                    className="apply-btn"
-                    data-applied={!!data?.applied?.[0]}
-                    disabled={!!data?.applied?.[0]}
-                    onClick={methods.apply}
-                  >
-                    {data?.applied?.[0] && user?.id ? (
-                      <div className="apply-btn-content">
-                        <span className="material-symbols-rounded icon">
-                          done
-                        </span>{" "}
-                        Applied
-                      </div>
-                    ) : (
-                      <div className="apply-btn-content">Apply</div>
-                    )}
-                  </button>
-                ) : null}
-              </div>
-            </div>
-          </Section_1>
+          <VacancyCard element={data} link={false} />
           {/*  */}
-          <Section_4>
+          <Section_1>
             <div className="content">
               <div className="left">
                 <button className="btn">
@@ -89,7 +36,10 @@ const VacancyPost: FC = () => {
               </div>
               <div className="right">
                 <Link
-                  to={`/chat/${id}`}
+                  to={`/chat`}
+                  onClick={() => {
+                    dispatch(setChat(data?.id));
+                  }}
                   data-disabled={!user?.id}
                   className="btn"
                 >
@@ -128,16 +78,16 @@ const VacancyPost: FC = () => {
                 </button>
               </div>
             </div>
-          </Section_4>
+          </Section_1>
           <Section_2>
             {data.description && (
               <div className="p-1">
                 <div className="description">{parse(data.description)}</div>
               </div>
             )}
-            {data.skills ? (
+            {data?.skills && data?.skills.length > 0 ? (
               <div className="p-1">
-                <h3>{appData.titles.skillsRequired}</h3>
+                <h3>Required Skills</h3>
                 <ul data-skills>
                   {data.skills.map(
                     (item: keyof typeof skills, index: number) => {
@@ -165,7 +115,7 @@ const VacancyPost: FC = () => {
             ) : null}
           </Section_2>
           {/*  */}
-          <div>{formData.created_at.get(data)}</div>
+          <div className="created-at">{formData.created_at.get(data)}</div>
 
           <Section_3>
             <div className="title">
@@ -211,145 +161,76 @@ const Container = styled.div`
   color: var(--text-color);
   font-size: 16px;
   padding: 20px;
-
-  .material-symbols-rounded {
-    color: var(--icon-color);
-  }
 `;
 
 const Content = styled.div`
   display: grid;
-  grid-template-columns: auto 350px;
-  column-gap: 30px;
+  grid-template-columns: auto 330px;
+  column-gap: 20px;
   padding: 30px 0;
+
+  .created-at {
+    margin-top: 15px;
+  }
 `;
 
 const Aside = styled.aside``;
-const Main = styled.div``;
+
+const Main = styled.div`
+  width: 100%;
+`;
 
 const Section_1 = styled.div`
-  padding: 20px;
-  padding-bottom: 15px;
-  background: var(--element-background);
-  border: 1px solid var(--border-color);
-  margin-bottom: 10px;
-
-  .p-1 {
-    display: grid;
-    grid-template-columns: 80px auto 40px;
-    column-gap: 20px;
-
-    .logo {
-      aspect-ratio: 1/1;
-      background: var(--element-color);
-      border-radius: 7px;
-    }
-
-    .main {
-      width: 100%;
-
-      h3 {
-        font-family: var(--font-bold);
-        color: var(--title-color-dark);
-        font-size: 20px;
-        margin-bottom: 4px;
-      }
-
-      p {
-        color: var(--text-color);
-      }
-
-      a {
-        color: var(--link-color);
-
-        &:hover {
-          color: var(--link-color-hover);
-        }
-      }
-    }
-
-    .options {
-      button {
-        height: 40px;
-        aspect-ratio: 1/1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: var(--content-background);
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-
-        .icon {
-          font-size: 32px;
-        }
-      }
-    }
-  }
-
-  .p-2 {
-    padding-top: 15px;
-  }
-
-  .p-3 {
-    border-top: 1px solid var(--border-color-dark);
-    padding-top: 10px;
-    margin-top: 20px;
+  .content {
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    .left {
+    .left,
+    .right {
       display: flex;
+      column-gap: 7px;
+    }
 
-      div {
-        display: flex;
-        align-items: center;
-        text-transform: lowercase;
-        column-gap: 2px;
-        border-left: 1px solid var(--border-color);
-        padding: 0 15px;
+    .info {
+      display: flex;
+      align-items: center;
+      column-gap: 5px;
+      font-size: 15px;
+      color: var(--text-color);
 
-        &:first-child {
-          border: none;
-          padding-left: 0;
-        }
-
-        .icon {
-          margin-bottom: -1px;
-          color: var(--text-color);
-        }
+      .icon {
+        font-size: 22px;
+        color: var(--text-color);
       }
     }
 
-    .right {
-      .apply-btn {
-        font-family: var(--font-bold);
-        background-color: var(--element-color);
-        border: 1px solid var(--element-color);
+    .btn {
+      background: var(--element-background);
+      border: 1px solid var(--border-color);
+      padding: 6px 15px;
+      border-radius: 3px;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--element-background-hover);
+      }
+
+      &[data-disabled="true"] {
+        pointer-events: none;
+      }
+
+      .btn-content {
+        display: flex;
+        align-items: center;
+        column-gap: 5px;
         font-size: 15px;
-        padding: 0 35px;
-        height: 30px;
-        border-radius: 3px;
-        cursor: pointer;
+        color: var(--text-color);
+        font-family: var(--font-semiBold);
 
-        * {
-          color: white;
-        }
-
-        &[data-applied="true"] {
-          background-color: transparent;
-          color: var(--element-color);
-
-          * {
-            color: var(--element-color);
-          }
-        }
-
-        .apply-btn-content {
-          display: flex;
-          align-items: center;
-          column-gap: 2px;
+        .icon {
+          font-size: 20px;
+          color: var(--text-color);
         }
       }
     }
@@ -364,12 +245,15 @@ const Section_2 = styled.div`
     color: var(--title-color-light);
     font-family: var(--font-bold);
     font-weight: normal;
+    width: 100%;
   }
 
   .description {
+    width: 100%;
     font-family: var(--font-regular);
     color: var(--text-color);
     margin-top: 15px;
+    word-break: break-all;
 
     h2 {
       font-size: 16px;
@@ -472,63 +356,6 @@ const Section_3 = styled.div`
 
     .loader {
       width: 26px;
-    }
-  }
-`;
-
-const Section_4 = styled.div`
-  .content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .left,
-    .right {
-      display: flex;
-      column-gap: 7px;
-    }
-
-    .info {
-      display: flex;
-      align-items: center;
-      column-gap: 5px;
-      font-size: 15px;
-      color: var(--text-color);
-
-      .icon {
-        font-size: 22px;
-        color: var(--text-color);
-      }
-    }
-
-    .btn {
-      background: var(--element-background);
-      border: 1px solid var(--border-color);
-      padding: 6px 15px;
-      border-radius: 3px;
-      cursor: pointer;
-
-      &:hover {
-        background: var(--element-background-hover);
-      }
-
-      &[data-disabled="true"] {
-        pointer-events: none;
-      }
-
-      .btn-content {
-        display: flex;
-        align-items: center;
-        column-gap: 5px;
-        font-size: 15px;
-        color: var(--text-color);
-        font-family: var(--font-semiBold);
-
-        .icon {
-          font-size: 20px;
-          color: var(--text-color);
-        }
-      }
     }
   }
 `;

@@ -3,13 +3,15 @@ import styled from "styled-components";
 
 interface Props {
   value: string;
-  options: { value: string | undefined; label: string }[];
-  onChange: (value: string | undefined) => void;
+  options: { value: string; label: string }[];
+  onChange?: (value: string) => void;
 }
 
 const RadioSelect: FC<Props> = ({ value, options, onChange }) => {
-  function handleClick(newValue: string | undefined) {
-    onChange(newValue);
+  function handleClick(newValue: string) {
+    if (onChange) {
+      onChange(newValue);
+    }
   }
   return (
     <Container>
@@ -26,7 +28,9 @@ const RadioSelect: FC<Props> = ({ value, options, onChange }) => {
                 <div>
                   <RadioBtn data-selected={elem.value === value}>
                     <span className="material-symbols-rounded icon">
-                      {elem.value === value ? "radio_button_checked" : "radio_button_unchecked"}
+                      {elem.value === value
+                        ? "radio_button_checked"
+                        : "radio_button_unchecked"}
                     </span>
                   </RadioBtn>
                   <Label>{elem.label}</Label>

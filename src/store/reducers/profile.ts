@@ -50,6 +50,7 @@ const getProfile = createAsyncThunk("getProfile", async (id: string) => {
   const { data: posts } = await supabase
     .from(postType)
     .select("*, user: user_metadata(*), views: views(count)")
+    .order("id", { ascending: false })
     .eq("user_id", id);
 
   const data = {

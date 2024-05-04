@@ -36,6 +36,7 @@ const vacancy = createSlice({
       pageData: {},
       count: {},
       filter: {},
+      searchParams: null,
     },
     element: {
       data: {},
@@ -49,6 +50,10 @@ const vacancy = createSlice({
     },
   } as VacancyState,
   reducers: {
+    resetVacancies(state) {
+      state.list.pageData = {};
+      state.element.data = {};
+    },
     vacancyListError(state, action: PayloadAction<boolean>) {
       state.list.error = action.payload;
     },
@@ -276,6 +281,7 @@ export const {
   setVacancyListData,
   setVacancyReaction,
   setCommentReaction,
+  resetVacancies,
 } = vacancy.actions;
 
 export default vacancy.reducer;
@@ -286,6 +292,96 @@ const config = {
 };
 
 /********************************************************************************************************************/
+const getVacancyList = createAsyncThunk(
+  "getVacancyList",
+  async (
+    args: {
+      searchText: string;
+      searchParams: any;
+      fromIndex: number;
+      toIndex: number;
+      dataKey: string;
+    },
+    { getState, dispatch }
+  ) => {
+    const { searchText, searchParams, fromIndex, toIndex, dataKey } = args;
+    const state = getState() as RootState;
+    const user = state.user.data;
+
+    try {
+      let selectString = `id, created_at, user_id, title, user: user_metadata(name, img), remote, emp_type, location, subtitle, fromSalary, toSalary, currency, experience, views (count)`;
+
+      if (user?.id) {
+        selectString += `, applied: applicants(id)`;
+      }
+
+      let query = supabase
+        .from("vacancies")
+        .select(selectString, { count: "exact" });
+
+      if (user?.id) {
+        query = query.eq("applied.user_id", user?.id);
+      }
+
+      // Apply search text filter
+      if (searchText) {
+        const removeSpaces = searchText.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
+        query = query.or(
+          `title.ilike.%${removeSpaces}%,description.ilike.%${removeSpaces}%,specialization.ilike.%${removeSpaces}%,subtitle.ilike.%${removeSpaces}%`
+        );
+      }
+
+      // Utility functions for applying filters
+      const useFilter = {
+        like(params: { value: string; column: string }) {
+          if (params.value) {
+            query = query.filter(params.column, "like", params.value);
+          }
+        },
+        or(params: { value: string[]; column: string }) {
+          if (params.value && params.value.length > 0) {
+            let matchQuery;
+            if (Array.isArray(params.value)) {
+              matchQuery = params.value
+                .map((e) => `${params.column}.ilike.${e}`)
+                .join(",");
+              query = query.or(matchQuery);
+            } else {
+              query = query.or(`${params.column}.ilike.${params.value}`);
+            }
+          }
+        },
+      };
+
+      // Apply additional filters from search parameters
+      useFilter.like({
+        value: searchParams.experience,
+        column: "experience",
+      });
+      useFilter.or({ value: searchParams.emp_type, column: "emp_type" });
+      useFilter.or({ value: searchParams.education, column: "education" });
+
+      // Fetch data from the API
+      const { data, error, count } = await query
+        .range(fromIndex, toIndex)
+        .order("id", { ascending: false });
+
+      if (error) {
+        throw error;
+      } else {
+        dispatch(vacancyListLoading(false));
+        dispatch(setVacancyListData({ key: dataKey, data }));
+
+        if (count) {
+          dispatch(setVacancyCount({ key: dataKey, value: count }));
+        }
+      }
+    } catch (error) {
+      dispatch(vacancyListError(true));
+    }
+  }
+);
+
 const getVacancy = createAsyncThunk(
   "getVacancy",
   async (id: string, { dispatch, getState }) => {
@@ -316,6 +412,60 @@ const getVacancy = createAsyncThunk(
     const { data, error }: any = await query;
 
     return { key: id, data, error };
+  }
+);
+
+const postVacancy = createAsyncThunk(
+  "postVacancy",
+  async (post: any, { getState }) => {
+    const state = getState() as RootState;
+    const user_id = state.user.data?.id;
+
+    if (!user_id) return false;
+
+    const { data } = await supabase
+      .from("vacancies")
+      .insert({ user_id, ...post })
+      .select();
+
+    return data;
+  }
+);
+
+const updateVacancy = createAsyncThunk(
+  "updateVacancy",
+  async (args: { id: string; post: any }, { getState }) => {
+    const { id, post } = args;
+    const state = getState() as RootState;
+    const user_id = state.user.data?.id;
+
+    if (!user_id) return false;
+
+    const { data } = await supabase
+      .from("vacancies")
+      .update(post)
+      .eq("id", id)
+      .select();
+
+    return data;
+  }
+);
+
+const deleteVacancy = createAsyncThunk(
+  "updateVacancy",
+  async (id: string, { getState }) => {
+    const state = getState() as RootState;
+    const user_id = state.user.data?.id;
+
+    if (!user_id) return false;
+
+    const { data } = await supabase
+      .from("vacancies")
+      .delete()
+      .eq("id", id)
+      .select();
+
+    return data;
   }
 );
 
@@ -506,7 +656,11 @@ const PostApplicant = createAsyncThunk(
     await supabase
       .from("applicants")
       .insert({ vacancy_id, user_id })
-      .then(() => dispatch(getVacancy(vacancy_id)));
+      .then(() => {
+        dispatch(getVacancy(vacancy_id));
+      });
+
+    return true;
   }
 );
 
@@ -551,7 +705,13 @@ const PostVacancyLike = createAsyncThunk(
 
 export const vacancyApi = {
   get: getVacancy,
+  post: postVacancy,
+  update: updateVacancy,
+  delete: deleteVacancy,
   like: PostVacancyLike,
+  list: {
+    get: getVacancyList,
+  },
   applicants: {
     post: PostApplicant,
   },

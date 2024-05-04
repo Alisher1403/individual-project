@@ -2,9 +2,9 @@ import { FC } from "react";
 import { VacancyCard } from "components";
 import backend from "backend";
 import styled from "styled-components";
-import Filter from "../layouts/Filter";
-import Searchbar from "../layouts/Searchbar";
-import useSearchParams from "../hooks/useSearchParams";
+import Filter from "../../layouts/Filter";
+import Searchbar from "../../layouts/Searchbar";
+import useSearchParams from "../../hooks/useSearchParams";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 const VacancyList: FC = () => {
@@ -52,9 +52,12 @@ const VacancyList: FC = () => {
         </div>
       </div>
       <Content>
+        {/* ========= FILTER ======== */}
         <Aside>
           <Filter />
         </Aside>
+
+        {/* ========= MAIN ======== */}
         <Main>
           <div>
             <Data>
@@ -63,7 +66,7 @@ const VacancyList: FC = () => {
                   data.map((el: any, idx: any) => (
                     <li key={idx}>
                       <div className="content">
-                        <VacancyCard key={idx} element={el} index={idx} />
+                        <VacancyCard key={idx} element={el} link={true} />
                       </div>
                     </li>
                   ))}
@@ -112,6 +115,7 @@ const VacancyList: FC = () => {
             </div>
           </div>
         </Main>
+        {/* ========= END ======== */}
       </Content>
     </Container>
   );
@@ -194,12 +198,23 @@ const Content = styled.div`
   grid-template-columns: 300px auto;
   column-gap: 15px;
   position: relative;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 250px auto;
+  }
+  @media (max-width: 900px) {
+    display: block;
+  }
 `;
 
 const Aside = styled.aside`
   position: sticky;
   height: 100vh;
   top: 0;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
 
   h3 {
     font-family: var(--font-semiBold);
@@ -210,7 +225,6 @@ const Aside = styled.aside`
 `;
 
 const Main = styled.div`
-  width: 100%;
   height: 100%;
 `;
 

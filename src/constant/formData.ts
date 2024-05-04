@@ -11,12 +11,6 @@ const experience = {
   }[lang],
   data: [
     {
-      value: undefined,
-      label: { eng: "All", rus: "Не имеет значения", fr: "Tous", es: "Todos" }[
-        lang
-      ],
-    },
-    {
       value: "0",
       label: {
         eng: "Without Experience",
@@ -188,7 +182,7 @@ const salary = {
     const { fromSalary: from, toSalary: to, currency: curr } = data;
 
     if (from === 0 && to === 0) {
-      return "Free";
+      return null;
     }
 
     if (from === 0 && to > 0) {
@@ -207,7 +201,7 @@ const salary = {
       return `${to}${currency.get(curr)}`;
     }
 
-    if (from === -1) return null;
+    if (from === -1) return "Free";
   },
 };
 
@@ -400,7 +394,7 @@ const months = {
 
 const currency = {
   data: [
-    { value: undefined, label: "$" },
+    { value: "dollar", label: "$" },
     { value: "soum", label: "сум" },
     { value: "euro", label: "€" },
     { value: "rouble", label: "₽" },

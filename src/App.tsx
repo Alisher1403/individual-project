@@ -13,7 +13,7 @@ import "swiper/css/free-mode";
 import SwiperCore from "swiper";
 import { Autoplay, FreeMode, Navigation, Pagination } from "swiper/modules";
 import backend from "backend";
-import Login from "./pages/Login";
+import Login from "./pages/Login/Login";
 import { SignUpApplicant, SignUpAs, SignUpEmployer } from "pages";
 
 SwiperCore.use([Autoplay, Navigation, Pagination, FreeMode]);

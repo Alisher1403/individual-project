@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { api } from "store/reducers";
 import { useParams } from "react-router-dom";
 import { requireLogin } from "store/reducers/user";
-import { UserImage } from ".";
+import { UserImage } from "..";
 
 interface Props {
   onCancel?: () => void;

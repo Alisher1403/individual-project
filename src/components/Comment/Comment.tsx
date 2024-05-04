@@ -1,6 +1,6 @@
 import { FC, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
-import { formData } from "../constant/formData";
+import { formData } from "../../constant/formData";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store";
 import { Options } from "ui";
@@ -10,7 +10,7 @@ import parse from "html-react-parser";
 import { useParams } from "react-router-dom";
 import { setCommentReaction } from "store/reducers/vacancy";
 import { requireLogin } from "store/reducers/user";
-import { UserImage } from ".";
+import { UserImage } from "..";
 
 interface Props {
   element: any;

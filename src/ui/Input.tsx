@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import styled from "styled-components";
 
 interface Props {
-  value?: string | number;
+  value?: string | number | null;
   type?: "text" | "password" | "number";
   placeholder?: string;
   title?: string;
@@ -10,7 +10,6 @@ interface Props {
 }
 
 const Input: FC<Props> = ({ value, type, placeholder, title, onChange }) => {
-  const defineType = !type || type === "number" ? "text" : type;
   if (!value) value = "";
 
   const [focus, setFocus] = useState("");
@@ -20,14 +19,14 @@ const Input: FC<Props> = ({ value, type, placeholder, title, onChange }) => {
     const val = event.target.value;
 
     if (onChange) {
-      if (type === "number") {
-        if (Number(val) || val.length <= 0) {
-          const defineNumbers = val.replace(/[^0-9]/g, "");
-          onChange(defineNumbers);
-        }
-      } else {
-        onChange(val);
-      }
+      // if (type === "number") {
+      //   if (Number(val) || val.length <= 0) {
+      //     const defineNumbers = val.replace(/[^0-9]/g, "");
+      //     onChange(defineNumbers);
+      //   }
+      // } else {
+      onChange(val);
+      // }
     }
   }
 
@@ -37,7 +36,7 @@ const Input: FC<Props> = ({ value, type, placeholder, title, onChange }) => {
       <Wrapper className={`input-wrapper ${focus}`}>
         <input
           className="input-input"
-          type={defineType}
+          type={type}
           placeholder={placeholder}
           value={value}
           onChange={handleOnChange}
@@ -54,7 +53,6 @@ const Input: FC<Props> = ({ value, type, placeholder, title, onChange }) => {
 export default Input;
 
 const Container = styled.div`
-  margin: var(--input-margin);
   width: 100%;
   height: 100%;
 

@@ -4,8 +4,8 @@ import { UIContext } from "ui";
 
 interface Props {
   value: string;
-  options: { value: string | undefined; label: string }[];
-  onChange?: (value: string | undefined) => void;
+  options: { value: string; label: string }[];
+  onChange?: (value: string) => void;
   width?: string | undefined;
   style?: React.CSSProperties;
 }
@@ -28,7 +28,7 @@ const Select: FC<Props> = ({
     setId(uid);
   }
 
-  function handleClick(params: { value: string | undefined; label: string }) {
+  function handleClick(params: { value: string; label: string }) {
     if (onChange) {
       onChange(params.value);
     }
@@ -41,7 +41,7 @@ const Select: FC<Props> = ({
   }
 
   return (
-    <Container style={style}>
+    <Container style={style} className="select-container">
       <Content $width={width}>
         <Selected
           onClick={componentClick}
@@ -81,8 +81,6 @@ const Select: FC<Props> = ({
 export default Select;
 
 const Container = styled.div`
-  margin: var(--input-margin);
-
   * {
     font-size: var(--input-font-size);
   }

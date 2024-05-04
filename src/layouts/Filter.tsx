@@ -8,7 +8,7 @@ interface FilterProps {}
 
 const Filter: FC<FilterProps> = () => {
   const searchParams = useSearchParams();
-  const { experience, emp_type, education, salary, currency } =
+  const { experience, emp_type, education, remote, salary, currency } =
     searchParams.getAll();
 
   const [salaryValue, setSalaryValue] = useState(salary);
@@ -18,14 +18,25 @@ const Filter: FC<FilterProps> = () => {
       <form>
         <Content>
           <h2 className="title">Apply Filters</h2>
+
           <Section>
             <p className="section-title">{formData.experience.title}</p>
             <RadioSelect
-              value={experience}
-              options={formData.experience.data}
-              onChange={(value) => searchParams.set({ experience: value })}
+              value={experience || ""}
+              options={[
+                { value: "", label: "All" },
+                ...formData.experience.data,
+              ]}
+              onChange={(value) => {
+                if (value === "") {
+                  searchParams.set({ experience: undefined });
+                } else {
+                  searchParams.set({ experience: value });
+                }
+              }}
             />
           </Section>
+
           <Section>
             <p className="section-title">{formData.emp_type.title}</p>
             <CheckSelect
@@ -34,6 +45,7 @@ const Filter: FC<FilterProps> = () => {
               onChange={(value) => searchParams.set({ emp_type: value })}
             />
           </Section>
+
           <Section>
             <p className="section-title">{formData.education.title}</p>
             <CheckSelect
@@ -42,10 +54,28 @@ const Filter: FC<FilterProps> = () => {
               onChange={(value) => searchParams.set({ education: value })}
             />
           </Section>
+
+          <Section>
+            <p className="section-title">Remote job</p>
+            <CheckSelect
+              value={remote || "false"}
+              options={[{ value: "true", label: "Remote" }]}
+              onChange={(value) => {
+                if (value) {
+                  if (value[0] === "false") {
+                    searchParams.set({ remote: true });
+                  } else if (value[0] === "true") {
+                    searchParams.set({ remote: undefined });
+                  }
+                }
+              }}
+            />
+          </Section>
+
           <Section>
             <p className="section-title">{formData.salary.title}</p>
 
-            <div className="salary grid">
+            <div className="salary grid mb">
               <Input
                 type="number"
                 value={salaryValue}
@@ -53,7 +83,7 @@ const Filter: FC<FilterProps> = () => {
                 onChange={(value) => setSalaryValue(value)}
               />
               <Select
-                value={currency}
+                value={currency ? currency : "dollar"}
                 options={formData.currency.data}
                 width="60px"
                 onChange={(value) => searchParams.set({ currency: value })}
@@ -88,6 +118,7 @@ const Container = styled.div`
   background: var(--element-background);
   padding: 15px;
   border: 1px solid var(--border-color);
+  border-radius: 10px;
 
   &::-webkit-scrollbar {
     display: none;
@@ -115,6 +146,10 @@ const Section = styled.div`
   padding: 15px 0;
   position: relative;
   border-bottom: 1px solid var(--border-color);
+
+  .mb {
+    margin-bottom: 5px;
+  }
 
   .section-title {
     font-family: var(--font-semiBold);

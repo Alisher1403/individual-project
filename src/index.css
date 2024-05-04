@@ -4,7 +4,9 @@
   /* Main */
   --main-bg: #f7f7f7;
   --navigation-height: 65px;
-  --red-color: rgb(255, 56, 56);
+  --red-color: rgba(244, 79, 79, 0.868);
+  --green-color: rgba(70, 219, 85, 0.879);
+  --orange-color: rgba(242, 141, 79, 0.867);
 
   /* common */
   --element-color: #7487eb;

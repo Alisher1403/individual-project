@@ -7,11 +7,12 @@ import {
   VacancyPost,
   Chat,
   Profile,
+  Edit,
 } from "pages";
 import styled from "styled-components";
 import { Route, Routes } from "react-router-dom";
 import { Navigation } from "layouts";
-import { RequireLogin } from "components";
+import { RequireLogin, ModalsList } from "components";
 
 const MainLayout: FC = () => {
   return (
@@ -25,12 +26,14 @@ const MainLayout: FC = () => {
             <Route path="/search/vacancy" element={<VacancyList />}></Route>
             <Route path="/vacancy/:id" element={<VacancyPost />}></Route>
             <Route path="/create" element={<Create />}></Route>
+            <Route path="/edit/:id" element={<Edit />}></Route>
             <Route path="/top-companies" element={<TopCompanies />}></Route>
-            <Route path="/chat/:id" element={<Chat />}></Route>
+            <Route path="/chat" element={<Chat />}></Route>
             <Route path="/profile/:id" element={<Profile />}></Route>
           </Routes>
         </MainContent>
       </Content>
+      <ModalsList />
     </Container>
   );
 };

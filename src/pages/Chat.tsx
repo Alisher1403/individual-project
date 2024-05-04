@@ -12,12 +12,20 @@ const Chat: FC = () => {
         <Main>
           <Header></Header>
           <Messages ref={messages.ref}>
-            <div className="loading-animation" ref={messages.observer} data-loading={messages.loading}></div>
+            <div
+              className="loading-animation"
+              ref={messages.observer}
+              data-loading={messages.loading}
+            ></div>
             <ul className="messages-list">
               {messages?.list
                 ? messages.list.map((item, index) => {
                     return (
-                      <li key={index} className="message" data-self-message={item?.sender_id === user_id}>
+                      <li
+                        key={index}
+                        className="message"
+                        data-self-message={item?.sender_id === user_id}
+                      >
                         <div className="message-content">{item.message}</div>
                       </li>
                     );

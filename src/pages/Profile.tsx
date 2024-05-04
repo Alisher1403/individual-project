@@ -8,7 +8,7 @@ import { api } from "store/reducers";
 import styled from "styled-components";
 import { Modal } from "ui";
 import UserImage from "../components/UserImage";
-import VacancyCard from "../components/VacancyCard";
+import VacancyCard from "../components/Vacancy/VacancyCard";
 
 const Profile: FC = () => {
   const dispatch = useDispatch() as AppDispatch;
@@ -56,6 +56,7 @@ const Profile: FC = () => {
   if (metadata)
     return (
       <Container>
+        {/*  */}
         <UserEdit>
           <div className="modal">
             <Modal open={editModal} onClose={() => setEditModal(false)}>
@@ -153,6 +154,8 @@ const Profile: FC = () => {
             </Modal>
           </div>
         </UserEdit>
+
+        {/*  */}
         <Content>
           <div className="header">
             <div className="user-img">

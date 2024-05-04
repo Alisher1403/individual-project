@@ -14,7 +14,7 @@ const HomeSwiper: FC<Props> = ({ children, delay }) => {
   const prevBtn = useRef(null);
 
   const swiperConfig: SwiperOptions = {
-    spaceBetween: 5,
+    spaceBetween: 7,
     speed: 300,
     autoplay: { delay: delay ?? 4000 },
     slidesPerView: 2.2,
@@ -112,6 +112,7 @@ const Container = styled.div`
     height: 100%;
     background-color: var(--element-background);
     border: 1px solid var(--border-color-light);
+    border-radius: 10px;
     padding: 0 15px;
     display: flex;
     flex-direction: column;
@@ -286,22 +287,47 @@ const Container = styled.div`
       padding: 12px 0;
 
       .logo {
-        height: 60px;
-        aspect-ratio: 1/1;
+        height: 65px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
         margin-bottom: 10px;
-        border-radius: 50%;
-        overflow: hidden;
 
-        .alt {
-          font-size: 25px;
+        .img-container {
+          background: none;
+
+          &.false {
+            background: var(--element-background-hover);
+            border-radius: 15px;
+            border: 1px solid var(--border-color-light);
+
+            .alt {
+              color: var(--text-color);
+            }
+          }
+
+          img {
+            width: 100%;
+            background: none;
+            object-fit: contain;
+          }
+
+          .alt {
+            background: none;
+            font-size: 25px;
+          }
         }
       }
 
-      .title {
-        margin-bottom: 10px;
-        font-size: 17px;
-        text-align: center;
-        padding: 0 20px;
+      .user-info {
+        width: 100%;
+
+        .title {
+          margin-bottom: 10px;
+          font-size: 17px;
+          text-align: center;
+          padding: 0 20px;
+        }
       }
 
       .subtitle {

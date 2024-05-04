@@ -5,6 +5,7 @@ import sidebar from "./sidebar";
 import home from "./home";
 import chats from "./chats";
 import profile from "./profile";
+import modals from "./modals";
 import { combineReducers } from "@reduxjs/toolkit";
 import { vacancyApi } from "./vacancy";
 import { homeApi } from "./home";
@@ -20,6 +21,7 @@ export const rootReducer = combineReducers({
   sidebar,
   home,
   chats,
+  modals,
 });
 
 export const api = {

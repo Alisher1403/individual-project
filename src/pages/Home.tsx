@@ -148,7 +148,9 @@ const Home: FC = () => {
                                 <div className="logo">
                                   <UserImage src={item?.img} alt={item?.name} />
                                 </div>
-                                <h3 className="title">{item.name}</h3>
+                                <div className="user-info">
+                                  <h3 className="title">{item.name}</h3>
+                                </div>
                                 {item?.description ? (
                                   <div className="description">
                                     <div className="description-content">
