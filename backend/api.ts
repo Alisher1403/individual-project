@@ -56,34 +56,14 @@ const vacancies = () => {
   const page = searchParams.get("page") || "1";
   const searchText = searchParams.get("text") || "";
 
-  const [searchList, setSearchList] = useState({
-    similar: [] as any[],
-    others: [] as any[],
-  });
+  const searchList = useSelector(
+    (state: RootState) => state.vacancy.searchList?.[searchText]
+  );
 
   useEffect(() => {
-    async function fetch() {
-      const { data: similar } = await supabase
-        .from("search")
-        .select("name")
-        .ilike("name", `%${searchText}%`)
-        .gte("count", 20)
-        .neq("name", searchText)
-        .order("count", { ascending: false })
-        .limit(7);
-
-      const { data: others } = await supabase
-        .from("search")
-        .select("name")
-        .neq("name", searchText)
-        .gte("count", 20)
-        .limit(7);
-
-      if (similar && others) {
-        setSearchList({ similar, others });
-      }
+    if (!searchList) {
+      dispatch(api.vacancy.search.get(searchText));
     }
-    fetch();
   }, [searchText]);
 
   // Data for the current page
@@ -323,7 +303,7 @@ const searchbar = () => {
       event.preventDefault();
     }
 
-    navigate({ pathname: "/search/vacancy", search: `text=${value}&page=1` });
+    navigate({ search: `text=${value}&page=1` });
 
     setFocus(false);
     inputRef.current?.blur();
@@ -579,4 +559,100 @@ const chats = () => {
   return { messages, user_id };
 };
 
-export default { vacancies, vacancy, searchbar, home, chats, app };
+const resumes = () => {
+  // Redux
+  const dispatch = useDispatch() as AppDispatch;
+  const resumeState = useSelector((state: RootState) => state.resume.list);
+
+  // Memoize the result of the useSelector
+  const memoizedState = useMemo(() => resumeState, [resumeState]);
+
+  const { loading, range, data, count } = memoizedState;
+
+  // Location and search parameters
+  const searchParams = useSearchParams();
+  const allSearchParams = searchParams.getAll();
+
+  const dataKey = JSON.stringify(allSearchParams);
+  const page = searchParams.get("page") || "1";
+  const searchText = searchParams.get("text") || "";
+
+  const searchList = useSelector(
+    (state: RootState) => state.vacancy.searchList?.[searchText]
+  );
+
+  useEffect(() => {
+    if (!searchList) {
+      dispatch(api.vacancy.search.get(searchText));
+    }
+  }, [searchText]);
+
+  // Data for the current page
+  const mainData = data?.[dataKey];
+  const mainDataCount = count;
+
+  // State for pagination
+  const [mainPagesList, setMainPagesList] = useState<number[]>([]);
+
+  useEffect(() => {
+    // Set default page if not provided
+    if (!page) {
+      searchParams.set({ page: "1" });
+    }
+
+    // Calculate the list of pages based on the total count and range
+    const pagesCount = Array.from(
+      { length: Math.ceil(mainDataCount / range) },
+      (_, i) => i + 1
+    );
+    setMainPagesList(pagesCount);
+  }, [mainDataCount]);
+
+  // Fetch data from the API
+  const fetchData = useCallback(async () => {
+    const fromIndex = (+page - 1) * range;
+    const toIndex = fromIndex + range - 1;
+
+    dispatch(
+      api.resume.list.get({
+        fromIndex,
+        toIndex,
+        searchParams: allSearchParams,
+        searchText,
+        dataKey,
+      })
+    );
+    dispatch(vacancyListLoading(true));
+  }, [dispatch, allSearchParams, page, range, searchParams]);
+
+  useEffect(() => {
+    // Fetch data on component mount if data for the current page is not available
+    if (!mainData) {
+      fetchData();
+    }
+  }, [dataKey]);
+
+  // Pagination object
+  const pagination = {
+    list: mainPagesList,
+    current: +page,
+    last:
+      mainPagesList.length > 0 &&
+      mainPagesList[mainPagesList.length - 1] > +page,
+    first: +page > 1 && mainData,
+    page: (index: number) => searchParams.set({ page: `${index}` }),
+    prev: () => searchParams.set({ page: `${+page - 1}` }),
+    next: () => searchParams.set({ page: `${+page + 1}` }),
+  };
+
+  // Return relevant variables and functions
+  return {
+    loading,
+    data: mainData,
+    count: mainDataCount,
+    pagination,
+    searchList,
+  };
+};
+
+export default { vacancies, vacancy, searchbar, home, chats, app, resumes };

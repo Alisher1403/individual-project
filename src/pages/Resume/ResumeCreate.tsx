@@ -12,19 +12,13 @@ import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
 import { resetVacancies } from "store/reducers/vacancy";
 import { useNavigate } from "react-router-dom";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
 
-const VacancyCreate: FC = () => {
+const ResumeCreate: FC = () => {
   const dispatch = useDispatch() as AppDispatch;
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.user.data);
-  const [exactSalary, setExactSalary] = useState(false);
-
-  const ages = [...Array(60 - 10 + 1).keys()]
-    .map((i) => i + 10)
-    .map((e) => ({
-      value: String(e),
-      label: String(e),
-    }));
 
   if (!user?.id) return;
 
@@ -35,14 +29,12 @@ const VacancyCreate: FC = () => {
     specialization: "...",
     description: "",
     skills: [] as string[],
-    fromSalary: 0,
-    toSalary: 0,
+    salary: 0,
     currency: "dollar" as string,
     emp_type: null as string | null,
     experience: null as string | null,
     education: null as string | null,
-    fromAge: null as null | number | string,
-    toAge: null as null | number | string,
+    dob: null as null | string,
     remote: false,
     contacts: [],
   });
@@ -114,43 +106,19 @@ const VacancyCreate: FC = () => {
           <InputWrapper>
             <p className="label">Salary</p>
             <p className="margin-y">
-              {formData.salary.get({
-                fromSalary: post.fromSalary,
-                toSalary: post.toSalary,
-                currency: post.currency,
-              })}
+              {post.salary}
+              {formData.currency.get(post.currency)}
             </p>
             <Grid>
               <div className="flex">
-                {!exactSalary ? <p className="title">from</p> : null}
                 <Input
-                  value={post.fromSalary || 0}
+                  value={post.salary}
                   type="number"
                   onChange={(value) => {
-                    if (!exactSalary) {
-                      setPost({ ...post, fromSalary: Number(value) });
-                    } else {
-                      setPost({
-                        ...post,
-                        fromSalary: Number(value),
-                        toSalary: Number(value),
-                      });
-                    }
+                    setPost({ ...post, salary: Number(value) });
                   }}
                 />
               </div>
-              {!exactSalary ? (
-                <div className="flex">
-                  <p className="title">to</p>
-                  <Input
-                    value={post.toSalary || 0}
-                    type="number"
-                    onChange={(value) =>
-                      setPost({ ...post, toSalary: Number(value) })
-                    }
-                  />
-                </div>
-              ) : null}
               <Select
                 value={post.currency ? post.currency : "dollar"}
                 options={formData.currency.data}
@@ -160,53 +128,28 @@ const VacancyCreate: FC = () => {
                 }}
               />
             </Grid>
-            <div className="margin-t">
-              <CheckSelect
-                value={String(exactSalary)}
-                options={[{ value: "true", label: "Exact salary" }]}
-                onChange={(value) => {
-                  if (value && value[0] === "false") {
-                    setExactSalary(true);
-                    setPost({ ...post, toSalary: post.fromSalary });
-                  } else {
-                    setExactSalary(false);
-                    setPost({ ...post, toSalary: 0 });
-                  }
-                }}
-              />
-            </div>
           </InputWrapper>
         </Section>
 
         {/* ========= AGE ========== */}
         <Section>
           <InputWrapper>
-            <p className="label">
-              Age - From {post.fromAge} to {post.toAge}
-            </p>
-
-            <Grid>
-              <div className="flex">
-                <p className="title">from</p>
-                <Select
-                  value={String(post.fromAge || "")}
-                  options={[{ value: "", label: "..." }, ...ages]}
-                  onChange={(value) =>
-                    setPost({ ...post, fromAge: Number(value) })
+            <p className="label">Date of birth</p>
+            <p className="margin-y">{}</p>
+            <div className="dob">
+              <DatePicker
+                picker="date"
+                format={"DD.MM.YYYY"}
+                onChange={(value) => {
+                  if (value) {
+                    const timestamptz = dayjs(value).toISOString();
+                    setPost({ ...post, dob: timestamptz });
+                  } else {
+                    setPost({ ...post, dob: null });
                   }
-                />
-              </div>
-              <div className="flex">
-                <p className="title">to</p>
-                <Select
-                  value={String(post.toAge || "")}
-                  options={[{ value: "", label: "..." }, ...ages]}
-                  onChange={(value) =>
-                    setPost({ ...post, toAge: Number(value) })
-                  }
-                />
-              </div>
-            </Grid>
+                }}
+              />
+            </div>
           </InputWrapper>
         </Section>
 
@@ -332,7 +275,7 @@ const VacancyCreate: FC = () => {
   );
 };
 
-export default VacancyCreate;
+export default ResumeCreate;
 
 const Container = styled.div``;
 
@@ -500,6 +443,10 @@ const InputWrapper = styled.div`
       width: 100%;
       padding: 10px;
     }
+  }
+
+  .dob {
+    display: flex;
   }
 `;
 

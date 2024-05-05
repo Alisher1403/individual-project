@@ -1,6 +1,5 @@
 import { imagesBucket } from "backend";
-import { FC, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { FC, useState } from "react";
 import { styled } from "styled-components";
 
 interface Props {
@@ -9,27 +8,24 @@ interface Props {
 }
 
 const UserImage: FC<Props> = ({ src, alt }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    setImageLoaded(false);
-  }, [location.pathname]);
+  const [loaded, setLoaded] = useState(false);
 
   if (alt)
     return (
-      <Container className={`img-container ${imageLoaded && "img-loaded"}`}>
+      <Container className={`img-container ${loaded ? "loaded" : ""}`}>
         {src ? (
           <img
             src={imagesBucket + src}
-            className={`${imageLoaded ? "loaded" : "unloaded"}`}
-            onLoad={() => {
-              setImageLoaded(true);
+            alt=""
+            onError={(e: any) => {
+              e.target.style.display = "none";
             }}
-            onError={() => setImageLoaded(false)}
+            onLoad={() => {
+              setLoaded(true);
+            }}
           />
         ) : null}
-        <span className="alt">{alt[0]}</span>
+        {!loaded && <span className="alt">{alt[0]}</span>}
       </Container>
     );
 };
@@ -53,18 +49,6 @@ const Container = styled.div`
     height: 100%;
     width: 100%;
     object-fit: cover;
-
-    &.loaded {
-      background: var(--element-background-dark);
-    }
-
-    &.unloaded {
-      display: none;
-    }
-  }
-
-  .img-check {
-    display: none;
   }
 
   .alt {

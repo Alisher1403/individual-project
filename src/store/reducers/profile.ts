@@ -46,12 +46,16 @@ const getProfile = createAsyncThunk("getProfile", async (id: string) => {
   if (!metadata) return;
   const userType = metadata[0]?.userType;
   const postType = userType === "employer" ? "vacancies" : "resumes";
+  const viewType =
+    userType === "employer" ? "vacancy_views(count)" : "resume_views(count)";
 
-  const { data: posts } = await supabase
+  let query = supabase
     .from(postType)
-    .select("*, user: user_metadata(*), views: views(count)")
+    .select(`*, user: user_metadata(*), ${viewType}`)
     .order("id", { ascending: false })
     .eq("user_id", id);
+
+  const { data: posts } = await query;
 
   const data = {
     metadata: metadata[0],

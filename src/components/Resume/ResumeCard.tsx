@@ -6,25 +6,22 @@ import { UserImage } from "..";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store";
 import { setVacancyDelete } from "store/reducers/modals";
-import { api } from "store/reducers";
-import { requireLogin } from "store/reducers/user";
 
 interface ComponentProps {
   element: any;
   link: boolean;
 }
 
-const VacancyCard: FC<ComponentProps> = ({ element, link }) => {
+const ResumeCard: FC<ComponentProps> = ({ element, link }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch() as AppDispatch;
   const user = useSelector((state: RootState) => state.user.data);
-  const metadata = useSelector((state: RootState) => state.user.metadata);
 
   const ContanteWrapper = (args: { children: any }) => {
     const { children } = args;
     if (link) {
       return (
-        <Link className="link" to={`/vacancy/${element.id}`}>
+        <Link className="link" to={`/resume/${element.id}`}>
           {children}
         </Link>
       );
@@ -131,35 +128,6 @@ const VacancyCard: FC<ComponentProps> = ({ element, link }) => {
                 {element?.views?.[0]?.count}
               </div>
             </div>
-            {metadata?.userType === "applicant" ? (
-              <div className="right">
-                <button
-                  className="apply-btn"
-                  data-applied={!!element?.applied?.[0]}
-                  disabled={!!element?.applied?.[0]}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    if (user?.id && element?.id) {
-                      dispatch(api.vacancy.applicants.post(element?.id));
-                    } else {
-                      dispatch(requireLogin(true));
-                    }
-                  }}
-                >
-                  {element?.applied?.[0] && user?.id ? (
-                    <div className="apply-btn-content">
-                      <span className="material-symbols-rounded icon">
-                        done
-                      </span>{" "}
-                      Applied
-                    </div>
-                  ) : (
-                    <div className="apply-btn-content">Apply</div>
-                  )}
-                </button>
-              </div>
-            ) : null}
           </div>
         </Content>
       </ContanteWrapper>
@@ -167,7 +135,7 @@ const VacancyCard: FC<ComponentProps> = ({ element, link }) => {
   );
 };
 
-export default VacancyCard;
+export default ResumeCard;
 
 //! =================================================================== STYLE =================================================================== !//
 

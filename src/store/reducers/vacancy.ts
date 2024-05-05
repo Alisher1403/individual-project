@@ -24,6 +24,9 @@ interface VacancyState {
     count: { [key: string]: number };
     loading: boolean;
   };
+  searchList: {
+    [key: string]: { similar: any[] | null; others: any[] | null };
+  };
 }
 
 const vacancy = createSlice({
@@ -48,6 +51,7 @@ const vacancy = createSlice({
       count: {},
       loading: false,
     },
+    searchList: {},
   } as VacancyState,
   reducers: {
     resetVacancies(state) {
@@ -269,6 +273,14 @@ const vacancy = createSlice({
         }
       }
     });
+
+    builder.addCase(getSearchList.fulfilled, (state, action) => {
+      if (action.payload) {
+        const { data, key } = action.payload;
+        state.searchList[key] = data;
+        console.log(data);
+      }
+    });
   },
 });
 
@@ -292,6 +304,32 @@ const config = {
 };
 
 /********************************************************************************************************************/
+const getSearchList = createAsyncThunk(
+  "getSearchList",
+  async (searchText: string) => {
+    const { data: similar } = await supabase
+      .from("search")
+      .select("name")
+      .ilike("name", `%${searchText}%`)
+      .gte("count", 20)
+      .neq("name", searchText)
+      .order("count", { ascending: false })
+      .limit(7);
+
+    const { data: others } = await supabase
+      .from("search")
+      .select("name")
+      .gte("count", 20)
+      .neq("name", searchText)
+      .order("count", { ascending: false })
+      .limit(10);
+
+    if (similar || others) {
+      return { key: searchText, data: { similar, others } };
+    }
+  }
+);
+
 const getVacancyList = createAsyncThunk(
   "getVacancyList",
   async (
@@ -309,7 +347,7 @@ const getVacancyList = createAsyncThunk(
     const user = state.user.data;
 
     try {
-      let selectString = `id, created_at, user_id, title, user: user_metadata(name, img), remote, emp_type, location, subtitle, fromSalary, toSalary, currency, experience, views (count)`;
+      let selectString = `id, created_at, user_id, title, user: user_metadata(name, img), remote, emp_type, location, subtitle, fromSalary, toSalary, currency, experience, views: vacancy_views (count)`;
 
       if (user?.id) {
         selectString += `, applied: applicants(id)`;
@@ -709,6 +747,9 @@ export const vacancyApi = {
   update: updateVacancy,
   delete: deleteVacancy,
   like: PostVacancyLike,
+  search: {
+    get: getSearchList,
+  },
   list: {
     get: getVacancyList,
   },

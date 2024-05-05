@@ -7,6 +7,8 @@ import UserImage from "./UserImage";
 import HomeSwiper from "./HomeSwiper";
 import VacancyDelete from "./Modals/VacancyDelete";
 import ModalsList from "./Modals";
+import ResumeExperience from "./Resume/ResumeExperience";
+import ResumeCard from "./Resume/ResumeCard";
 
 export {
   VacancyCard,
@@ -18,4 +20,6 @@ export {
   HomeSwiper,
   VacancyDelete,
   ModalsList,
+  ResumeExperience,
+  ResumeCard,
 };

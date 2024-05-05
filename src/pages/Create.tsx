@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "store";
-import { VacancyCreate } from "pages";
+import { ResumeCreate, VacancyCreate } from "pages";
 import { Navigate } from "react-router-dom";
 
 const Create: FC = () => {
@@ -16,7 +16,7 @@ const Create: FC = () => {
   }
 
   if (userType === "applicant") {
-    return <div></div>;
+    return <ResumeCreate />;
   }
   if (userType === "employer") {
     return <VacancyCreate />;

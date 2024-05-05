@@ -251,3 +251,14 @@ h6 {
   line-height: 140%;
   color: var(--text-color);
 }
+
+.custom-icon-text {
+  display: flex;
+  align-items: center;
+  column-gap: 2px;
+  font-size: 15px;
+
+  .icon {
+    font-size: 18px;
+  }
+}

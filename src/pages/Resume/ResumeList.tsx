@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { VacancyCard } from "components";
+import { ResumeCard } from "components";
 import backend from "backend";
 import styled from "styled-components";
 import Filter from "../../layouts/Filter";
@@ -7,10 +7,11 @@ import Searchbar from "../../layouts/Searchbar";
 import useSearchParams from "../../hooks/useSearchParams";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-const VacancyList: FC = () => {
+const ResumeList: FC = () => {
   const searchParams = useSearchParams();
-  const { data, count, loading, error, pagination, searchList } =
-    backend.vacancies();
+  const { data, count, loading, pagination, searchList } = backend.resumes();
+
+  console.log(data);
 
   return (
     <Container className="main-container">
@@ -73,7 +74,7 @@ const VacancyList: FC = () => {
                   data.map((el: any, idx: any) => (
                     <li key={idx}>
                       <div className="content">
-                        <VacancyCard key={idx} element={el} link={true} />
+                        <ResumeCard element={el} link={true} />
                       </div>
                     </li>
                   ))}
@@ -81,7 +82,6 @@ const VacancyList: FC = () => {
             </Data>
 
             {loading && <div>Loading Vacancies...</div>}
-            {error && <div>Error</div>}
 
             <div className="inline">
               <Pagination className="inline">
@@ -128,7 +128,7 @@ const VacancyList: FC = () => {
   );
 };
 
-export default VacancyList;
+export default ResumeList;
 
 const Container = styled.div`
   background-color: var(--content-background);

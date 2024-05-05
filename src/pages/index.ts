@@ -1,8 +1,10 @@
 import VacancyList from "./Vacancy/VacancyList";
 import VacancyPost from "./Vacancy/VacancyPost";
+import VacancyCreate from "./Vacancy/VacancyCreate";
+import ResumeCreate from "./Resume/ResumeCreate";
+import ResumeList from "./Resume/ResumeList";
 import Home from "./Home";
 import Login from "./Login/Login";
-import VacancyCreate from "./Vacancy/VacancyCreate";
 import Create from "./Create";
 import TopCompanies from "./TopCompanies";
 import Chat from "./Chat";
@@ -26,4 +28,6 @@ export {
   SignUpApplicant,
   SignUpEmployer,
   Edit,
+  ResumeCreate,
+  ResumeList,
 };

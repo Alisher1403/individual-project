@@ -295,15 +295,14 @@ const Container = styled.div`
 
         .img-container {
           background: none;
+          background: var(--element-background-hover);
+          border-radius: 15px;
+          border: 1px solid var(--border-color-light);
 
-          &.false {
-            background: var(--element-background-hover);
-            border-radius: 15px;
-            border: 1px solid var(--border-color-light);
-
-            .alt {
-              color: var(--text-color);
-            }
+          &.loaded {
+            background: none;
+            border: none;
+            border-radius: none;
           }
 
           img {
@@ -313,7 +312,7 @@ const Container = styled.div`
           }
 
           .alt {
-            background: none;
+            color: var(--text-color);
             font-size: 25px;
           }
         }

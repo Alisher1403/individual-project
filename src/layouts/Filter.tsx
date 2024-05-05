@@ -1,22 +1,31 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 import { CheckSelect, RadioSelect, Select, Input } from "ui";
 import { formData } from "constant";
 import { useSearchParams } from "hooks";
+import { Slider } from "antd";
+import { useLocation } from "react-router-dom";
 
 interface FilterProps {}
 
 const Filter: FC<FilterProps> = () => {
   const searchParams = useSearchParams();
-  const { experience, emp_type, education, remote, salary, currency } =
+  const location = useLocation();
+  const { experience, emp_type, education, remote, salary, currency, age } =
     searchParams.getAll();
 
   const [salaryValue, setSalaryValue] = useState(salary);
+  const [ageValue, setAgeValue] = useState(age);
+
+  useEffect(() => {
+    setSalaryValue(salary);
+    setAgeValue(age);
+  }, [location.search]);
 
   return (
     <Container>
-      <form>
-        <Content>
+      <Content>
+        <form>
           <h2 className="title">Apply Filters</h2>
 
           <Section>
@@ -56,7 +65,7 @@ const Filter: FC<FilterProps> = () => {
           </Section>
 
           <Section>
-            <p className="section-title">Remote job</p>
+            <p className="section-title">Remote work</p>
             <CheckSelect
               value={remote || "false"}
               options={[{ value: "true", label: "Remote" }]}
@@ -68,6 +77,25 @@ const Filter: FC<FilterProps> = () => {
                     searchParams.set({ remote: undefined });
                   }
                 }
+              }}
+            />
+          </Section>
+
+          <Section>
+            <p className="section-title">
+              Age {ageValue ? ageValue?.[0] + " - " + ageValue?.[1] : null}
+            </p>
+            <Slider
+              min={10}
+              max={60}
+              range
+              value={ageValue || [18, 40]}
+              defaultValue={[18, 40]}
+              onChange={(value) => {
+                setAgeValue(value);
+              }}
+              onChangeComplete={(value) => {
+                searchParams.set({ age: value });
               }}
             />
           </Section>
@@ -101,8 +129,8 @@ const Filter: FC<FilterProps> = () => {
               </button>
             </div>
           </Section>
-        </Content>
-      </form>
+        </form>
+      </Content>
     </Container>
   );
 };
@@ -111,18 +139,11 @@ export default Filter;
 
 const Container = styled.div`
   min-width: 250px;
-  position: sticky;
-  overflow-y: scroll;
   height: 100%;
-  top: 0;
   background: var(--element-background);
-  padding: 15px;
-  border: 1px solid var(--border-color);
   border-radius: 10px;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  overflow: hidden;
+  border: 1px solid var(--border-color);
 
   .break {
     width: 100%;
@@ -133,6 +154,22 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
+  padding: 15px;
+  overflow-y: scroll;
+  height: 100%;
+
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  &::-webkit-scrollbar-track {
+    /* background: var(--border-color); */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--element-color);
+  }
+
   .title {
     font-size: 17px;
     font-family: var(--font-semiBold);

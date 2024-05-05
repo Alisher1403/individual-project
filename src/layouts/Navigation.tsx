@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import styled from "styled-components";
 import { NavLink, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
@@ -13,10 +13,40 @@ const Navigation: FC = () => {
   const dispatch = useDispatch() as AppDispatch;
   const metadata = useSelector((state: RootState) => state.user.metadata);
   const user = useSelector((state: RootState) => state.user.data);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <Container>
+      <Menu data-open={menuOpen} onClick={() => setMenuOpen(false)}>
+        <div className="menu-content" onClick={(e) => e.stopPropagation()}>
+          <ul className="links-list">
+            <li className="logo" onClick={() => setMenuOpen(false)}>
+              <NavLink to={`/`}>
+                <Logo />
+              </NavLink>
+            </li>
+            <li onClick={() => setMenuOpen(false)}>
+              <NavLink to={`/`}>Home</NavLink>
+            </li>
+            <li onClick={() => setMenuOpen(false)}>
+              <NavLink to={`/search/vacancy`}>Vacancies</NavLink>
+            </li>
+            <li onClick={() => setMenuOpen(false)}>
+              <NavLink to={`/search/resume`}>Resumes</NavLink>
+            </li>
+          </ul>
+        </div>
+      </Menu>
+
       <Content>
+        {/*  */}
+        <button
+          className="custom-btn secondary menu-btn"
+          onClick={() => setMenuOpen(true)}
+        >
+          <span className="material-symbols-rounded icon">menu</span>
+        </button>
+        {/*  */}
         <Section className="left">
           <ul className="links-list">
             <li>
@@ -93,6 +123,7 @@ export default Navigation;
 const Container = styled.nav`
   border-bottom: 1px solid var(--border-color);
   background: var(--element-background);
+  position: relative;
 `;
 
 const Content = styled.div`
@@ -105,6 +136,78 @@ const Content = styled.div`
   height: var(--navigation-height);
   padding: 0 10px;
   z-index: 100;
+
+  .menu-btn {
+    border: none;
+    border-radius: 5px;
+    display: none;
+
+    @media (max-width: 700px) {
+      display: block;
+    }
+
+    .icon {
+      font-size: 25px;
+    }
+  }
+`;
+
+const Menu = styled.div`
+  background: #6f6f6f2b;
+  position: fixed;
+  height: 100dvh;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  overflow: hidden;
+  visibility: collapse;
+
+  &[data-open="true"] {
+    visibility: visible;
+
+    .menu-content {
+      transform: translateX(0);
+    }
+  }
+
+  .menu-content {
+    max-width: 200px;
+    width: 100%;
+    height: 100svh;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: var(--element-background);
+    padding: 20px;
+    transform: translateX(-100%);
+    transition: 0.3s;
+  }
+
+  .links-list {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    z-index: 2;
+
+    .logo {
+      margin-bottom: 10px;
+    }
+
+    a {
+      width: 100%;
+      display: block;
+      padding: 5px 0;
+
+      &.active {
+        border-bottom: 2px solid var(--element-color);
+        color: var(--element-color);
+      }
+    }
+  }
 `;
 
 const Section = styled.div`
@@ -147,6 +250,14 @@ const Section = styled.div`
         font-size: 15px;
         white-space: nowrap;
         color: white;
+      }
+    }
+  }
+
+  @media (max-width: 700px) {
+    &.left {
+      .links-list {
+        display: none;
       }
     }
   }
