@@ -35,6 +35,9 @@ const VacancyCard: FC<ComponentProps> = ({ element, link, hideApply }) => {
   };
 
   function save() {
+    if (!user?.id) {
+      dispatch(requireLogin(true))
+    }
     if (!element?.saved?.[0]) {
       dispatch(api.vacancy.saved.post(element?.id))
     } else {

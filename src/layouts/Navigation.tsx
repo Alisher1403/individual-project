@@ -86,6 +86,13 @@ const Navigation: FC = () => {
                     },
                   },
                   {
+                    label: "Saved",
+                    icon: "bookmark",
+                    onClick: () => {
+                      navigate(`/saved`);
+                    },
+                  },
+                  {
                     label: "Profile",
                     icon: "person",
                     onClick: () => {

@@ -15,6 +15,7 @@ import SignUpAs from "./Login/SignUpAs";
 import SignUpApplicant from "./Login/SignUpApplicant";
 import SignUpEmployer from "./Login/SignUpEmployer";
 import Edit from "./Edit";
+import Saved from "./Saved";
 
 export {
   VacancyList,
@@ -34,4 +35,5 @@ export {
   ResumeList,
   ResumePost,
   Applicants,
+  Saved
 };

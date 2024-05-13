@@ -69,9 +69,9 @@ const ResumeCard: FC<ComponentProps> = ({ element, link }) => {
               ) : null}
             </div>
             <div className="options">
-              <button>
+              {/* <button>
                 <span className="material-symbols-rounded icon">bookmark</span>
-              </button>
+              </button> */}
             </div>
           </div>
           {/*  */}
