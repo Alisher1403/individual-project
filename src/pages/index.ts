@@ -1,8 +1,10 @@
 import VacancyList from "./Vacancy/VacancyList";
 import VacancyPost from "./Vacancy/VacancyPost";
 import VacancyCreate from "./Vacancy/VacancyCreate";
+import Applicants from "./Vacancy/Applicants";
 import ResumeCreate from "./Resume/ResumeCreate";
 import ResumeList from "./Resume/ResumeList";
+import ResumePost from "./Resume/ResumePost";
 import Home from "./Home";
 import Login from "./Login/Login";
 import Create from "./Create";
@@ -30,4 +32,6 @@ export {
   Edit,
   ResumeCreate,
   ResumeList,
+  ResumePost,
+  Applicants,
 };

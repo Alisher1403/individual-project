@@ -20,7 +20,7 @@ const Home: FC = () => {
           <Header>
             <h1>Find your dream job</h1>
             <div className="searchbar-wrapper">
-              <Searchbar />
+              <Searchbar pathname='/search/vacancy' />
             </div>
           </Header>
           <main>
@@ -82,7 +82,7 @@ const Home: FC = () => {
                     (item: any, key: number) => {
                       return (
                         <SwiperSlide key={key}>
-                          <Link to={`vacancy/${item.id}`}>
+                          <Link to={`/vacancy/${item.id}`}>
                             <div className="swiper-content">
                               <div className="body">
                                 <h3 className="title">{item.title}</h3>
@@ -134,6 +134,9 @@ const Home: FC = () => {
                 </HomeSwiper>
               </SwiperSection>
             ) : null}
+
+            {/* ----------------------------------------------------------- */}
+
             {data.vacancies?.topCompanies ? (
               <SwiperSection>
                 <h2 className="title">Top hiring companies</h2>
@@ -142,7 +145,7 @@ const Home: FC = () => {
                     (item: any, key: number) => {
                       return (
                         <SwiperSlide key={key} style={{ height: "auto" }}>
-                          <Link to={`profile/${item.id}`}>
+                          <Link to={`/profile/${item.id}`}>
                             <div className="swiper-content centered">
                               <div className="body">
                                 <div className="logo">
@@ -159,6 +162,70 @@ const Home: FC = () => {
                                   </div>
                                 ) : null}
                                 <button className="button">View jobs</button>
+                              </div>
+                            </div>
+                          </Link>
+                        </SwiperSlide>
+                      );
+                    }
+                  )}
+                </HomeSwiper>
+              </SwiperSection>
+            ) : null}
+
+
+            {/* ----------------------------------------------------------- */}
+
+            {data.vacancies?.topVacancies ? (
+              <SwiperSection>
+                <h2 className="title">Most applied jobs</h2>
+                <HomeSwiper delay={5500}>
+                  {data.vacancies?.latestVacancies?.map(
+                    (item: any, key: number) => {
+                      return (
+                        <SwiperSlide key={key}>
+                          <Link to={`/vacancy/${item.id}`}>
+                            <div className="swiper-content">
+                              <div className="body">
+                                <h3 className="title">{item.title}</h3>
+                                <div className="user">
+                                  <div className="img">
+                                    <UserImage
+                                      src={item?.user?.img}
+                                      alt={item?.user?.name}
+                                    />
+                                  </div>
+                                  <p className="name">{item.user?.name}</p>
+                                </div>
+                                <div className="info-list">
+                                  <div className="info">
+                                    <span className="material-symbols-rounded icon">
+                                      location_on
+                                    </span>
+                                    {item?.location}
+                                  </div>
+                                  {formData.emp_type.get(item?.emp_type) ? (
+                                    <>
+                                      <div className="break"></div>
+                                      <div className="info">
+                                        <span className="material-symbols-rounded icon">
+                                          work
+                                        </span>
+                                        {formData.emp_type.get(item.emp_type)}
+                                      </div>
+                                    </>
+                                  ) : null}
+                                </div>
+                                <div className="time-ago">
+                                  {formData.timeAgo(item.created_at)}
+                                </div>
+                              </div>
+                              <div className="salary">
+                                {formData.salary.get({
+                                  fromSalary: item?.fromSalary,
+                                  toSalary: item?.toSalary,
+                                  currency: item?.currency,
+                                })}
                               </div>
                             </div>
                           </Link>

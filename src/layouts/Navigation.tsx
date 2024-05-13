@@ -155,7 +155,7 @@ const Content = styled.div`
 const Menu = styled.div`
   background: #6f6f6f2b;
   position: fixed;
-  height: 100dvh;
+  height: 100lvh;
   width: 100vw;
   top: 0;
   left: 0;

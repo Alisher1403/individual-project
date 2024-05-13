@@ -281,6 +281,45 @@ const vacancy = createSlice({
         console.log(data);
       }
     });
+
+    builder.addCase(PostApplicant.fulfilled, (state, action) => {
+      if (action.payload) {
+        const { id } = action.payload;
+        Object.entries(state.list.pageData).map(([_, list]) => {
+          list.map((e) => {
+            if (e?.id === id) {
+              return (e.applied[0] = true);
+            }
+          });
+        });
+      }
+    });
+
+    builder.addCase(PostVacancySaved.fulfilled, (state, action) => {
+      if (action.payload) {
+        const { id } = action.payload;
+        Object.entries(state.list.pageData).map(([_, list]) => {
+          list.map((e) => {
+            if (e?.id === id) {
+              return (e.saved[0] = true);
+            }
+          });
+        });
+      }
+    });
+
+    builder.addCase(DeleteVacancySaved.fulfilled, (state, action) => {
+      if (action.payload) {
+        const { id } = action.payload;
+        Object.entries(state.list.pageData).map(([_, list]) => {
+          list.map((e) => {
+            if (e?.id === id) {
+              return (e.saved[0] = null);
+            }
+          });
+        });
+      }
+    });
   },
 });
 
@@ -350,7 +389,7 @@ const getVacancyList = createAsyncThunk(
       let selectString = `id, created_at, user_id, title, user: user_metadata(name, img), remote, emp_type, location, subtitle, fromSalary, toSalary, currency, experience, views: vacancy_views (count)`;
 
       if (user?.id) {
-        selectString += `, applied: applicants(id)`;
+        selectString += `, applied: applicants(resumes()), saved: saved_vacancies(id)`;
       }
 
       let query = supabase
@@ -358,7 +397,9 @@ const getVacancyList = createAsyncThunk(
         .select(selectString, { count: "exact" });
 
       if (user?.id) {
-        query = query.eq("applied.user_id", user?.id);
+        query = query
+          .eq("applied.resumes.user_id", user?.id)
+          .eq("saved.user_id", user?.id);
       }
 
       // Apply search text filter
@@ -390,6 +431,24 @@ const getVacancyList = createAsyncThunk(
           }
         },
       };
+
+      if (searchParams.remote === "true") {
+        query.eq("remote", true);
+      }
+
+      if (searchParams.salary) {
+        query.gte("fromSalary", searchParams.salary);
+      }
+
+      if (searchParams.currency) {
+        query.eq("currency", searchParams.currency);
+      } else {
+        query.eq("currency", "dollar");
+      }
+
+      if (searchParams.age) {
+        query.lte("fromAge", searchParams.age);
+      }
 
       // Apply additional filters from search parameters
       useFilter.like({
@@ -427,11 +486,11 @@ const getVacancy = createAsyncThunk(
     const state = getState() as RootState;
     const user_id = state.user.data?.id;
 
-    let selectString = `*, user: user_metadata(name, img), views (count), applicants: applicants(count), 
+    let selectString = `*, user: user_metadata(name, img), views: vacancy_views (count), applicants: applicants(count), 
     likes: vacancy_reactions(count), dislikes: vacancy_reactions(count)`;
 
     if (user_id) {
-      selectString += `, reaction: vacancy_reactions(type), applied: applicants(id)`;
+      selectString += `, reaction: vacancy_reactions(type), applied: applicants(resumes()), saved: saved_vacancies(id)`;
     }
 
     let query = supabase
@@ -443,7 +502,8 @@ const getVacancy = createAsyncThunk(
 
     if (user_id) {
       query = query
-        .eq("applied.user_id", user_id)
+        .eq("applied.resumes.user_id", user_id)
+        .eq("saved.user_id", user_id)
         .eq("reaction.user_id", user_id);
     }
 
@@ -685,7 +745,11 @@ const PostCommentLike = createAsyncThunk(
 
 const PostApplicant = createAsyncThunk(
   "PostApplicant",
-  async (vacancy_id: string, { getState, dispatch }) => {
+  async (
+    args: { vacancy_id: string; resume_id: string },
+    { getState, dispatch }
+  ) => {
+    const { vacancy_id, resume_id } = args;
     const state = getState() as RootState;
     const user_id = state.user.data?.id;
 
@@ -693,12 +757,12 @@ const PostApplicant = createAsyncThunk(
 
     await supabase
       .from("applicants")
-      .insert({ vacancy_id, user_id })
+      .insert({ vacancy_id, resume_id })
       .then(() => {
         dispatch(getVacancy(vacancy_id));
       });
 
-    return true;
+    return { id: vacancy_id };
   }
 );
 
@@ -741,6 +805,38 @@ const PostVacancyLike = createAsyncThunk(
   }
 );
 
+const PostVacancySaved = createAsyncThunk(
+  "PostVacancySaved",
+  async (id: string, { getState }) => {
+    const state = getState() as RootState;
+    const user_id = state.user.data?.id;
+
+    if (!user_id) return;
+
+    await supabase.from("saved_vacancies").insert({ user_id, vacancy_id: id });
+
+    return { id };
+  }
+);
+
+const DeleteVacancySaved = createAsyncThunk(
+  "DeleteVacancySaved",
+  async (id: string, { getState }) => {
+    const state = getState() as RootState;
+    const user_id = state.user.data?.id;
+
+    if (!user_id) return;
+
+    await supabase
+      .from("saved_vacancies")
+      .delete()
+      .eq("user_id", user_id)
+      .eq("vacancy_id", id);
+
+    return { id };
+  }
+);
+
 export const vacancyApi = {
   get: getVacancy,
   post: postVacancy,
@@ -762,5 +858,9 @@ export const vacancyApi = {
     update: UpdateComment,
     delete: DeleteComment,
     like: PostCommentLike,
+  },
+  saved: {
+    post: PostVacancySaved,
+    delete: DeleteVacancySaved,
   },
 };

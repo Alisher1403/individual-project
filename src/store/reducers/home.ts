@@ -26,6 +26,7 @@ const getAll = createAsyncThunk("getAll", async () => {
       specializations: null as null | any[],
       latestVacancies: null as null | any[],
       topCompanies: null as null | any[],
+      topVacancies: null as null | any[],
     };
 
     const date = new Date();
@@ -35,6 +36,8 @@ const getAll = createAsyncThunk("getAll", async () => {
       .from("specializations")
       .select("*, vacancies(count), salary: vacancies!inner(toSalary.max())")
       .eq("salary.currency", "dollar")
+      .neq("name", "")
+      .neq("name", "...")
       .then((result): void => {
         if (result.data && result.data.length > 3) {
           data.specializations = result.data;
@@ -50,12 +53,25 @@ const getAll = createAsyncThunk("getAll", async () => {
     await supabase
       .from("vacancies")
       .select("*, user: user_metadata!inner(img, name)")
-      .eq("user.userType", "employer")
       .order("created_at", { ascending: false })
-      .limit(8)
+      .limit(12)
       .then((result) => {
         if (result.data && result.data.length > 4) {
           data.latestVacancies = result.data;
+        }
+      });
+
+    await supabase
+      .from("vacancies")
+      .select("*, user: user_metadata!inner(img, name), applicants(count)")
+      .order("count", {
+        ascending: false,
+        referencedTable: "applicants",
+      })
+      .limit(12)
+      .then((result) => {
+        if (result.data && result.data.length > 4) {
+          data.topVacancies = result.data;
         }
       });
 

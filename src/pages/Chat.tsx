@@ -1,46 +1,77 @@
-import backend from "backend";
-import { FC } from "react";
+import backend, { supabase } from "backend";
+import { FC, useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import styled from "styled-components";
 
 const Chat: FC = () => {
-  const { messages, user_id } = backend.chats();
+  const { messages, currentChat, user_id } = backend.chats();
+  const [input, setInput] = useState("");
+
+  if (!user_id) {
+    return <Navigate to={"/"} />;
+  }
+
+  useEffect(() => {
+    if (currentChat) {
+      supabase.from("chats").select("*").eq("vacancy_id", currentChat);
+    }
+  }, []);
+
+  function send() {
+    console.log(input);
+    supabase.from("chats");
+    setInput("");
+  }
 
   return (
     <Container className="main-container">
       <Content>
         <Aside></Aside>
-        <Main>
-          <Header></Header>
-          <Messages ref={messages.ref}>
-            <div
-              className="loading-animation"
-              ref={messages.observer}
-              data-loading={messages.loading}
-            ></div>
-            <ul className="messages-list">
-              {messages?.list
-                ? messages.list.map((item, index) => {
-                    return (
-                      <li
-                        key={index}
-                        className="message"
-                        data-self-message={item?.sender_id === user_id}
-                      >
-                        <div className="message-content">{item.message}</div>
-                      </li>
-                    );
-                  })
-                : null}
-            </ul>
-          </Messages>
-          <Input className="input-wrapper">
-            <form onSubmit={(e) => e.preventDefault()}>
-              <div className="content">
-                <input type="text" />
-              </div>
-            </form>
-          </Input>
-        </Main>
+        {currentChat ? (
+          <Main>
+            <Header></Header>
+            <Messages ref={messages.ref}>
+              <div
+                className="loading-animation"
+                ref={messages.observer}
+                data-loading={messages.loading}
+              ></div>
+              <ul className="messages-list">
+                {messages?.list
+                  ? messages.list.map((item, index) => {
+                      return (
+                        <li
+                          key={index}
+                          className="message"
+                          data-self-message={item?.sender_id === user_id}
+                        >
+                          <div className="message-content">{item.message}</div>
+                        </li>
+                      );
+                    })
+                  : null}
+              </ul>
+            </Messages>
+            <Input className="input-wrapper">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  send();
+                }}
+              >
+                <div className="content">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                  />
+                </div>
+              </form>
+            </Input>
+          </Main>
+        ) : (
+          "Select chat"
+        )}
       </Content>
     </Container>
   );

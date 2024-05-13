@@ -5,16 +5,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserImage } from "..";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store";
-import { setVacancyDelete } from "store/reducers/modals";
+import { setApplyModal, setVacancyDelete } from "store/reducers/modals";
 import { api } from "store/reducers";
 import { requireLogin } from "store/reducers/user";
 
 interface ComponentProps {
   element: any;
   link: boolean;
+  hideApply?: boolean
 }
 
-const VacancyCard: FC<ComponentProps> = ({ element, link }) => {
+const VacancyCard: FC<ComponentProps> = ({ element, link, hideApply }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch() as AppDispatch;
   const user = useSelector((state: RootState) => state.user.data);
@@ -33,6 +34,14 @@ const VacancyCard: FC<ComponentProps> = ({ element, link }) => {
     }
   };
 
+  function save() {
+    if (!element?.saved?.[0]) {
+      dispatch(api.vacancy.saved.post(element?.id))
+    } else {
+      dispatch(api.vacancy.saved.delete(element?.id))
+    }
+  }
+
   return (
     <Container key={element.id}>
       <ContanteWrapper>
@@ -47,7 +56,11 @@ const VacancyCard: FC<ComponentProps> = ({ element, link }) => {
                 {element?.remote && <span className="remote">remote</span>}
               </h3>
               <div
-                onClick={() => navigate(`/profile/${element?.user_id}`)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  navigate(`/profile/${element?.user_id}`);
+                }}
                 className="profile-link"
               >
                 <div className="user-img">
@@ -66,8 +79,12 @@ const VacancyCard: FC<ComponentProps> = ({ element, link }) => {
               </p>
             </div>
             <div className="options">
-              <button>
-                <span className="material-symbols-rounded icon">bookmark</span>
+              <button onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                save();
+              }}>
+                <span className={`material-symbols-rounded icon ${element?.saved?.[0] && 'filled'}`}>bookmark</span>
               </button>
             </div>
           </div>
@@ -131,7 +148,7 @@ const VacancyCard: FC<ComponentProps> = ({ element, link }) => {
                 {element?.views?.[0]?.count}
               </div>
             </div>
-            {metadata?.userType === "applicant" ? (
+            {metadata?.userType === "applicant" && !hideApply ? (
               <div className="right">
                 <button
                   className="apply-btn"
@@ -141,7 +158,7 @@ const VacancyCard: FC<ComponentProps> = ({ element, link }) => {
                     e.stopPropagation();
                     e.preventDefault();
                     if (user?.id && element?.id) {
-                      dispatch(api.vacancy.applicants.post(element?.id));
+                      dispatch(setApplyModal(element));
                     } else {
                       dispatch(requireLogin(true));
                     }

@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "store";
 import { Navigate } from "react-router-dom";
 import VacancyEdit from "./Vacancy/VacancyEdit";
+import ResumeEdit from "./Resume/ResumeEdit";
 
 const Edit: FC = () => {
   const userType = useSelector(
@@ -16,7 +17,7 @@ const Edit: FC = () => {
   }
 
   if (userType === "applicant") {
-    return <div></div>;
+    return <ResumeEdit />;
   }
   if (userType === "employer") {
     return <VacancyEdit />;

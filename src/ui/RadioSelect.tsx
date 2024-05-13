@@ -85,7 +85,7 @@ const RadioBtn = styled.div`
     font-size: 22px;
   }
 `;
-const Label = styled.p`
+const Label = styled.div`
   font-size: var(--input-font-size);
   color: var(--input-color);
 `;

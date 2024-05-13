@@ -2,7 +2,11 @@ import { FC } from "react";
 import styled from "styled-components";
 import backend from "backend";
 
-const Searchbar: FC = () => {
+interface Props {
+  pathname: string;
+}
+
+const Searchbar: FC<Props> = ({ pathname }) => {
   const {
     value,
     setValue,
@@ -26,7 +30,7 @@ const Searchbar: FC = () => {
         <SearchInput data-focused={focus} className="searchbar">
           <FocusBg data-focus={focus} onClick={() => setFocus(false)} />
           <Top>
-            <form onSubmit={(e) => search(value, e)}>
+            <form onSubmit={(e) => search(value, pathname, e)}>
               <input
                 name="text"
                 type="text"
@@ -57,7 +61,7 @@ const Searchbar: FC = () => {
                 {searchedItems.slice(0, listLength)?.map((elem, idx) => {
                   return (
                     <li key={idx}>
-                      <SearchItems onClick={() => search(elem)}>
+                      <SearchItems onClick={() => search(elem, pathname)}>
                         <div className="content">
                           <div className="left">
                             <div className="icon">
@@ -94,7 +98,7 @@ const Searchbar: FC = () => {
                       if (!searchedItems.includes(elem.toLowerCase())) {
                         return (
                           <li key={idx}>
-                            <SearchItems onClick={() => search(elem)}>
+                            <SearchItems onClick={() => search(elem, pathname)}>
                               <div className="content">
                                 <div className="left">
                                   <div className="icon">

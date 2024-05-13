@@ -17,7 +17,7 @@ const HomeSwiper: FC<Props> = ({ children, delay }) => {
     spaceBetween: 7,
     speed: 300,
     autoplay: { delay: delay ?? 4000 },
-    slidesPerView: 2.2,
+    slidesPerView: 1.8,
     autoHeight: false,
     breakpoints: {
       1250: { slidesPerView: 5.5 },

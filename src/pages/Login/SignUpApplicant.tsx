@@ -20,6 +20,8 @@ const SignUpApplicant: FC = () => {
     dispatch(api.user.signUp(form)).then((e) => {
       if (e.payload) {
         setUserExists(false);
+        navigate('/')
+        window.location.reload();
       } else {
         setUserExists(true);
       }

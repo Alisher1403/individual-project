@@ -11,6 +11,7 @@ import { useParams } from "react-router-dom";
 import { setCommentReaction } from "store/reducers/vacancy";
 import { requireLogin } from "store/reducers/user";
 import { UserImage } from "..";
+import { setCommentDelete } from "store/reducers/modals";
 
 interface Props {
   element: any;
@@ -143,7 +144,7 @@ const Comment: FC<Props> = ({ element }) => {
                       thumb_down
                     </span>
                   </button>
-                  <button className="btn">Respond</button>
+                  {/* <button className="btn">Respond</button> */}
                 </div>
               </div>
             </div>
@@ -161,10 +162,7 @@ const Comment: FC<Props> = ({ element }) => {
                       label: "Delete",
                       onClick: () =>
                         dispatch(
-                          api.vacancy.comments.delete({
-                            id: element.id,
-                            vacancy_id,
-                          })
+                          setCommentDelete({ id: element?.id, vacancy_id })
                         ),
                     },
                   ]}

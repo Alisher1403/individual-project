@@ -52,9 +52,8 @@ const Login: FC = () => {
                   }}
                 />
               </div>
-              <span className="error-message">This user already exists</span>
             </div>
-            <div className="input-container">
+            <div className="input-container" data-error={userExists}>
               <h3 className="input-label">Password</h3>
               <div className="input-wrapper">
                 <input
@@ -66,6 +65,7 @@ const Login: FC = () => {
                   }
                 />
                 <div
+                  className="password-visible"
                   onClick={(e) => {
                     e.preventDefault();
                     if (passwordType === "password") {
@@ -75,15 +75,16 @@ const Login: FC = () => {
                     }
                   }}
                 >
-                  <span className="material-symbols-rounded icon">
+                  <span className="material-symbols-rounded icon visibility">
                     visibility
                   </span>
                 </div>
               </div>
+              <span className="error-message">Incorrect name or password</span>
             </div>
 
             <button type="submit" className="submit-button">
-              Sign In
+              Log in
             </button>
           </div>
         </form>
@@ -209,7 +210,7 @@ const Content = styled.div`
             }
           }
 
-          button {
+          .password-visible {
             border: none;
             background: none;
             padding: 0 5px;
@@ -224,6 +225,7 @@ const Content = styled.div`
             .icon {
               font-size: 22px;
               margin-bottom: -2px;
+              line-height: 0;
             }
           }
         }

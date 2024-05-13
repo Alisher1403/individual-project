@@ -10,7 +10,7 @@ import parse from "html-react-parser";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store";
 import { api } from "store/reducers";
-import { resetVacancies } from "store/reducers/vacancy";
+import { resetResumes } from "store/reducers/resume";
 import { useNavigate } from "react-router-dom";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";
@@ -40,10 +40,10 @@ const ResumeCreate: FC = () => {
   });
 
   function submit() {
-    dispatch(api.vacancy.post(post)).then((e) => {
+    dispatch(api.resume.post(post)).then((e) => {
       if (e.payload) {
         dispatch(api.profile.get(user?.id));
-        dispatch(resetVacancies());
+        dispatch(resetResumes());
         navigate(`/profile/${user?.id}`);
       }
     });
@@ -135,7 +135,7 @@ const ResumeCreate: FC = () => {
         <Section>
           <InputWrapper>
             <p className="label">Date of birth</p>
-            <p className="margin-y">{}</p>
+            <p className="margin-y">{ }</p>
             <div className="dob">
               <DatePicker
                 picker="date"

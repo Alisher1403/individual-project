@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserImage } from "..";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store";
-import { setVacancyDelete } from "store/reducers/modals";
+import { setResumeDelete } from "store/reducers/modals";
 
 interface ComponentProps {
   element: any;
@@ -44,7 +44,11 @@ const ResumeCard: FC<ComponentProps> = ({ element, link }) => {
                 {element?.remote && <span className="remote">remote</span>}
               </h3>
               <div
-                onClick={() => navigate(`/profile/${element?.user_id}`)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  navigate(`/profile/${element?.user_id}`);
+                }}
                 className="profile-link"
               >
                 <div className="user-img">
@@ -55,12 +59,14 @@ const ResumeCard: FC<ComponentProps> = ({ element, link }) => {
                 </div>
                 <p>{element?.user?.name}</p>
               </div>
-              <p className="custom-icon-text">
-                {element.location}
-                <span className="material-symbols-rounded icon">
-                  location_on
-                </span>
-              </p>
+              {element?.location ? (
+                <p className="custom-icon-text">
+                  {element.location}
+                  <span className="material-symbols-rounded icon">
+                    location_on
+                  </span>
+                </p>
+              ) : null}
             </div>
             <div className="options">
               <button>
@@ -102,7 +108,7 @@ const ResumeCard: FC<ComponentProps> = ({ element, link }) => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    dispatch(setVacancyDelete(element));
+                    dispatch(setResumeDelete(element));
                   }}
                 >
                   {" "}
@@ -118,7 +124,10 @@ const ResumeCard: FC<ComponentProps> = ({ element, link }) => {
           <div className="card-footer">
             <div className="left">
               {formData.salary.get(element) && (
-                <div className="salary">{formData.salary.get(element)}</div>
+                <div className="salary">
+                  {element?.salary}
+                  {formData.currency.get(element?.currency)}
+                </div>
               )}
               <div>{formData.timeAgo(element.created_at)}</div>
               <div>

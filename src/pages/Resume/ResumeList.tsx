@@ -16,7 +16,7 @@ const ResumeList: FC = () => {
   return (
     <Container className="main-container">
       <div className="searchbar-wrapper">
-        <Searchbar />
+        <Searchbar pathname="/search/resume"/>
       </div>
       <div className="top-content">
         <div className="count">

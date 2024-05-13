@@ -176,13 +176,6 @@ const vacancy = () => {
   }, [id, location.pathname]);
 
   const methods = {
-    apply() {
-      if (user?.id) {
-        dispatch(api.vacancy.applicants.post(id));
-      } else {
-        dispatch(requireLogin(true));
-      }
-    },
     like() {
       if (user?.id) {
         dispatch(setVacancyReaction({ vacancy_id: id, type: "like" }));
@@ -298,12 +291,16 @@ const searchbar = () => {
   };
 
   // Function to handle search
-  function search(value: string, event?: FormEvent<HTMLFormElement>) {
+  function search(
+    value: string,
+    pathname: string,
+    event?: FormEvent<HTMLFormElement>
+  ) {
     if (event) {
       event.preventDefault();
     }
 
-    navigate({ search: `text=${value}&page=1` });
+    navigate({ pathname, search: `text=${value}&page=1` });
 
     setFocus(false);
     inputRef.current?.blur();
@@ -377,7 +374,7 @@ const searchbar = () => {
           }
           if (error) throw error;
         } else {
-          const localSearched = localStorage.getItem("searched") || "";
+          const localSearched = localStorage.getItem("searched") || "[]";
           const localSearchedList = JSON.parse(localSearched);
           setSearched(localSearchedList);
         }
@@ -416,7 +413,7 @@ const searchbar = () => {
             const { data, error } = await supabase
               .from("search")
               .select("name")
-              .ilike("name", `%${regexValue}%`)
+              .ilike("name", `${regexValue}%`)
               .gte("count", "10");
 
             // Map the retrieved data to a list format with specific properties
@@ -451,7 +448,7 @@ const searchbar = () => {
   useEffect(() => {
     if (searched && Array.isArray(searched)) {
       const arr = searched.filter((elem) => {
-        if (elem.includes(value.toLowerCase())) {
+        if (elem.startsWith(value.toLowerCase())) {
           return elem;
         }
       });
@@ -463,7 +460,7 @@ const searchbar = () => {
   useEffect(() => {
     if (searchListData && Array.isArray(searchListData)) {
       const arr = searchListData.filter((elem) => {
-        if (elem.includes(value.toLowerCase())) {
+        if (elem.startsWith(value.toLowerCase())) {
           return elem;
         }
       });
@@ -508,19 +505,12 @@ const home = () => {
 };
 
 const chats = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch() as AppDispatch;
   const user_id = useSelector((state: RootState) => state.user.data?.id);
 
   const currentChat = useSelector(
     (state: RootState) => state.chats.currentChat
   );
-
-  useEffect(() => {
-    if (!user_id) {
-      navigate("/");
-    }
-  }, []);
 
   const messagesRef = useRef<HTMLDivElement>(null);
   const key = `${currentChat}/${user_id}`;
@@ -556,8 +546,10 @@ const chats = () => {
     }
   }, []);
 
-  return { messages, user_id };
+  return { messages, currentChat, user_id };
 };
+
+/******************************** RESUMES API *************************************/
 
 const resumes = () => {
   // Redux
@@ -655,4 +647,34 @@ const resumes = () => {
   };
 };
 
-export default { vacancies, vacancy, searchbar, home, chats, app, resumes };
+const resume = () => {
+  const params = useParams();
+  const dispatch: AppDispatch = useDispatch();
+  const location = useLocation();
+  const id = params?.id || "";
+
+  const element = useSelector((state: RootState) => state.resume.data[id!]);
+  const user = useSelector((state: RootState) => state.user.data);
+
+  const data = useMemo(() => element, [element]);
+  const { error } = useSelector((state: RootState) => state.vacancy.element);
+
+  useEffect(() => {
+    if (id && !data) {
+      dispatch(api.resume.get(id));
+    }
+  }, [id, location.pathname]);
+
+  return { data, error, id, user };
+};
+
+export default {
+  vacancies,
+  vacancy,
+  searchbar,
+  home,
+  chats,
+  app,
+  resumes,
+  resume,
+};

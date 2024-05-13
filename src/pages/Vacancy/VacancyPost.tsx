@@ -7,12 +7,12 @@ import { skills } from "icons";
 import { Link } from "react-router-dom";
 import { Comment, CommentEditor, VacancyCard } from "components";
 import SidebarList from "../../layouts/SidebarList";
-import { useDispatch } from "react-redux";
-import { setChat } from "store/reducers/chats";
+// import { useDispatch } from "react-redux";
+// import { setChat } from "store/reducers/chats";
 
 const VacancyPost: FC = () => {
   const { data, error, comments, id, methods, user } = backend.vacancy();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   if (!data || error) return;
 
@@ -25,17 +25,17 @@ const VacancyPost: FC = () => {
           <Section_1>
             <div className="content">
               <div className="left">
-                <button className="btn">
+                <Link to={`/applicants/${id}`} className="btn">
                   <div className="btn-content">
                     <span className="material-symbols-rounded icon">
                       group_add
                     </span>
                     <span>{data?.applicants[0].count} Applied</span>
                   </div>
-                </button>
+                </Link>
               </div>
               <div className="right">
-                <Link
+                {/* <Link
                   to={`/chat`}
                   onClick={() => {
                     dispatch(setChat(data?.id));
@@ -47,15 +47,14 @@ const VacancyPost: FC = () => {
                     <span className="material-symbols-rounded icon">chat</span>
                     <span>Open Chat</span>
                   </div>
-                </Link>
+                </Link> */}
                 <button className="btn" onClick={methods.like}>
                   <div className="btn-content">
                     <span
-                      className={`material-symbols-rounded icon ${
-                        data.reaction[0]?.type === "like" &&
+                      className={`material-symbols-rounded icon ${data.reaction[0]?.type === "like" &&
                         user?.id &&
                         "filled"
-                      }`}
+                        }`}
                     >
                       thumb_up
                     </span>
@@ -65,11 +64,10 @@ const VacancyPost: FC = () => {
                 <button className="btn" onClick={methods.dislike}>
                   <div className="btn-content">
                     <span
-                      className={`material-symbols-rounded icon ${
-                        data.reaction[0]?.type === "dislike" &&
+                      className={`material-symbols-rounded icon ${data.reaction[0]?.type === "dislike" &&
                         user?.id &&
                         "filled"
-                      }`}
+                        }`}
                     >
                       thumb_down
                     </span>

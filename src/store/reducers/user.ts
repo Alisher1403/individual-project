@@ -137,21 +137,16 @@ const signUp = createAsyncThunk(
         throw error;
       }
 
-      supabase
-        .from("user_metadata")
-        .upsert(
-          {
-            id: data.user?.id,
-            name: data.user?.email,
-            email: data.user?.email,
-            img: null,
-            userType: form.type,
-          },
-          { onConflict: "id" }
-        )
-        .then(() => {
-          window.location.reload();
-        });
+      await supabase.from("user_metadata").upsert(
+        {
+          id: data.user?.id,
+          name: data.user?.email,
+          email: data.user?.email,
+          img: null,
+          userType: form.type,
+        },
+        { onConflict: "id" }
+      );
 
       await dispatch(signIn(form));
       dispatch(requireLogin(false));

@@ -9,6 +9,8 @@ import {
   Profile,
   Edit,
   ResumeList,
+  ResumePost,
+  Applicants,
 } from "pages";
 import styled from "styled-components";
 import { Route, Routes } from "react-router-dom";
@@ -27,6 +29,8 @@ const MainLayout: FC = () => {
             <Route path="/search/vacancy" element={<VacancyList />}></Route>
             <Route path="/search/resume" element={<ResumeList />}></Route>
             <Route path="/vacancy/:id" element={<VacancyPost />}></Route>
+            <Route path="/applicants/:id" element={<Applicants />}></Route>
+            <Route path="/resume/:id" element={<ResumePost />}></Route>
             <Route path="/create" element={<Create />}></Route>
             <Route path="/edit/:id" element={<Edit />}></Route>
             <Route path="/top-companies" element={<TopCompanies />}></Route>

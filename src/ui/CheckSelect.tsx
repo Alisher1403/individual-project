@@ -118,6 +118,6 @@ const Button = styled.div`
     font-size: 28px;
   }
 `;
-const Label = styled.p`
+const Label = styled.div`
   font-size: var(--input-font-size);
 `;

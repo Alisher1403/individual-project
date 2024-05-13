@@ -15,7 +15,7 @@ const VacancyList: FC = () => {
   return (
     <Container className="main-container">
       <div className="searchbar-wrapper">
-        <Searchbar />
+        <Searchbar pathname="/search/vacancy" />
       </div>
       <div className="top-content">
         <div className="count">

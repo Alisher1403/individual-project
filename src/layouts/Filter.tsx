@@ -6,7 +6,7 @@ import { useSearchParams } from "hooks";
 import { Slider } from "antd";
 import { useLocation } from "react-router-dom";
 
-interface FilterProps {}
+interface FilterProps { }
 
 const Filter: FC<FilterProps> = () => {
   const searchParams = useSearchParams();
@@ -83,14 +83,13 @@ const Filter: FC<FilterProps> = () => {
 
           <Section>
             <p className="section-title">
-              Age {ageValue ? ageValue?.[0] + " - " + ageValue?.[1] : null}
+              Age {ageValue && ageValue}
             </p>
             <Slider
               min={10}
               max={60}
-              range
-              value={ageValue || [18, 40]}
-              defaultValue={[18, 40]}
+              value={ageValue || 0}
+              defaultValue={0}
               onChange={(value) => {
                 setAgeValue(value);
               }}

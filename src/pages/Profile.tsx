@@ -8,7 +8,9 @@ import { api } from "store/reducers";
 import styled from "styled-components";
 import { Modal } from "ui";
 import UserImage from "../components/UserImage";
-import VacancyCard from "../components/Vacancy/VacancyCard";
+import { VacancyCard, ResumeCard } from "components";
+import parse from 'html-react-parser';
+import { setDescriptionModal } from "store/reducers/modals";
 
 const Profile: FC = () => {
   const dispatch = useDispatch() as AppDispatch;
@@ -17,14 +19,27 @@ const Profile: FC = () => {
   const user = useSelector((state: RootState) => state.user.data);
   const [editModal, setEditModal] = useState(false);
   const [editData, setEditData] = useState({ name: "", email: "" });
+  const [imgUploading, setImgUploading] = useState(false);
 
-  const metadata = useSelector(
-    (state: RootState) => state.profile.data[id!]?.metadata
-  );
+  const metadata = useSelector((state: RootState) => {
+    if (id === user?.id) {
+      return state.user.metadata;
+    } else {
+      return state.profile.data[id!]?.metadata;
+    }
+  });
 
   const posts = useSelector(
     (state: RootState) => state.profile.data[id!]?.posts
   );
+
+  function getCard(item: any) {
+    if (metadata?.userType === "employer") {
+      <VacancyCard element={item} link={true} />;
+    } else if (metadata?.userType === "applicant") {
+      return <ResumeCard element={item} link={true} />;
+    }
+  }
 
   const isHost = user?.id === metadata?.id;
 
@@ -45,7 +60,16 @@ const Profile: FC = () => {
       }
     },
     updateImg(file: File) {
-      dispatch(api.user.metadata.updateImg(file));
+      setImgUploading(true);
+      dispatch(api.user.metadata.updateImg(file)).then(() =>
+        setImgUploading(false)
+      );
+    },
+    deleteImg() {
+      setImgUploading(true);
+      dispatch(api.user.metadata.deleteImg()).then(() =>
+        setImgUploading(false)
+      );
     },
   };
 
@@ -71,6 +95,11 @@ const Profile: FC = () => {
                   <div className="metadata-img-wrapper">
                     <div className="metadata-img">
                       <UserImage src={metadata?.img} alt={metadata?.name} />
+                      {imgUploading ? (
+                        <div className="img-loader">
+                          <div className="loader"></div>
+                        </div>
+                      ) : null}
                     </div>
                     <div className="btn-group img-btn-group">
                       <label
@@ -85,7 +114,7 @@ const Profile: FC = () => {
                         className="custom-btn secondary"
                         onClick={(e) => {
                           e.preventDefault();
-                          dispatch(api.user.metadata.deleteImg());
+                          methods.deleteImg();
                         }}
                       >
                         <span className="material-symbols-rounded icon">
@@ -168,34 +197,45 @@ const Profile: FC = () => {
             </div>
           </div>
 
-          <div className="posts">
-            <div className="btn-group">
-              {isHost ? (
-                <>
-                  <button
-                    className="custom-btn secondary"
-                    onClick={() => setEditModal(true)}
-                  >
-                    <span className="material-symbols-rounded icon custom-btn-icon">
-                      person
-                    </span>
-                    Edit profile
-                  </button>
+          <div className="btn-group">
+            {isHost ? (
+              <>
+                <button
+                  className="custom-btn secondary"
+                  onClick={() => setEditModal(true)}
+                >
+                  <span className="material-symbols-rounded icon custom-btn-icon">
+                    person
+                  </span>
+                  Edit profile
+                </button>
 
-                  <Link to={`/create`} className="custom-btn secondary">
-                    <span className="material-symbols-rounded">add</span>
-                    Add New Post
-                  </Link>
-                </>
-              ) : null}
-            </div>
+                <Link to={`/create`} className="custom-btn secondary">
+                  <span className="material-symbols-rounded">add</span>
+                  Add New Post
+                </Link>
+
+                <button
+                  className="custom-btn secondary"
+                  onClick={() => dispatch(setDescriptionModal(true))}
+                >
+                  <span className="material-symbols-rounded icon custom-btn-icon">
+                    edit_note
+                  </span>
+                  Change description
+                </button>
+              </>
+            ) : null}
+          </div>
+
+          {
+            metadata?.description && metadata?.description?.length > 0 ? <div className="description">{parse(metadata?.description)}</div> : null
+          }
+
+          <div className="posts">
             <h2 className="title">Posts</h2>
             {posts?.map((item: any, index: number) => {
-              return (
-                <div key={index}>
-                  <VacancyCard element={item} link={true} />
-                </div>
-              );
+              return <div key={index}>{getCard(item)}</div>;
             })}
           </div>
         </Content>
@@ -265,10 +305,10 @@ const Content = styled.div`
     }
   }
 
-  .posts {
-    .btn-group {
+  .btn-group {
       display: flex;
-      column-gap: 5px;
+      flex-wrap: wrap;
+      gap: 5px;
 
       .custom-btn {
         height: 35px;
@@ -277,8 +317,20 @@ const Content = styled.div`
         align-items: center;
         border-radius: 100px;
       }
-    }
+  }
 
+  .description{
+    font-size: 15px;
+    font-family: var(--font-regular);
+    color: var(--text-color);
+    margin: 15px 0;
+    padding: 15px 0;
+    border: 1px solid var(--border-color-dark);
+    border-left: none;
+    border-right: none;
+  }
+
+  .posts {
     .title {
       border-bottom: 1px solid var(--border-color-dark);
       padding-bottom: 3px;
@@ -319,17 +371,28 @@ const UserEdit = styled.div`
         .metadata-img {
           height: 120px;
           aspect-ratio: 1/1;
-          background: var(--element-background-dark);
-          border-radius: 50%;
+          position: relative;
+          border-radius: 10px;
           overflow: hidden;
           position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
 
-          .alt {
-            font-size: 40px;
-            font-family: var(--font-semiBold);
+          .img-container {
+            background: var(--element-background-dark);
+
+            &.loaded {
+              background: none;
+            }
+
+            .alt {
+              font-size: 40px;
+              font-family: var(--font-semiBold);
+            }
           }
 
-          .loading {
+          .img-loader {
             height: 100%;
             width: 100%;
             top: 0;
@@ -341,6 +404,13 @@ const UserEdit = styled.div`
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 2;
+
+            .loader {
+              height: 50px;
+              width: 50px;
+              border-color: white;
+            }
           }
         }
 
