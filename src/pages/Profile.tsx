@@ -35,7 +35,7 @@ const Profile: FC = () => {
 
   function getCard(item: any) {
     if (metadata?.userType === "employer") {
-      <VacancyCard element={item} link={true} />;
+      return <VacancyCard element={item} link={true} />;
     } else if (metadata?.userType === "applicant") {
       return <ResumeCard element={item} link={true} />;
     }

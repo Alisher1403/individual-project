@@ -490,6 +490,8 @@ const searchbar = () => {
   };
 };
 
+/******************************** HOME API *************************************/
+
 const home = () => {
   const dispatch: AppDispatch = useDispatch();
   const data = useSelector((state: RootState) => state.home);
